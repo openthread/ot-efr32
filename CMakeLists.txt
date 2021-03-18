@@ -45,6 +45,7 @@ set(OT_PLATFORM_LIB "openthread-${EFR32_PLATFORM}")
 set(OT_PLATFORM "external" CACHE STRING "disable example platforms" FORCE)
 set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls management" FORCE)
 set(OT_EXTERNAL_MBEDTLS "silabs-mbedtls" CACHE STRING "use silabs mbedtls" FORCE)
+set(OT_MBEDTLS ${OT_EXTERNAL_MBEDTLS})
 
 add_subdirectory(openthread)
 
