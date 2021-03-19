@@ -54,4 +54,5 @@ target_link_libraries(silabs-efr32mg21-sdk
         silabs-mbedtls
     PRIVATE
         ${silabs-librail}
-        ot-config)
+        ot-config
+)

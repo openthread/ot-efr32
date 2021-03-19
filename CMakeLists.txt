@@ -47,6 +47,10 @@ set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls manage
 set(OT_EXTERNAL_MBEDTLS "silabs-mbedtls" CACHE STRING "use silabs mbedtls" FORCE)
 set(OT_MBEDTLS ${OT_EXTERNAL_MBEDTLS})
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+
 add_subdirectory(openthread)
 
 target_compile_definitions(ot-config INTERFACE
@@ -54,6 +58,11 @@ target_compile_definitions(ot-config INTERFACE
     OPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-efr32-config.h"
     OPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE="openthread-core-efr32-config-check.h"
     OPENTHREAD_CONFIG_NCP_UART_ENABLE=1
+)
+
+target_compile_options(ot-config INTERFACE
+    -Wno-shadow
+    -Wno-pedantic
 )
 
 target_include_directories(ot-config INTERFACE

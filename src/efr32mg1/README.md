@@ -16,7 +16,7 @@ Download and install the [GNU toolchain for ARM Cortex-M][gnu-toolchain].
 In a Bash terminal, follow these instructions to install the GNU toolchain and other dependencies.
 
 ```bash
-$ cd <path-to-openthread>
+$ cd <path-to-ot-efr32>
 $ ./script/bootstrap
 ```
 
@@ -45,62 +45,38 @@ For more information on configuring, building, and installing applications for t
 3. Configure the path to Flex SDK source code.
 
 ```bash
-$ cd <path-to-openthread>/third_party
-$ mkdir silabs
 $ cd <path-to-Simplicity-Studio>/developer/sdks
-$ cp -rf gecko_sdk_suite <path-to-openthread>/third_party/silabs/
+$ cp -rf gecko_sdk_suite <path-to-ot-efr32>/third_party/silabs/
 ```
 
 Alternatively create a symbolic link to the Flex SDK source code.
 
 ```bash
-$ cd <path-to-openthread>/third_party
-$ mkdir silabs
-$ ln -s <path-to-Simplicity-Studio>/developer/sdks/gecko_sdk_suite silabs/gecko_sdk_suite
+$ ln -s <path-to-Simplicity-Studio>/developer/sdks/gecko_sdk_suite third_party/silabs/gecko_sdk_suite
 ```
 
 4. Build OpenThread Firmware (CLI example) on EFR32 platform.
 
 ```bash
-$ cd <path-to-openthread>
-$ ./bootstrap
-```
-
-For EFR32MG1™ Mighty Gecko Wireless Starter Kit, this can be done using both the CMake and autotools build systems
-
-**CMake (preferred)**
-
-```bash
-$ ./script/cmake-build efr32mg1 -DBOARD=brd4151a
+$ cd <path-to-ot-efr32>
+$ git submodule update --init
+$ ./script/build efr32mg1 -DBOARD=brd4151a
 ...
 -- Configuring done
 -- Generating done
--- Build files have been written to: <path-to-openthread>/build/efr32mg1
+-- Build files have been written to: <path-to-ot-efr32>/build
 + [[ -n ot-rcp ]]
 + ninja ot-rcp
-[160/160] Linking CXX executable examples/apps/ncp/ot-rcp
-+ cd <path-to-openthread>
+[160/160] Linking CXX executable bin/ot-rcp
++ cd <path-to-ot-efr32>
 ```
 
-After a successful build, the `elf` files are found in `<path-to-openthread>/build/efr32mg1/examples`.
+After a successful build, the `elf` files are found in `<path-to-ot-efr32>/build/bin`.
 
 ```bash
-# For linux
-$ find build/efr32mg1/examples -type f -executable
-build/efr32mg1/examples/apps/ncp/ot-rcp
-
-# For BSD/Darwin/mac systems
-$ find build/efr32mg1/examples -type f -perm +111
-build/efr32mg1/examples/apps/ncp/ot-rcp
+$ ls build/bin
+ot-rcp
 ```
-
-**autotools (soon to be depracated)**
-
-```bash
-$ make -f examples/Makefile-efr32mg1 BOARD=BRD4151A
-```
-After a successful build, the `elf` files are found in `<path-to-openthread>/output/efr32mg1/bin`.
-
 
 ## Flash Binaries
 
@@ -111,7 +87,7 @@ Compiled binaries may be flashed onto the EFR32 using [JLinkGDBServer][jlinkgdbs
 ```bash
 $ cd <path-to-JLinkGDBServer>
 $ sudo ./JLinkGDBServer -if swd -device EFR32MG1PxxxF256
-$ cd <path-to-openthread>/output/efr32mg1/bin
+$ cd <path-to-ot-efr32>/build/bin
 $ arm-none-eabi-gdb ot-cli-ftd
 $ (gdb) target remote 127.0.0.1:2331
 $ (gdb) load
@@ -124,7 +100,7 @@ Or Compiled binaries also may be flashed onto the specified EFR32 dev board usin
 [j-link-commander]: https://www.segger.com/products/debug-probes/j-link/tools/j-link-commander/
 
 ```bash
-$ cd <path-to-openthread>/output/efr32mg1/bin
+$ cd <path-to-ot-efr32>/build/bin
 $ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.hex
 $ JLinkExe -device EFR32MG1PxxxF256 -speed 4000 -if SWD -autoconnect 1 -SelectEmuBySN <SerialNo>
 $ J-Link>loadfile ot-cli-ftd.hex
@@ -141,7 +117,7 @@ $ JLinkExe
 Alternatively Simplicity Commander provides a graphical interface for J-Link Commander.
 
 ```bash
-$ cd <path-to-openthread>/output/efr32mg1/bin
+$ cd <path-to-ot-efr32>/build/bin
 $ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.ihex
 $ <path-to-simplicity-studio>/developer/adapter_packs/commander/commander
 ```
@@ -255,7 +231,7 @@ In the J-Link Device drop-down list select the serial number of the device to fl
 The above example demonstrates basic OpenThread capabilities. Enable more features/roles (e.g. commissioner, joiner, DHCPv6 Server/Client, etc.) by assigning compile-options before compiling.
 
 ```bash
-$ cd <path-to-openthread>
+$ cd <path-to-ot-efr32>
 $ ./bootstrap
 $ make -f examples/Makefile-efr32mg1 COMMISSIONER=1 JOINER=1 DHCP6_CLIENT=1 DHCP6_SERVER=1
 ```
