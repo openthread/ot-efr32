@@ -95,20 +95,6 @@ endif()
 # ==============================================================================
 
 # ==============================================================================
-# Filter out CFLAGS
-# ==============================================================================
-set(ignored_flags
-    "-pedantic-errors"  # Needed for RAIL lib
-    "-Wshadow"          # Needed for RAIL lib
-)
-
-foreach(flag IN LISTS ignored_flags)
-    string(REPLACE "${flag}" "" OT_CFLAGS "${OT_CFLAGS}")
-endforeach()
-list(APPEND EFR32_CFLAGS ${OT_CFLAGS})
-set(OT_CFLAGS ${OT_CFLAGS} PARENT_SCOPE)
-
-# ==============================================================================
 # Platform targets
 # ==============================================================================
 set(EFR32_COMMON_3RD_LIBS
