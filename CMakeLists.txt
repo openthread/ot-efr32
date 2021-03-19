@@ -56,6 +56,11 @@ target_compile_definitions(ot-config INTERFACE
     OPENTHREAD_CONFIG_NCP_UART_ENABLE=1
 )
 
+target_compile_options(ot-config INTERFACE
+    -Wno-shadow
+    -Wno-pedantic
+)
+
 target_include_directories(ot-config INTERFACE
     ${PROJECT_SOURCE_DIR}/src/src
     ${PROJECT_SOURCE_DIR}/src/${EFR32_PLATFORM}
