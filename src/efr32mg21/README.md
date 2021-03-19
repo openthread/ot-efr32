@@ -18,7 +18,7 @@ Download and install the [GNU toolchain for ARM Cortex-M][gnu-toolchain].
 In a Bash terminal, follow these instructions to install the GNU toolchain and other dependencies.
 
 ```bash
-$ cd <path-to-openthread>
+$ cd <path-to-efr32>
 $ ./script/bootstrap
 ```
 
@@ -48,77 +48,50 @@ For more information on configuring, building, and installing applications for t
 
 ```bash
 $ cd <path-to-Simplicity-Studio>/developer/sdks
-$ cp -rf gecko_sdk_suite <path-to-openthread>/third_party/silabs/
+$ cp -rf gecko_sdk_suite <path-to-efr32>/third_party/silabs/
 ```
 
 Alternatively create a symbolic link to the Flex SDK source code.
 
 ```bash
-$ cd <path-to-openthread>/third_party
-$ ln -s <path-to-Simplicity-Studio>/developer/sdks/gecko_sdk_suite silabs/gecko_sdk_suite
+$ ln -s <path-to-Simplicity-Studio>/developer/sdks/gecko_sdk_suite third_party/silabs/gecko_sdk_suite
 ```
 
 4. Build OpenThread Firmware (CLI example) on EFR32 platform.
 
 ```bash
-$ cd <path-to-openthread>
-$ ./bootstrap
-```
-
-For EFR32MG21™ Mighty Gecko Wireless Starter Kit, this can be done using both the CMake and autotools build systems
-
-**CMake (preferred)**
-
-```bash
-$ ./script/cmake-build efr32mg21 -DBOARD=brd4180b
+$ cd <path-to-efr32>
+$ git submodule update --init
+$ ./script/build efr32mg21 -DBOARD=brd4180b
 ...
 -- Configuring done
 -- Generating done
--- Build files have been written to: <path-to-openthread>/build/efr32mg21
+-- Build files have been written to: <path-to-efr32>/build
 + [[ -n ot-rcp ot-cli-ftd ot-cli-mtd ot-ncp-ftd ot-ncp-mtd sleepy-demo-ftd sleepy-demo-mtd ]]
 + ninja ot-rcp ot-cli-ftd ot-cli-mtd ot-ncp-ftd ot-ncp-mtd sleepy-demo-ftd sleepy-demo-mtd
-[940/940] Linking CXX executable examples/apps/ncp/ot-ncp-ftd
-+ cd <path-to-openthread>
+[940/940] Linking CXX executable bin/ot-ncp-ftd
++ cd <path-to-efr32>
 ```
 
-After a successful build, the `elf` files are found in `<path-to-openthread>/build/efr32mg21/examples`.
+After a successful build, the `elf` files are found in `<path-to-efr32>/build/bin`.
 
 ```bash
-# For linux
-$ find build/efr32mg21/examples -type f -executable
-build/efr32mg21/examples/apps/cli/ot-cli-mtd
-build/efr32mg21/examples/apps/cli/ot-cli-ftd
-build/efr32mg21/examples/apps/ncp/ot-ncp-ftd
-build/efr32mg21/examples/apps/ncp/ot-ncp-mtd
-build/efr32mg21/examples/apps/ncp/ot-rcp
-build/efr32mg21/examples/platforms/efr32/sleepy-demo/sleepy-demo-ftd/sleepy-demo-ftd
-build/efr32mg21/examples/platforms/efr32/sleepy-demo/sleepy-demo-mtd/sleepy-demo-mtd
-
-# For BSD/Darwin/mac systems
-$ find build/efr32mg21/examples -type f -perm +111
-build/efr32mg21/examples/apps/cli/ot-cli-mtd
-build/efr32mg21/examples/apps/cli/ot-cli-ftd
-build/efr32mg21/examples/apps/ncp/ot-ncp-ftd
-build/efr32mg21/examples/apps/ncp/ot-ncp-mtd
-build/efr32mg21/examples/apps/ncp/ot-rcp
-build/efr32mg21/examples/platforms/efr32/sleepy-demo/sleepy-demo-ftd/sleepy-demo-ftd
-build/efr32mg21/examples/platforms/efr32/sleepy-demo/sleepy-demo-mtd/sleepy-demo-mtd
+$ ls build/bin
+ot-cli-mtd
+ot-cli-ftd
+ot-ncp-ftd
+ot-ncp-mtd
+ot-rcp
+sleepy-demo-ftd
+sleepy-demo-mtd
 ```
-
-**autotools (soon to be depracated)**
-
-```bash
-$ make -f examples/Makefile-efr32mg21 BOARD=BRD4180A
-```
-
-After a successful build, the `elf` files are found in `<path-to-openthread>/output/efr32mg21/bin`.
 
 ## Flash Binaries
 
 Simplicity Commander provides a graphical interface for J-Link Commander.
 
 ```bash
-$ cd <path-to-openthread>/output/efr32mg21/bin
+$ cd <path-to-efr32>/build/bin
 $ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.hex
 $ <path-to-simplicity-studio>/developer/adapter_packs/commander/commander
 ```
@@ -216,7 +189,7 @@ Done
 The above example demonstrates basic OpenThread capabilities. Enable more features/roles (e.g. commissioner, joiner, DHCPv6 Server/Client, etc.) by assigning compile-options before compiling.
 
 ```bash
-$ cd <path-to-openthread>
+$ cd <path-to-efr32>
 $ ./bootstrap
 $ make -f examples/Makefile-efr32mg21 COMMISSIONER=1 JOINER=1 DHCP6_CLIENT=1 DHCP6_SERVER=1
 ```
