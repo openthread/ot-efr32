@@ -28,6 +28,7 @@
 
 add_executable(sleepy-demo-mtd
     main.c
+    ${PROJECT_SOURCE_DIR}/openthread/examples/apps/cli/cli_uart.cpp
 )
 
 target_include_directories(sleepy-demo-mtd PRIVATE ${COMMON_INCLUDES})
