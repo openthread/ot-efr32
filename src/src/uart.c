@@ -36,7 +36,7 @@
 
 #include "openthread-system.h"
 #include <openthread-core-config.h>
-#include <openthread/platform/uart.h>
+#include "utils/uart.h"
 
 #include "utils/code_utils.h"
 

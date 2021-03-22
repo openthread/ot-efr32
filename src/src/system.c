@@ -39,7 +39,7 @@
 #include <string.h>
 
 #include "openthread-system.h"
-#include <openthread/platform/uart.h>
+#include "utils/uart.h"
 
 #include "common/logging.hpp"
 
