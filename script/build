@@ -49,7 +49,7 @@ die()
 
 build()
 {
-    local builddir="${OT_CMAKE_BUILD_DIR:-build}"
+    local builddir="${OT_CMAKE_BUILD_DIR:-build/${platform}}"
 
     mkdir -p "${builddir}"
     cd "${builddir}"
@@ -98,7 +98,7 @@ main()
             OT_CMAKE_NINJA_TARGET+=("sleepy-demo-ftd" "sleepy-demo-mtd")
             ;;
     esac
-    
+
     options+=("$@")
     build -DEFR32_PLATFORM="${platform}" "${options[@]}"
 }
