@@ -39,9 +39,9 @@
 #include <string.h>
 
 #include "openthread-system.h"
-#include <openthread/platform/uart.h>
 
 #include "common/logging.hpp"
+#include "utils/uart.h"
 
 #include "bsp.h"
 #include "bsp_init.h"
