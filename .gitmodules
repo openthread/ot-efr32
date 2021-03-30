@@ -1,3 +1,6 @@
 [submodule "openthread"]
 	path = openthread
 	url = https://github.com/openthread/openthread.git
+[submodule "third_party/silabs/sdk_support"]
+	path = third_party/silabs/sdk_support
+	url = https://github.com/SiliconLabs/sdk_support.git

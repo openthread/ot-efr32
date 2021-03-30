@@ -49,7 +49,7 @@ die()
 
 build()
 {
-    local builddir="${OT_CMAKE_BUILD_DIR:-build}"
+    builddir="${OT_CMAKE_BUILD_DIR:-build/${platform}}"
 
     mkdir -p "${builddir}"
     cd "${builddir}"
@@ -63,6 +63,18 @@ build()
     fi
 
     cd "${OT_SRCDIR}"
+}
+
+create_srec()
+{
+        if [ "$(uname)" = 'Linux' ]
+        then
+                EXECUTABLE="-executable"
+        elif [ "$(uname)" = 'Darwin' ]
+        then
+                EXECUTABLE="-perm +111"
+        fi
+        find $1 -type f $EXECUTABLE -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
 }
 
 main()
@@ -98,9 +110,10 @@ main()
             OT_CMAKE_NINJA_TARGET+=("sleepy-demo-ftd" "sleepy-demo-mtd")
             ;;
     esac
-    
+
     options+=("$@")
     build -DEFR32_PLATFORM="${platform}" "${options[@]}"
+    create_srec ${builddir}
 }
 
 main "$@"

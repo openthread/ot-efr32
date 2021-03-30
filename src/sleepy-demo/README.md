@@ -9,20 +9,18 @@ For setting up the build environment refer to [examples/platforms/efr32/README.m
 In this `README`, all example commands will be targeting the `efr32mg12` platform. The same commands should work for the other `efr32` platforms
 
 ```bash
-$ cd <path-to-openthread>
-$ ./bootstrap
-$ make -f examples/Makefile-efr32mg12 COMMISSIONER=1 JOINER=1 DHCP6_CLIENT=1 DHCP6_SERVER=1 BOARD=BRD4161A
+$ cd <path-to-ot-efr32>
+$ ./script/build efr32mg12 -DBOARD=brd4161a
 ```
 
-Convert the resulting executables into S-Record format and append a s37 suffix.
+The build script will convert the resulting executables into S-Record format and append a s37 suffix.
 
 ```bash
-$ cd output/efr32mg12/bin
-$ arm-none-eabi-objcopy -O srec sleepy-demo-mtd sleepy-demo-mtd.s37
-$ arm-none-eabi-objcopy -O srec sleepy-demo-ftd sleepy-demo-ftd.s37
+$ ls build/efr32mg12/bin/sleepy*
+build/efr32mg12/bin/sleepy-demo-ftd  build/efr32mg12/bin/sleepy-demo-ftd.s37  build/efr32mg12/bin/sleepy-demo-mtd  build/efr32mg12/bin/sleepy-demo-mtd.s37
 ```
 
-In Silicon Labs Simplicity Studio flash one device with the sleepy-demo-mtd.s37 image and the other device with the sleepy-demo-ftd.s37 image.
+In Silicon Labs Simplicity Studio flash one device with the `sleepy-demo-mtd.s37` image and the other device with the `sleepy-demo-ftd.s37` image.
 
 For instructions on flashing firmware, see [examples/platforms/efr32/README.md](../README.md#flash-binaries)
 
