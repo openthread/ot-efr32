@@ -32,8 +32,7 @@ string(TOUPPER "${EFR32_PLATFORM}" PLATFORM_UPPERCASE)
 string(TOLOWER "${BOARD}" BOARD_LOWERCASE)
 string(TOUPPER "${BOARD}" BOARD_UPPERCASE)
 
-set(SILABS_GSDK_VERSION 3.1)
-set(SILABS_GSDK_DIR ${PROJECT_SOURCE_DIR}/third_party/silabs/gecko_sdk_suite/v${SILABS_GSDK_VERSION})
+set(SILABS_GSDK_DIR ${PROJECT_SOURCE_DIR}/third_party/silabs/sdk_support)
 
 # Check if GSDK exists
 if(NOT EXISTS "${SILABS_GSDK_DIR}")

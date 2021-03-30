@@ -24,40 +24,8 @@ $ ./script/bootstrap
 
 ## Build Examples
 
-1. Download and install the [Simplicity Studio][simplicity_studio].
-
-[simplicity_studio]: http://www.silabs.com/products/development-tools/software/simplicity-studio
-
-2. Install Flex (Gecko) SDK including RAIL Library from Simplicity Studio.
-   - Connect EFR32MG21 Wireless Starter Kit to Simplicity Studio.
-   - Find Flex SDK v3.1 in the Software Update page and click Install.
-   - Flex SDK v3.1 will be installed in the path:
-     - Mac
-       - `/Applications/Simplicity\ Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite`
-     - Windows
-       - `C:\SiliconLabs\SimplicityStudio\v5\developer\sdks\gecko_sdk_suite`
-     - Linux
-       - `./SimplicityStudio_v5/developer/sdks/gecko_sdk_suite`
-
-For more information on configuring, building, and installing applications for the Wireless Gecko (EFR32) portfolio using FLEX, see [Getting Started with the Silicon Labs Flex Software Development Kit for the Wireless Gecko (EFR32™) Portfolio][qsg138]. For more information on RAIL, see [Radio Abstraction Interface Layer][rail].
-
-[qsg138]: https://www.silabs.com/documents/public/quick-start-guides/qsg138-flex-efr32.pdf
-[rail]: http://www.silabs.com/products/development-tools/software/radio-abstraction-interface-layer-sdk
-
-3. Configure the path to Flex SDK source code.
-
-```bash
-$ cd <path-to-Simplicity-Studio>/developer/sdks
-$ cp -rf gecko_sdk_suite <path-to-efr32>/third_party/silabs/
-```
-
-Alternatively create a symbolic link to the Flex SDK source code.
-
-```bash
-$ ln -s <path-to-Simplicity-Studio>/developer/sdks/gecko_sdk_suite third_party/silabs/gecko_sdk_suite
-```
-
-4. Build OpenThread Firmware (CLI example) on EFR32 platform.
+Before building example apps, make sure to initialize all submodules. Afterward,
+the build may be launched using `./script/build`
 
 ```bash
 $ cd <path-to-efr32>
@@ -73,17 +41,12 @@ $ ./script/build efr32mg21 -DBOARD=brd4180b
 + cd <path-to-efr32>
 ```
 
-After a successful build, the `elf` files are found in `<path-to-efr32>/build/bin`.
+After a successful build, the `elf` files are found in `<path-to-efr32>/build/efr32mg21/bin`.
 
 ```bash
-$ ls build/bin
-ot-cli-mtd
-ot-cli-ftd
-ot-ncp-ftd
-ot-ncp-mtd
-ot-rcp
-sleepy-demo-ftd
-sleepy-demo-mtd
+$ ls build/efr32mg21/bin
+ot-cli-ftd      ot-cli-mtd      ot-ncp-ftd      ot-ncp-mtd      ot-rcp      sleepy-demo-ftd      sleepy-demo-mtd
+ot-cli-ftd.s37  ot-cli-mtd.s37  ot-ncp-ftd.s37  ot-ncp-mtd.s37  ot-rcp.s37  sleepy-demo-ftd.s37  sleepy-demo-mtd.s37
 ```
 
 ## Flash Binaries
@@ -91,8 +54,6 @@ sleepy-demo-mtd
 Simplicity Commander provides a graphical interface for J-Link Commander.
 
 ```bash
-$ cd <path-to-efr32>/build/bin
-$ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.hex
 $ <path-to-simplicity-studio>/developer/adapter_packs/commander/commander
 ```
 
@@ -190,8 +151,7 @@ The above example demonstrates basic OpenThread capabilities. Enable more featur
 
 ```bash
 $ cd <path-to-efr32>
-$ ./bootstrap
-$ make -f examples/Makefile-efr32mg21 COMMISSIONER=1 JOINER=1 DHCP6_CLIENT=1 DHCP6_SERVER=1
+$ ./script/build efr32mg21 -DBOARD=brd4180b -DOT_COMMISSIONER=ON -DOT_JOINER=ON -DOT_DHCP6_CLIENT=ON -DOT_DHCP6_SERVER=ON
 ```
 
 For a list of all available commands, visit [OpenThread CLI Reference README.md][cli].
