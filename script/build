@@ -67,14 +67,12 @@ build()
 
 create_srec()
 {
-        if [ "$(uname)" = 'Linux' ]
-        then
-                EXECUTABLE="-executable"
-        elif [ "$(uname)" = 'Darwin' ]
-        then
-                EXECUTABLE="-perm +111"
-        fi
-        find $1 -type f $EXECUTABLE -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
+    if [ "$(uname)" = 'Linux' ]; then
+        EXECUTABLE="-executable"
+    elif [ "$(uname)" = 'Darwin' ]; then
+        EXECUTABLE="-perm +111"
+    fi
+    find "$1" -type f "$EXECUTABLE" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
 }
 
 main()
@@ -88,7 +86,6 @@ main()
     echo "${EFR32_PLATFORMS[@]}" | grep -wq "${platform}" || die "Unsupported platform ${platform}"
     shift
 
-    local local_options=()
     local options=("${OT_OPTIONS[@]}")
 
     options+=("-DCMAKE_TOOLCHAIN_FILE=src/${platform}/arm-none-eabi.cmake")
@@ -113,7 +110,7 @@ main()
 
     options+=("$@")
     build -DEFR32_PLATFORM="${platform}" "${options[@]}"
-    create_srec ${builddir}
+    create_srec "${builddir}"
 }
 
 main "$@"
