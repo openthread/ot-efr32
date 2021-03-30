@@ -27,13 +27,17 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
+# shellcheck disable=SC2034  # Unused variables left for readability
+
 set -euxo pipefail
 
 OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET:-}
 
 script_dir="$(dirname "$(realpath "$0")")"
-repo_dir="$(dirname $script_dir)"
-source $script_dir/efr32-definitions
+repo_dir="$(dirname "$script_dir")"
+
+# shellcheck source=script/efr32-definitions
+source "$script_dir/efr32-definitions"
 
 readonly OT_OPTIONS=(
     "-DCMAKE_BUILD_TYPE=MinSizeRel"
@@ -73,7 +77,7 @@ create_srec()
     elif [ "$(uname)" = 'Darwin' ]; then
         EXECUTABLE="-perm +111"
     fi
-    find $1 -type f $EXECUTABLE -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
+    find "$1" -type f "$EXECUTABLE" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
 }
 
 main()
@@ -112,7 +116,7 @@ main()
 
     options+=("$@")
     build -DEFR32_PLATFORM="${platform}" "${options[@]}"
-    create_srec ${builddir}
+    create_srec "${builddir}"
 }
 
 main "$@"
