@@ -81,7 +81,7 @@ void mtdReceiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo
  *
  * @param[in]  aInstance  The OpenThread instance structure.
  *
-*/
+ */
 extern void otAppCliInit(otInstance *aInstance);
 
 // Variables
