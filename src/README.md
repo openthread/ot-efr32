@@ -1,4 +1,18 @@
-# OpenThread on EFR32MG12 Example
+# OpenThread on EFR32
+
+##### Table of Contents
+* [Prerequisites](#prerequisites)
+  * [Toolchain](#toolchain)
+  * [Flashing and debugging tools](#flash-debug)
+* [Build examples](#build)
+* [Flash](#flash)
+  * [Simplicity Commander](#simplicity-commander)
+  * [J-Link GDB Server](#jlinkgdbserver)
+* [Run the example with EFR32 boards](#example)
+* [Additional features](#additional-features)
+* [Verification](#verification)
+
+---
 
 This directory contains example platform drivers for the [Silicon Labs EFR32MG12][efr32mg] based on [EFR32™ Mighty Gecko Wireless Starter Kit][slwstk6000b] or [Thunderboard™ Sense 2 Sensor-to-Cloud Advanced IoT Development Kit][sltb004a].
 
@@ -6,26 +20,44 @@ This directory contains example platform drivers for the [Silicon Labs EFR32MG12
 [slwstk6000b]: http://www.silabs.com/products/development-tools/wireless/mesh-networking/mighty-gecko-starter-kit
 [sltb004a]: https://www.silabs.com/products/development-tools/thunderboard/thunderboard-sense-two-kit
 
-The example platform drivers are intended to present the minimal code necessary to support OpenThread. [EFR32MG12P SoC][efr32mg12p] has rich memory and peripheral resources which can support all OpenThread capabilities. See the "Run the example with EFR32MG12 boards" section below for an example using basic OpenThread capabilities.
+The example platform drivers are intended to present the minimal code necessary to support OpenThread. [EFR32MG][efr32mg] has rich memory and peripheral resources which can support all OpenThread capabilities.
 
 See [sleepy-demo/README.md](sleepy-demo/README.md) for instructions for an example that uses the low-energy modes of the EFR32MG12 when running as a Sleepy End Device.
 
-[efr32mg12p]: http://www.silabs.com/products/wireless/mesh-networking/efr32mg-mighty-gecko-zigbee-thread-soc/device.EFR32MG12P432F1024GL125
 
-## Toolchain
+<a name="prerequisites"/>
+
+## Prerequisites
+
+<a name="toolchain"/>
+
+### Toolchain
 
 Download and install the [GNU toolchain for ARM Cortex-M][gnu-toolchain].
 
 [gnu-toolchain]: https://developer.arm.com/open-source/gnu-toolchain/gnu-rm
 
-In a Bash terminal, follow these instructions to install the GNU toolchain and other dependencies.
+In a `bash` terminal, follow these instructions to install the GNU toolchain and other dependencies.
 
 ```bash
 $ cd <path-to-ot-efr32>
 $ ./script/bootstrap
 ```
 
-## Build Examples
+<a name="flash-debug"/>
+
+## Flashing and debugging tools
+Install [Simplicity Studio][simplicity-studio] to flash, debug, and make use of logging features with SEGGER J-Link.
+
+[simplicity-studio]: https://www.silabs.com/developers/simplicity-studio
+
+
+Alternatively, the [J-Link][j-link] software pack can be used to flash and debug.
+
+
+<a name="build"/>
+
+## Build examples
 
 Before building example apps, make sure to initialize all submodules. Afterward,
 the build may be launched using `./script/build`
@@ -52,15 +84,49 @@ ot-cli-ftd      ot-cli-mtd      ot-ncp-ftd      ot-ncp-mtd      ot-rcp      slee
 ot-cli-ftd.s37  ot-cli-mtd.s37  ot-ncp-ftd.s37  ot-ncp-mtd.s37  ot-rcp.s37  sleepy-demo-ftd.s37  sleepy-demo-mtd.s37
 ```
 
-## Flash Binaries
 
-Compiled binaries may be flashed onto the EFR32 using [JLinkGDBServer][jlinkgdbserver]. EFR32 Starter kit mainboard integrates an on-board SEGGER J-Link debugger.
+<a name="flash"/>
+
+## Flash Binaries
+Compiled binaries may be flashed onto the EFR32 using various tools from the [J-Link][[j-link] software pack. EFR32 Starter kit mainboard integrates an on-board SEGGER J-Link debugger.
+
+
+<a name="simplicity-commander"/>
+
+### Simplicity Commander
+
+Simplicity Commander provides a graphical interface for J-Link Commander. It's included as part of [Simplicity Studio][simplicity-studio] and is also available as a [standalone application][simplicity-commander]
+
+[simplicity-commander]: https://www.silabs.com/mcu/programming-options#programming
+
+```bash
+$ <path-to-simplicity-studio>/developer/adapter_packs/commander/commander
+```
+
+In the J-Link Device drop-down list select the serial number of the device to flash. Click the Adapter Connect button. Ensure the Debug Interface drop-down list is set to SWD and click the Target Connect button. Click on the Flash icon on the left side of the window to switch to the flash page. In the Flash MCU pane enter the path of the ot-cli-ftd.s37 file or choose the file with the Browse... button. Click the Flash button located under the Browse... button.
+
+For more information see [UG162: Simplicity Commander Reference][UG162]
+
+[UG162]: https://www.silabs.com/documents/public/user-guides/ug162-simplicity-commander-reference-guide.pdf
+
+
+<a name="jlinkgdbserver"/>
+
+### J-Link GDB Server
+Compiled binaries also may be flashed onto the specified EFR32 dev board using [J-LinkGDBServer][jlinkgdbserver].
 
 [jlinkgdbserver]: https://www.segger.com/jlink-gdb-server.html
 
+| Platform  | EFR32 Device      |
+|-----------|-------------------|
+| EFR32MG1  | EFR32MG1PxxxF256  |
+| EFR32MG12 | EFR32MG12PxxxF1024|
+| EFR32MG12 | EFR32MG13PxxxF1024|
+| EFR32MG21 | EFR32MG21AxxxF1024|
+
 ```bash
 $ cd <path-to-JLinkGDBServer>
-$ sudo ./JLinkGDBServer -if swd -device EFR32MG12PxxxF1024
+$ sudo ./JLinkGDBServer -if swd -device <efr32-device>
 $ cd <path-to-ot-efr32>/build/bin
 $ arm-none-eabi-gdb ot-cli-ftd
 $ (gdb) target remote 127.0.0.1:2331
@@ -69,16 +135,21 @@ $ (gdb) monitor reset
 $ (gdb) c
 ```
 
-Note: Support for the "EFR32MG12PxxxF1024" device was added to JLinkGDBServer V6.14d.
-
-Or Compiled binaries also may be flashed onto the specified EFR32 dev board using [J-Link Commander][j-link-commander].
+### J-Link Commander
+Compiled binaries also may be flashed onto the specified EFR32 dev board using [J-Link Commander][j-link-commander].
 
 [j-link-commander]: https://www.segger.com/products/debug-probes/j-link/tools/j-link-commander/
 
+| Platform  | EFR32 Device      |
+|-----------|-------------------|
+| EFR32MG1  | EFR32MG1PxxxF256  |
+| EFR32MG12 | EFR32MG12PxxxF1024|
+| EFR32MG12 | EFR32MG13PxxxF1024|
+| EFR32MG21 | EFR32MG21AxxxF1024|
 ```bash
 $ cd <path-to-ot-efr32>/build/bin
 $ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.hex
-$ JLinkExe -device EFR32MG12PxxxF1024 -speed 4000 -if SWD -autoconnect 1 -SelectEmuBySN <SerialNo>
+$ JLinkExe -device <efr32-device> -speed 4000 -if SWD -autoconnect 1 -SelectEmuBySN <SerialNo>
 $ J-Link>loadfile ot-cli-ftd.hex
 $ J-Link>r
 $ J-Link>q
@@ -90,15 +161,10 @@ Note: SerialNo is J-Link serial number. Use the following command to get the ser
 $ JLinkExe
 ```
 
-Alternatively Simplicity Commander provides a graphical interface for J-Link Commander.
 
-```bash
-$ <path-to-simplicity-studio>/developer/adapter_packs/commander/commander
-```
+<a name="example"/>
 
-In the J-Link Device drop-down list select the serial number of the device to flash. Click the Adapter Connect button. Ensure the Debug Interface drop-down list is set to SWD and click the Target Connect button. Click on the Flash icon on the left side of the window to switch to the flash page. In the Flash MCU pane enter the path of the ot-cli-ftd.s37 file or choose the file with the Browse... button. Click the Flash button located under the Browse... button.
-
-## Run the example with EFR32MG12 boards
+## Run the example with EFR32 boards
 
 1. Flash two EFR32 boards with the `CLI example` firmware (as shown above).
 2. Open terminal to first device `/dev/ttyACM0` (serial port settings: 115200 8-N-1). Type `help` for a list of commands.
@@ -202,16 +268,25 @@ In the J-Link Device drop-down list select the serial number of the device to fl
    16 bytes from fd3d:b50b:f96d:722d:558:f56b:d688:799: icmp_seq=1 hlim=64 time=24ms
    ```
 
+
+For a list of all available commands, visit [OpenThread CLI Reference README.md][cli].
+
+[cli]: https://github.com/openthread/openthread/blob/main/src/cli/README.md
+
+
+<a name="additional-features"/>
+
+## Additional features
 The above example demonstrates basic OpenThread capabilities. Enable more features/roles (e.g. commissioner, joiner, DHCPv6 Server/Client, etc.) by assigning compile-options before compiling.
 
+**Example** Building efr32mg12 for board `brd4161a` with some more features/roles enabled
 ```bash
 $ cd <path-to-ot-efr32>
 $ ./script/build efr32mg12 -DBOARD=brd4161a -DOT_COMMISSIONER=ON -DOT_JOINER=ON -DOT_DHCP6_CLIENT=ON -DOT_DHCP6_SERVER=ON
 ```
 
-For a list of all available commands, visit [OpenThread CLI Reference README.md][cli].
 
-[cli]: https://github.com/openthread/openthread/blob/main/src/cli/README.md
+<a name="verification"/>
 
 ## Verification
 
