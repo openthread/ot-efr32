@@ -30,6 +30,8 @@ name: Build
 
 on:
   push:
+    branches-ignore:
+      - 'dependabot/**'
   pull_request:
     branches:
       - 'main'
@@ -53,7 +55,7 @@ jobs:
     - name: Bootstrap
       run: |
         sudo rm /etc/apt/sources.list.d/* && sudo apt-get update
-        sudo apt-get --no-install-recommends install -y clang-format-9 clang-tidy-9 shellcheck
+        sudo apt-get --no-install-recommends install -y clang-format-9 shellcheck
         python3 -m pip install yapf==0.29.0
         sudo snap install shfmt
     - name: Check
@@ -66,12 +68,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - gcc_ver: 4
-            gcc_download_url: https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2
-            gcc_extract_dir: gcc-arm-none-eabi-4_9-2015q3
-          - gcc_ver: 5
-            gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/5_4-2016q3/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2
-            gcc_extract_dir: gcc-arm-none-eabi-5_4-2016q3
           - gcc_ver: 6
             gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/6-2017q2/gcc-arm-none-eabi-6-2017-q2-update-linux.tar.bz2
             gcc_extract_dir: gcc-arm-none-eabi-6-2017-q2-update

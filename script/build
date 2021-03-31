@@ -91,7 +91,6 @@ main()
     echo "${efr32_platforms[@]}" | grep -wq "${platform}" || die "Unsupported platform ${platform}"
     shift
 
-    local local_options=()
     local options=("${OT_OPTIONS[@]}")
 
     options+=("-DCMAKE_TOOLCHAIN_FILE=src/${platform}/arm-none-eabi.cmake")
