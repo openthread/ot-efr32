@@ -9,7 +9,7 @@
 
 This repo contains example platform drivers for the [Silicon Labs EFR32 Mighty Gecko][efr32mg].
 
-[efr32mg]: http://www.silabs.com/products/wireless/mesh-networking/efr32mg-mighty-gecko-zigbee-thread-soc
+[efr32mg]: https://www.silabs.com/support/getting-started/mesh-networking/thread/mighty-gecko
 
 The example platform drivers are intended to present the minimal code necessary to support OpenThread.
 

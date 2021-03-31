@@ -18,7 +18,7 @@
 
 This directory contains example platform drivers for the [Silicon Labs EFR32MG12][efr32mg] based on [EFR32™ Mighty Gecko Wireless Starter Kit][slwstk6000b] or [Thunderboard™ Sense 2 Sensor-to-Cloud Advanced IoT Development Kit][sltb004a].
 
-[efr32mg]: http://www.silabs.com/products/wireless/mesh-networking/efr32mg-mighty-gecko-zigbee-thread-soc
+[efr32mg]: https://www.silabs.com/support/getting-started/mesh-networking/thread/mighty-gecko
 [slwstk6000b]: http://www.silabs.com/products/development-tools/wireless/mesh-networking/mighty-gecko-starter-kit
 [sltb004a]: https://www.silabs.com/products/development-tools/thunderboard/thunderboard-sense-two-kit
 
