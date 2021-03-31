@@ -1,6 +1,7 @@
 #!/bin/bash
-# shellcheck disable=SC2034  # $efr32_platforms is unused in this file,
-#                              which causes a false positive for this check
+# shellcheck disable=SC2034  # $efr32_platforms is unused in this file, but is
+#                              used by scripts which source this file, which
+#                              causes a false positive for this check
 
 readonly efr32_platforms=(efr32mg1 efr32mg12 efr32mg13 efr32mg21)
 script_dir="$(dirname "$(realpath "$0")")"
