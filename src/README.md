@@ -119,6 +119,8 @@ Compiled binaries also may be flashed onto the specified EFR32 dev board using [
 
 [jlinkgdbserver]: https://www.segger.com/jlink-gdb-server.html
 
+
+<a name="jlink-efr32-devices"/>
 | Platform  | EFR32 Device      |
 |-----------|-------------------|
 | EFR32MG1  | EFR32MG1PxxxF256  |
@@ -145,12 +147,8 @@ Compiled binaries also may be flashed onto the specified EFR32 dev board using [
 
 [j-link-commander]: https://www.segger.com/products/debug-probes/j-link/tools/j-link-commander/
 
-| Platform  | EFR32 Device      |
-|-----------|-------------------|
-| EFR32MG1  | EFR32MG1PxxxF256  |
-| EFR32MG12 | EFR32MG12PxxxF1024|
-| EFR32MG12 | EFR32MG13PxxxF1024|
-| EFR32MG21 | EFR32MG21AxxxF1024|
+Refer to the [table](#jlink-efr32-devices) above for which value to use for `<efr32-device>`
+
 ```bash
 $ cd <path-to-ot-efr32>/build/bin
 $ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.hex
