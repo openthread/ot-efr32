@@ -4,10 +4,11 @@
 * [Prerequisites](#prerequisites)
   * [Toolchain](#toolchain)
   * [Flashing and debugging tools](#flash-debug)
-* [Build examples](#build)
-* [Flash](#flash)
+* [Building examples](#build)
+* [Flashing binaries](#flash)
   * [Simplicity Commander](#simplicity-commander)
-  * [J-Link GDB Server](#jlinkgdbserver)
+  * [J-Link GDB Server](#jlink-gdb-server)
+  * [J-Link Commander](#jlink-commander)
 * [Run the example with EFR32 boards](#example)
 * [Additional features](#additional-features)
 * [Verification](#verification)
@@ -22,7 +23,7 @@ This directory contains example platform drivers for the [Silicon Labs EFR32MG12
 
 The example platform drivers are intended to present the minimal code necessary to support OpenThread. [EFR32MG][efr32mg] has rich memory and peripheral resources which can support all OpenThread capabilities.
 
-See [sleepy-demo/README.md](sleepy-demo/README.md) for instructions for an example that uses the low-energy modes of the EFR32MG12 when running as a Sleepy End Device.
+See [EFR32 Sleepy Demo Example](./sleepy-demo/README.md) for instructions for an example that uses the low-energy modes of the EFR32MG12 when running as a Sleepy End Device.
 
 
 <a name="prerequisites"/>
@@ -52,12 +53,13 @@ Install [Simplicity Studio][simplicity-studio] to flash, debug, and make use of 
 [simplicity-studio]: https://www.silabs.com/developers/simplicity-studio
 
 
-Alternatively, the [J-Link][j-link] software pack can be used to flash and debug.
+Alternatively, the [J-Link][jlink-software-pack] software pack can be used to flash and debug.
 
+[jlink-software-pack]: https://www.segger.com/downloads/jlink/#J-LinkSoftwareAndDocumentationPack
 
 <a name="build"/>
 
-## Build examples
+## Building examples
 
 Before building example apps, make sure to initialize all submodules. Afterward,
 the build may be launched using `./script/build`
@@ -87,7 +89,7 @@ ot-cli-ftd.s37  ot-cli-mtd.s37  ot-ncp-ftd.s37  ot-ncp-mtd.s37  ot-rcp.s37  slee
 
 <a name="flash"/>
 
-## Flash Binaries
+## Flashing Binaries
 Compiled binaries may be flashed onto the EFR32 using various tools from the [J-Link][[j-link] software pack. EFR32 Starter kit mainboard integrates an on-board SEGGER J-Link debugger.
 
 
@@ -110,7 +112,7 @@ For more information see [UG162: Simplicity Commander Reference][UG162]
 [UG162]: https://www.silabs.com/documents/public/user-guides/ug162-simplicity-commander-reference-guide.pdf
 
 
-<a name="jlinkgdbserver"/>
+<a name="jlink-gdb-server"/>
 
 ### J-Link GDB Server
 Compiled binaries also may be flashed onto the specified EFR32 dev board using [J-LinkGDBServer][jlinkgdbserver].
@@ -134,6 +136,9 @@ $ (gdb) load
 $ (gdb) monitor reset
 $ (gdb) c
 ```
+
+
+<a name="jlink-commander"/>
 
 ### J-Link Commander
 Compiled binaries also may be flashed onto the specified EFR32 dev board using [J-Link Commander][j-link-commander].
@@ -269,7 +274,7 @@ $ JLinkExe
    ```
 
 
-For a list of all available commands, visit [OpenThread CLI Reference README.md][cli].
+For a list of all available commands, visit [OpenThread CLI Reference][cli].
 
 [cli]: https://github.com/openthread/openthread/blob/main/src/cli/README.md
 
