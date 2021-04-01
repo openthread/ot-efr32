@@ -63,13 +63,13 @@ Alternatively, the [J-Link][jlink-software-pack] software pack can be used to fl
 
 Before building example apps, make sure to initialize all submodules. Afterward, the build can be launched using `./script/build`.
 
-To see which platforms are supported, the bash script [`<path-to-ot-efr32>/script/efr32_definitions`](../script/efr32_definitions) has been provided. Once `source`d, the functions `efr32_get_platforms` and `efr32_get_boards` can be used to get lists of available platforms and boards for those platforms
+To see which platforms are supported, the bash script [`<path-to-ot-efr32>/script/efr32-definitions`](../script/efr32-definitions) has been provided. Once `source`d, the functions `efr32_get_platforms` and `efr32_get_boards` can be used to get lists of available platforms and boards for those platforms
 
 **Example**
 
 ```bash
 $ cd <path-to-ot-efr32>
-$ source ./script/efr32_definitions
+$ source ./script/efr32-definitions
 $ efr32_get_platforms
 efr32mg1 efr32mg12 efr32mg13 efr32mg21
 $ platform="efr32mg12"
@@ -143,7 +143,7 @@ Refer to the [table](#jlink-efr32-devices) above for which value to use for `<ef
 **Example:** Flashing `ot-cli-ftd` to a `efr32mg12` device
 
 ```bash
-$ source <path-to-ot-efr32>/script/efr32_definitions
+$ source <path-to-ot-efr32>/script/efr32-definitions
 $ platform="efr32mg12"
 $ cd <path-to-ot-efr32>/build/$platform/bin
 $ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.hex
@@ -284,7 +284,7 @@ A debug session may be started with [J-LinkGDBServer][jlinkgdbserver].
 **Example:** Debugging `ot-cli-ftd` on a `efr32mg12` device
 
 ```bash
-$ source <path-to-ot-efr32>/script/efr32_definitions
+$ source <path-to-ot-efr32>/script/efr32-definitions
 $ platform="efr32mg12"
 $ cd <path-to-JLinkGDBServer>
 $ sudo ./JLinkGDBServer -if swd -singlerun -device $(efr32_get_jlink_device $platform)

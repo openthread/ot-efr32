@@ -2,7 +2,7 @@
 
 The EFR32 Sleepy applications demonstrates Sleepy End Device behavior using the EFR32's low power EM2 mode. The steps below will take you through the process of building and running the demo
 
-For setting up the build environment refer to [OpenThread on EFR32](../README.md).
+For setting up the build environment refer to [OpenThread on EFR32](../../src/README.md).
 
 ## 1. Build
 
@@ -22,7 +22,7 @@ build/efr32mg12/bin/sleepy-demo-ftd  build/efr32mg12/bin/sleepy-demo-ftd.s37  bu
 
 In Silicon Labs Simplicity Studio flash one device with the `sleepy-demo-mtd.s37` image and the other device with the `sleepy-demo-ftd.s37` image.
 
-For instructions on flashing firmware, see [Flashing binaries](../README.md#flash)
+For instructions on flashing firmware, see [Flashing binaries](../../README.md#flash)
 
 ## 2. Starting nodes
 
