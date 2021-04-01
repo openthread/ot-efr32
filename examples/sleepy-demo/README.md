@@ -10,13 +10,15 @@ In this `README`, all example commands will be targeting the `efr32mg12` platfor
 
 ```bash
 $ cd <path-to-ot-efr32>
-$ ./script/build efr32mg12 -DBOARD=brd4161a
+$ platform="efr32mg12"
+$ board="brd4161a"
+$ ./script/build $platform -DBOARD=$board
 ```
 
-The build script will convert the resulting executables into S-Record format and append a s37 suffix.
+The build script will convert the resulting executables into S-Record format and append a `.s37` file extension.
 
 ```bash
-$ ls build/efr32mg12/bin/sleepy*
+$ ls build/$platform/bin/sleepy*
 build/efr32mg12/bin/sleepy-demo-ftd  build/efr32mg12/bin/sleepy-demo-ftd.s37  build/efr32mg12/bin/sleepy-demo-mtd  build/efr32mg12/bin/sleepy-demo-mtd.s37
 ```
 
