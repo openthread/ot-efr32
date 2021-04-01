@@ -1,6 +1,6 @@
 # OpenThread on EFR32
 
-##### Table of Contents
+## Table of Contents
 
 - [Prerequisites](#prerequisites)
   - [Toolchain](#toolchain)
@@ -8,15 +8,15 @@
 - [Building examples](#build)
 - [Flashing binaries](#flash)
   - [Simplicity Commander](#simplicity-commander)
-  - [J-Link GDB Server](#jlink-gdb-server)
   - [J-Link Commander](#jlink-commander)
 - [Run the example with EFR32 boards](#example)
+- [Debugging with J-Link GDB Server](#debugging-jlink-gdb-server)
 - [Additional features](#additional-features)
 - [Verification](#verification)
 
 ---
 
-This directory contains example platform drivers for the [Silicon Labs EFR32MG12][efr32mg] based on [EFR32™ Mighty Gecko Wireless Starter Kit][slwstk6000b] or [Thunderboard™ Sense 2 Sensor-to-Cloud Advanced IoT Development Kit][sltb004a].
+This directory contains example platform drivers for the [Silicon Labs EFR32MG][efr32mg] based on [EFR32™ Mighty Gecko Wireless Starter Kit][slwstk6000b] or [Thunderboard™ Sense 2 Sensor-to-Cloud Advanced IoT Development Kit][sltb004a].
 
 [efr32mg]: https://www.silabs.com/support/getting-started/mesh-networking/thread/mighty-gecko
 [slwstk6000b]: http://www.silabs.com/products/development-tools/wireless/mesh-networking/mighty-gecko-starter-kit
@@ -24,7 +24,7 @@ This directory contains example platform drivers for the [Silicon Labs EFR32MG12
 
 The example platform drivers are intended to present the minimal code necessary to support OpenThread. [EFR32MG][efr32mg] has rich memory and peripheral resources which can support all OpenThread capabilities.
 
-See [EFR32 Sleepy Demo Example](./sleepy-demo/README.md) for instructions for an example that uses the low-energy modes of the EFR32MG12 when running as a Sleepy End Device.
+See [EFR32 Sleepy Demo Example](./sleepy-demo/README.md) for instructions for an example that uses the low-energy modes of the EFR32MG when running as a Sleepy End Device.
 
 <a name="prerequisites"/>
 
@@ -61,27 +61,47 @@ Alternatively, the [J-Link][jlink-software-pack] software pack can be used to fl
 
 ## Building examples
 
-Before building example apps, make sure to initialize all submodules. Afterward,
-the build may be launched using `./script/build`
+Before building example apps, make sure to initialize all submodules. Afterward, the build can be launched using `./script/build`.
+
+To see which platforms are supported, the bash script [`<path-to-ot-efr32>/script/efr32_definitions`](../script/efr32_definitions) has been provided. Once `source`d, the functions `efr32_get_platforms` and `efr32_get_boards` can be used to get lists of available platforms and boards for those platforms
+
+**Example**
+
+```bash
+$ cd <path-to-ot-efr32>
+$ source ./script/efr32_definitions
+$ efr32_get_platforms
+efr32mg1 efr32mg12 efr32mg13 efr32mg21
+$ platform="efr32mg12"
+$ efr32_get_boards $platform
+brd4161a
+brd4166a
+brd4170a
+brd4304a
+```
+
+The example below demonstrates how to build for `efr32mg12` on `brd4161a`, but the same command maybe used for other platforms and boards.
 
 ```bash
 $ cd <path-to-ot-efr32>
 $ git submodule update --init
-$ ./script/build efr32mg12 -DBOARD=brd4161a
+$ platform="efr32mg12"
+$ board="brd4161a"
+$ ./script/build $platform -DBOARD=$board
 ...
 -- Configuring done
 -- Generating done
--- Build files have been written to: <path-to-ot-efr32>/build/efr32mg12
+-- Build files have been written to: <path-to-ot-efr32>/build/<platform>
 + [[ -n ot-rcp ot-cli-ftd ot-cli-mtd ot-ncp-ftd ot-ncp-mtd sleepy-demo-ftd sleepy-demo-mtd ]]
 + ninja ot-rcp ot-cli-ftd ot-cli-mtd ot-ncp-ftd ot-ncp-mtd sleepy-demo-ftd sleepy-demo-mtd
 [572/572] Linking CXX executable bin/ot-ncp-ftd
 + cd <path-to-ot-efr32>
 ```
 
-After a successful build, the `elf` files are found in `<path-to-ot-efr32>/build/efr32mg12/bin`.
+After a successful build, the `elf` files are found in `<path-to-ot-efr32>/build/<platform>/bin`.
 
 ```bash
-$ ls build/efr32mg12/bin
+$ ls build/$platform/bin
 ot-cli-ftd      ot-cli-mtd      ot-ncp-ftd      ot-ncp-mtd      ot-rcp      sleepy-demo-ftd      sleepy-demo-mtd
 ot-cli-ftd.s37  ot-cli-mtd.s37  ot-ncp-ftd.s37  ot-ncp-mtd.s37  ot-rcp.s37  sleepy-demo-ftd.s37  sleepy-demo-mtd.s37
 ```
@@ -110,33 +130,6 @@ For more information see [UG162: Simplicity Commander Reference][ug162]
 
 [ug162]: https://www.silabs.com/documents/public/user-guides/ug162-simplicity-commander-reference-guide.pdf
 
-<a name="jlink-gdb-server"/>
-
-### J-Link GDB Server
-
-Compiled binaries also may be flashed onto the specified EFR32 dev board using [J-LinkGDBServer][jlinkgdbserver].
-
-[jlinkgdbserver]: https://www.segger.com/jlink-gdb-server.html
-
-<a name="jlink-efr32-devices"/>
-| Platform  | EFR32 Device      |
-|-----------|-------------------|
-| EFR32MG1  | EFR32MG1PxxxF256  |
-| EFR32MG12 | EFR32MG12PxxxF1024|
-| EFR32MG12 | EFR32MG13PxxxF1024|
-| EFR32MG21 | EFR32MG21AxxxF1024|
-
-```bash
-$ cd <path-to-JLinkGDBServer>
-$ sudo ./JLinkGDBServer -if swd -device <efr32-device>
-$ cd <path-to-ot-efr32>/build/bin
-$ arm-none-eabi-gdb ot-cli-ftd
-$ (gdb) target remote 127.0.0.1:2331
-$ (gdb) load
-$ (gdb) monitor reset
-$ (gdb) c
-```
-
 <a name="jlink-commander"/>
 
 ### J-Link Commander
@@ -147,16 +140,20 @@ Compiled binaries also may be flashed onto the specified EFR32 dev board using [
 
 Refer to the [table](#jlink-efr32-devices) above for which value to use for `<efr32-device>`
 
+**Example:** Flashing `ot-cli-ftd` to a `efr32mg12` device
+
 ```bash
-$ cd <path-to-ot-efr32>/build/bin
+$ source <path-to-ot-efr32>/script/efr32_definitions
+$ platform="efr32mg12"
+$ cd <path-to-ot-efr32>/build/$platform/bin
 $ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.hex
-$ JLinkExe -device <efr32-device> -speed 4000 -if SWD -autoconnect 1 -SelectEmuBySN <SerialNo>
+$ <path-to-JLinkGDBServer>/JLinkExe -device $(efr32_get_jlink_device $platform) -speed 4000 -if SWD -autoconnect 1 -SelectEmuBySN <SerialNo>
 $ J-Link>loadfile ot-cli-ftd.hex
 $ J-Link>r
 $ J-Link>q
 ```
 
-Note: SerialNo is J-Link serial number. Use the following command to get the serial number of the connected J-Link.
+**Note**: `SerialNo` is J-Link serial number. Use the following command to get the serial number of the connected J-Link.
 
 ```bash
 $ JLinkExe
@@ -273,6 +270,31 @@ For a list of all available commands, visit [OpenThread CLI Reference][cli].
 [cli]: https://github.com/openthread/openthread/blob/main/src/cli/README.md
 
 <a name="additional-features"/>
+
+<a name="debugging-jlink-gdb-server"/>
+
+## Debugging with J-Link GDB Server
+
+A debug session may be started with [J-LinkGDBServer][jlinkgdbserver].
+
+[jlinkgdbserver]: https://www.segger.com/jlink-gdb-server.html
+
+<a name="jlink-efr32-devices"/>
+
+**Example:** Debugging `ot-cli-ftd` on a `efr32mg12` device
+
+```bash
+$ source <path-to-ot-efr32>/script/efr32_definitions
+$ platform="efr32mg12"
+$ cd <path-to-JLinkGDBServer>
+$ sudo ./JLinkGDBServer -if swd -singlerun -device $(efr32_get_jlink_device $platform)
+$ cd <path-to-ot-efr32>/build/$platform/bin
+$ arm-none-eabi-gdb ot-cli-ftd
+$ (gdb) target remote 127.0.0.1:2331
+$ (gdb) load
+$ (gdb) monitor reset
+$ (gdb) c
+```
 
 ## Additional features
 
