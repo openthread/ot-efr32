@@ -6,7 +6,7 @@ repo_dir="$(dirname "$script_dir")"
 efr32_get_platforms()
 {
     if [ $# -ne 0 ]; then
-        printf "Gets a list of platforms\n\nUsage: %s\n" "$(basename "$0")" >&2
+        printf "Gets a list of platforms\n\nUsage:\n\t%s\n" "$(basename "$0")" >&2
         return 1
     fi
 
@@ -21,16 +21,14 @@ efr32_check_platform()
     #
     # Arg $1 -- value
     if [ -z "$1" ] || [ $# -ne 1 ]; then
-        printf "Checks if a value is a valid efr32 platform\n\nUsage: %s <value> \n" "$(basename "$0")" >&2
+        printf "Checks if a value is a valid efr32 platform\n\nUsage:\n\t%s <value> \n" "$0" >&2
         return 1
     fi
 
     local match=false
     local platform="$1"
-    local platforms=()
-    while IFS='' read -r line; do platforms+=("$line"); done < <(efr32_get_platforms)
 
-    for efr32_platform in ${platforms[@]}; do
+    for efr32_platform in $(efr32_get_platforms); do
         if [[ $efr32_platform == "$platform" ]]; then
             match=true
             break
@@ -38,7 +36,7 @@ efr32_check_platform()
     done
 
     if ! $match; then
-        printf "ERROR: Invalid platform\nValid platforms:   %s\n" "${platforms[*]}" >&2
+        printf "ERROR: Invalid platform\nValid platforms:   %s\n" "$(efr32_get_platforms)" >&2
         return 2
     fi
     return 0
@@ -50,7 +48,7 @@ efr32_get_boards()
     #
     # Arg $1 -- efr32 platform
     if [ -z "$1" ] || [ $# -ne 1 ]; then
-        printf "Gets a list of boards for a given platform\n\nUsage: %s <efr32_platform> \n" "$(basename "$0")" >&2
+        printf "Gets a list of boards for a given platform\n\nUsage:\n\t%s <efr32_platform> \n" "$(basename "$0")" >&2
         return 1
     fi
 
@@ -67,7 +65,7 @@ efr32_get_jlink_device()
     #
     # Arg $1 -- efr32 platform
     if [ -z "$1" ] || [ $# -ne 1 ]; then
-        printf "Gets the J-Link device type for a efr32 platform\n\nUsage: %s <efr32_platform> \n" "$(basename "$0")" >&2
+        printf "Gets the J-Link device type for a efr32 platform\n\nUsage:\n\t%s <efr32_platform> \n" "$(basename "$0")" >&2
         return 1
     fi
 

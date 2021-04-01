@@ -24,7 +24,7 @@ This directory contains example platform drivers for the [Silicon Labs EFR32MG][
 
 The example platform drivers are intended to present the minimal code necessary to support OpenThread. [EFR32MG][efr32mg] has rich memory and peripheral resources which can support all OpenThread capabilities.
 
-See [EFR32 Sleepy Demo Example](./sleepy-demo/README.md) for instructions for an example that uses the low-energy modes of the EFR32MG when running as a Sleepy End Device.
+See [EFR32 Sleepy Demo Example](../examples/sleepy-demo/README.md) for instructions for an example that uses the low-energy modes of the EFR32MG when running as a Sleepy End Device.
 
 <a name="prerequisites"/>
 

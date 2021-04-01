@@ -83,16 +83,16 @@ create_srec()
 
 main()
 {
-    local efr32_platforms=()
-    while IFS='' read -r line; do efr32_platforms+=("$line"); done < <(efr32_get_platforms)
+    local efr32_platforms
+    efr32_platforms=$(efr32_get_platforms)
 
     if [[ $# == 0 ]]; then
-        echo "Please specify a platform: ${efr32_platforms[*]}"
+        printf "Please specify a platform.\n\nValid platforms:   %s\n\nUsage:\n\t%s <efr32_platform> -DBOARD=<efr32_board>\n" "$efr32_platforms" "$(basename "$0")" >&2
         exit 1
     fi
 
     local platform="$1"
-    echo "${efr32_platforms[@]}" | grep -wq "${platform}" || die "Unsupported platform ${platform}"
+    echo "$efr32_platforms" | grep -wq "${platform}" || die "Unsupported platform ${platform}"
     shift
 
     local options=("${OT_OPTIONS[@]}")
