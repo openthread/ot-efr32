@@ -50,7 +50,7 @@ main()
 {
     export CPPFLAGS="${CPPFLAGS:-} -DNDEBUG"
 
-    for platform in "${efr32_platforms[@]}"; do
+    for platform in $(efr32_get_platforms); do
         for board in $(efr32_get_boards "$platform"); do
             echo "Building [$platform -- $board]..."
             rm -rf "$OT_BUILDDIR"
