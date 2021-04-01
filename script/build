@@ -70,12 +70,15 @@ build()
 
 create_srec()
 {
+    local executable_flag
+
     if [ "$(uname)" = 'Linux' ]; then
-        EXECUTABLE="-executable"
+        executable_flag="-executable"
     elif [ "$(uname)" = 'Darwin' ]; then
-        EXECUTABLE="-perm +111"
+        executable_flag="-perm +111"
     fi
-    find "$1" -type f "$EXECUTABLE" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
+
+    find "$1" -type f $executable_flag -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
 }
 
 main()
