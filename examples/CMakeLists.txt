@@ -26,50 +26,12 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-cmake_minimum_required(VERSION 3.10.2)
-project(ot-efr32 VERSION 0.2.0)
+# ==============================================================================
+# sleepy-demo
+# ==============================================================================
+option(EFR32_APP_SLEEPY_DEMO "enable sleepy-demo app" ON)
 
-set(EFR32_PLATFORM_VALUES
-    "efr32mg1"
-    "efr32mg12"
-    "efr32mg13"
-    "efr32mg21"
-)
-set_property(CACHE EFR32_PLATFORM PROPERTY STRINGS ${EFR32_PLATFORM_VALUES})
-if(NOT EFR32_PLATFORM IN_LIST EFR32_PLATFORM_VALUES)
-    message(FATAL_ERROR "Please select a supported platform: ${EFR32_PLATFORM_VALUES}")
+if(EFR32_APP_SLEEPY_DEMO)
+    add_subdirectory(sleepy-demo)
 endif()
 
-set(OT_PLATFORM_LIB "openthread-${EFR32_PLATFORM}")
-
-set(OT_PLATFORM "external" CACHE STRING "disable example platforms" FORCE)
-set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls management" FORCE)
-set(OT_EXTERNAL_MBEDTLS "silabs-mbedtls" CACHE STRING "use silabs mbedtls" FORCE)
-set(OT_MBEDTLS ${OT_EXTERNAL_MBEDTLS})
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-
-add_subdirectory(openthread)
-
-target_compile_definitions(ot-config INTERFACE
-    OPENTHREAD_CONFIG_FILE="openthread-core-efr32-config.h"
-    OPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-efr32-config.h"
-    OPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE="openthread-core-efr32-config-check.h"
-)
-
-target_compile_options(ot-config INTERFACE
-    -Wno-shadow
-    -Wno-pedantic
-)
-
-target_include_directories(ot-config INTERFACE
-    ${PROJECT_SOURCE_DIR}/src/src
-    ${PROJECT_SOURCE_DIR}/src/${EFR32_PLATFORM}
-    ${PROJECT_SOURCE_DIR}/src/${EFR32_PLATFORM}/crypto
-)
-
-add_subdirectory(examples)
-add_subdirectory(src)
-add_subdirectory(third_party)
