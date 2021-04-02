@@ -143,7 +143,8 @@ Refer to the [table](#jlink-efr32-devices) above for which value to use for `<ef
 **Example:** Flashing `ot-cli-ftd` to a `efr32mg12` device
 
 ```bash
-$ source <path-to-ot-efr32>/script/efr32-definitions
+$ cd <path-to-ot-efr32>
+$ source ./script/efr32-definitions
 $ platform="efr32mg12"
 $ cd <path-to-ot-efr32>/build/$platform/bin
 $ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.hex
