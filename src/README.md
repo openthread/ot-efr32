@@ -124,7 +124,12 @@ Simplicity Commander provides a graphical interface for J-Link Commander. It's i
 $ <path-to-simplicity-studio>/developer/adapter_packs/commander/commander
 ```
 
-In the J-Link Device drop-down list select the serial number of the device to flash. Click the Adapter Connect button. Ensure the Debug Interface drop-down list is set to SWD and click the Target Connect button. Click on the Flash icon on the left side of the window to switch to the flash page. In the Flash MCU pane enter the path of the ot-cli-ftd.s37 file or choose the file with the Browse... button. Click the Flash button located under the Browse... button.
+1. In the J-Link Device drop-down list select the serial number of the device to flash.
+2. Click the Adapter Connect button.
+3. Ensure the Debug Interface drop-down list is set to SWD and click the Target Connect button.
+4. Click on the Flash icon on the left side of the window to switch to the flash page.
+5. In the Flash MCU pane, enter the path of the `ot-cli-ftd.s37` file or choose the file with the Browse... button.
+6. Click the Flash button located under the Browse... button.
 
 For more information see [UG162: Simplicity Commander Reference][ug162]
 
@@ -137,8 +142,6 @@ For more information see [UG162: Simplicity Commander Reference][ug162]
 Compiled binaries also may be flashed onto the specified EFR32 dev board using [J-Link Commander][j-link-commander].
 
 [j-link-commander]: https://www.segger.com/products/debug-probes/j-link/tools/j-link-commander/
-
-Refer to the [table](#jlink-efr32-devices) above for which value to use for `<efr32-device>`
 
 **Example:** Flashing `ot-cli-ftd` to a `efr32mg12` device
 
@@ -270,8 +273,6 @@ For a list of all available commands, visit [OpenThread CLI Reference][cli].
 
 [cli]: https://github.com/openthread/openthread/blob/main/src/cli/README.md
 
-<a name="additional-features"/>
-
 <a name="debugging-jlink-gdb-server"/>
 
 ## Debugging with J-Link GDB Server
@@ -279,8 +280,6 @@ For a list of all available commands, visit [OpenThread CLI Reference][cli].
 A debug session may be started with [J-LinkGDBServer][jlinkgdbserver].
 
 [jlinkgdbserver]: https://www.segger.com/jlink-gdb-server.html
-
-<a name="jlink-efr32-devices"/>
 
 **Example:** Debugging `ot-cli-ftd` on a `efr32mg12` device
 
@@ -296,6 +295,8 @@ $ (gdb) load
 $ (gdb) monitor reset
 $ (gdb) c
 ```
+
+<a name="additional-features"/>
 
 ## Additional features
 
