@@ -2,7 +2,7 @@
 
 The EFR32 Sleepy applications demonstrates Sleepy End Device behavior using the EFR32's low power EM2 mode. The steps below will take you through the process of building and running the demo
 
-For setting up the build environment refer to [examples/platforms/efr32/README.md](../README.md).
+For setting up the build environment refer to [OpenThread on EFR32](../../src/README.md).
 
 ## 1. Build
 
@@ -10,19 +10,21 @@ In this `README`, all example commands will be targeting the `efr32mg12` platfor
 
 ```bash
 $ cd <path-to-ot-efr32>
-$ ./script/build efr32mg12 -DBOARD=brd4161a
+$ platform="efr32mg12"
+$ board="brd4161a"
+$ ./script/build $platform -DBOARD=$board
 ```
 
-The build script will convert the resulting executables into S-Record format and append a s37 suffix.
+The build script will convert the resulting executables into S-Record format and append a `.s37` file extension.
 
 ```bash
-$ ls build/efr32mg12/bin/sleepy*
+$ ls build/$platform/bin/sleepy*
 build/efr32mg12/bin/sleepy-demo-ftd  build/efr32mg12/bin/sleepy-demo-ftd.s37  build/efr32mg12/bin/sleepy-demo-mtd  build/efr32mg12/bin/sleepy-demo-mtd.s37
 ```
 
 In Silicon Labs Simplicity Studio flash one device with the `sleepy-demo-mtd.s37` image and the other device with the `sleepy-demo-ftd.s37` image.
 
-For instructions on flashing firmware, see [examples/platforms/efr32/README.md](../README.md#flash-binaries)
+For instructions on flashing firmware, see [Flashing binaries](../../README.md#flash)
 
 ## 2. Starting nodes
 

@@ -31,9 +31,18 @@ set -euxo pipefail
 
 OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET:-}
 
-readonly EFR32_PLATFORMS=(efr32mg1 efr32mg12 efr32mg13 efr32mg21)
+if [[ -n ${BASH_SOURCE[0]} ]]; then
+    script_path="${BASH_SOURCE[0]}"
+else
+    script_path="$0"
+fi
 
-readonly OT_SRCDIR="$(pwd)"
+script_dir="$(dirname "$(realpath "$script_path")")"
+repo_dir="$(dirname "$script_dir")"
+
+# shellcheck source=script/efr32-definitions
+source "$script_dir/efr32-definitions"
+
 readonly OT_OPTIONS=(
     "-DCMAKE_BUILD_TYPE=MinSizeRel"
     "-DOT_DIAGNOSTIC=ON"
@@ -49,12 +58,12 @@ die()
 
 build()
 {
-    builddir="${OT_CMAKE_BUILD_DIR:-build/${platform}}"
+    builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${platform}}"
 
     mkdir -p "${builddir}"
     cd "${builddir}"
 
-    cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON "$@" "${OT_SRCDIR}"
+    cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON "$@" "${repo_dir}"
 
     if [[ -n ${OT_CMAKE_NINJA_TARGET[*]} ]]; then
         ninja "${OT_CMAKE_NINJA_TARGET[@]}"
@@ -62,28 +71,34 @@ build()
         ninja
     fi
 
-    cd "${OT_SRCDIR}"
+    cd "${repo_dir}"
 }
 
 create_srec()
 {
+    local executable_flag
+
     if [ "$(uname)" = 'Linux' ]; then
-        EXECUTABLE="-executable"
+        executable_flag=(-executable)
     elif [ "$(uname)" = 'Darwin' ]; then
-        EXECUTABLE="-perm +111"
+        executable_flag=(-perm +111)
     fi
-    find "$1" -type f "$EXECUTABLE" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
+
+    find "$1" -type f "${executable_flag[@]}" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
 }
 
 main()
 {
+    local efr32_platforms
+    efr32_platforms=$(efr32_get_platforms)
+
     if [[ $# == 0 ]]; then
-        echo "Please specify a platform: ${EFR32_PLATFORMS[*]}"
+        printf "Please specify a platform.\n\nValid platforms:   %s\n\nUsage:\n\t%s <efr32_platform> -DBOARD=<efr32_board>\n" "$efr32_platforms" "$(basename "$0")" >&2
         exit 1
     fi
 
     local platform="$1"
-    echo "${EFR32_PLATFORMS[@]}" | grep -wq "${platform}" || die "Unsupported platform ${platform}"
+    echo "$efr32_platforms" | grep -wq "${platform}" || die "Unsupported platform ${platform}"
     shift
 
     local options=("${OT_OPTIONS[@]}")

@@ -7,23 +7,17 @@
 
 # OpenThread on EFR32 Examples
 
-This repo contains example platform drivers for the [Silicon Labs EFR32][efr32].
+This repo contains example platform drivers for the [Silicon Labs EFR32 Mighty Gecko][efr32mg].
 
-[efr32]: https://www.silabs.com/wireless/zigbee/efr32mg1-series-1-socs
+[efr32mg]: https://www.silabs.com/support/getting-started/mesh-networking/thread/mighty-gecko
 
 The example platform drivers are intended to present the minimal code necessary to support OpenThread.
 
 To learn more about building and running the examples please check:
 
-- [OpenThread on EFR32MG1 examples][efr32mg1-page]
-- [OpenThread on EFR32MG12 examples][efr32mg12-page]
-- [OpenThread on EFR32MG13 examples][efr32mg13-page]
-- [OpenThread on EFR32MG21 examples][efr32mg21-page]
+- [OpenThread on EFR32][efr32-page]
 
-[efr32mg1-page]: ./src/efr32mg1/README.md
-[efr32mg12-page]: ./src/efr32mg12/README.md
-[efr32mg13-page]: ./src/efr32mg13/README.md
-[efr32mg21-page]: ./src/efr32mg21/README.md
+[efr32-page]: ./src/README.md
 
 # Contributing
 

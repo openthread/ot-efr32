@@ -70,5 +70,6 @@ target_include_directories(ot-config INTERFACE
     ${PROJECT_SOURCE_DIR}/src/${EFR32_PLATFORM}/crypto
 )
 
+add_subdirectory(examples)
 add_subdirectory(src)
 add_subdirectory(third_party)

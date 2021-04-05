@@ -1,6 +1,5 @@
-#!/bin/bash
 #
-#  Copyright (c) 2020, The OpenThread Authors.
+#  Copyright (c) 2021, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -27,43 +26,12 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-set -euxo pipefail
+# ==============================================================================
+# sleepy-demo
+# ==============================================================================
+option(EFR32_APP_SLEEPY_DEMO "enable sleepy-demo app" ON)
 
-if [[ -n ${BASH_SOURCE[0]} ]]; then
-    script_path="${BASH_SOURCE[0]}"
-else
-    script_path="$0"
-fi
+if(EFR32_APP_SLEEPY_DEMO)
+    add_subdirectory(sleepy-demo)
+endif()
 
-script_dir="$(dirname "$(realpath "$script_path")")"
-repo_dir="$(dirname "$script_dir")"
-
-# shellcheck source=script/efr32-definitions
-source "$script_dir/efr32-definitions"
-
-readonly OT_BUILDDIR="${OT_CMAKE_BUILD_DIR:-$repo_dir/build}"
-
-readonly OT_OPTIONS=(
-    "-DOT_COMPILE_WARNING_AS_ERROR=ON"
-    "-DOT_COMMISSIONER=ON"
-    "-DOT_DHCP6_CLIENT=ON"
-    "-DOT_DHCP6_SERVER=ON"
-    "-DOT_DNS_CLIENT=ON"
-    "-DOT_JOINER=ON"
-)
-
-main()
-{
-    export CPPFLAGS="${CPPFLAGS:-} -DNDEBUG"
-
-    for platform in $(efr32_get_platforms); do
-        for board in $(efr32_get_boards "$platform"); do
-            echo "Building [$platform -- $board]..."
-            rm -rf "$OT_BUILDDIR"
-            "$script_dir"/build "$platform" "${OT_OPTIONS[@]}" -DBOARD="$board"
-        done
-    done
-
-}
-
-main "$@"

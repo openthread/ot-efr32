@@ -107,14 +107,5 @@ include(${PLATFORM_LOWERCASE}/${PLATFORM_LOWERCASE}.cmake)
 list(APPEND OT_PUBLIC_INCLUDES ${EFR32_INCLUDES})
 set(OT_PUBLIC_INCLUDES ${OT_PUBLIC_INCLUDES} PARENT_SCOPE)
 
-# ==============================================================================
-# sleepy-demo
-# ==============================================================================
-option(EFR32_APP_SLEEPY_DEMO "enable sleepy-demo app" ON)
-
-if(EFR32_APP_SLEEPY_DEMO)
-    add_subdirectory(sleepy-demo)
-endif()
-
 target_include_directories(ot-config INTERFACE ${OT_PUBLIC_INCLUDES})
 target_compile_definitions(ot-config INTERFACE ${OT_PLATFORM_DEFINES})
