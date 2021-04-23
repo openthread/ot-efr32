@@ -109,7 +109,7 @@ static UARTDRV_Handle_t     sUartHandle = &sUartHandleData;
 #define RECEIVE_BUFFER_SIZE 128
 static uint8_t       sReceiveBuffer1[RECEIVE_BUFFER_SIZE];
 static uint8_t       sReceiveBuffer2[RECEIVE_BUFFER_SIZE];
-static uint8_t       lastCount           = 0;
+static uint8_t       lastCount   = 0;
 static volatile bool sTxComplete = false;
 
 typedef struct ReceiveFifo_t
@@ -193,7 +193,7 @@ static void processReceive(void)
 static void flushTimeoutAlarmCallback(sl_sleeptimer_timer_handle_t *aHandle, void *aData)
 {
     OT_UNUSED_VARIABLE(aHandle);
-    *(bool*)aData      = true;
+    *(bool *)aData = true;
 }
 
 otError otPlatUartFlush(void)
@@ -205,7 +205,7 @@ otError otPlatUartFlush(void)
 
     // Start flush timeout timer
     status = sl_sleeptimer_start_timer_ms(&flushTimer, OPENTHREAD_CONFIG_EFR32_UART_TX_FLUSH_TIMEOUT_MS,
-                                          flushTimeoutAlarmCallback, (void*)&flushTimedOut, 0,
+                                          flushTimeoutAlarmCallback, (void *)&flushTimedOut, 0,
                                           SL_SLEEPTIMER_NO_HIGH_PRECISION_HF_CLOCKS_REQUIRED_FLAG);
     otEXPECT_ACTION(status == SL_STATUS_OK, error = OT_ERROR_FAILED);
 
