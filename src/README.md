@@ -6,7 +6,7 @@
   - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
     - [Toolchain](#toolchain)
-  - [Flashing and debugging tools](#flashing-and-debugging-tools)
+    - [Flashing and debugging tools](#flashing-and-debugging-tools)
   - [Building examples](#building-examples)
   - [Flashing Binaries](#flashing-binaries)
     - [Simplicity Commander](#simplicity-commander)
@@ -50,7 +50,7 @@ $ ./script/bootstrap
 
 <a name="flash-debug"/>
 
-## Flashing and debugging tools
+### Flashing and debugging tools
 
 Install [Simplicity Studio][simplicity-studio] to flash, debug, and make use of logging features with SEGGER J-Link.
 
