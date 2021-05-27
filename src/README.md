@@ -2,17 +2,20 @@
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
-  - [Toolchain](#toolchain)
-  - [Flashing and debugging tools](#flash-debug)
-- [Building examples](#build)
-- [Flashing binaries](#flash)
-  - [Simplicity Commander](#simplicity-commander)
-  - [J-Link Commander](#jlink-commander)
-- [Run the example with EFR32 boards](#example)
-- [Debugging with J-Link GDB Server](#debugging-jlink-gdb-server)
-- [Additional features](#additional-features)
-- [Verification](#verification)
+- [OpenThread on EFR32](#openthread-on-efr32)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+    - [Toolchain](#toolchain)
+  - [Flashing and debugging tools](#flashing-and-debugging-tools)
+  - [Building examples](#building-examples)
+  - [Flashing Binaries](#flashing-binaries)
+    - [Simplicity Commander](#simplicity-commander)
+      - [Download Links](#download-links)
+    - [J-Link Commander](#j-link-commander)
+  - [Run the example with EFR32 boards](#run-the-example-with-efr32-boards)
+  - [Debugging with J-Link GDB Server](#debugging-with-j-link-gdb-server)
+  - [Additional features](#additional-features)
+  - [Verification](#verification)
 
 ---
 
@@ -116,9 +119,13 @@ Compiled binaries may be flashed onto the EFR32 using various tools from the [J-
 
 ### Simplicity Commander
 
-Simplicity Commander provides a graphical interface for J-Link Commander. It's included as part of [Simplicity Studio][simplicity-studio] and is also available as a [standalone application][simplicity-commander]
+Simplicity Commander provides a graphical interface for J-Link Commander. It's included as part of [Simplicity Studio][simplicity-studio] and is also available as a standalone application
 
-[simplicity-commander]: https://www.silabs.com/mcu/programming-options#programming
+#### Download Links
+
+- [Linux](https://www.silabs.com/documents/public/software/SimplicityCommander-Linux.zip)
+- [Mac](https://www.silabs.com/documents/public/software/SimplicityCommander-Mac.zip)
+- [Windows](https://www.silabs.com/documents/public/software/SimplicityCommander-Windows.zip)
 
 ```bash
 $ <path-to-simplicity-studio>/developer/adapter_packs/commander/commander
