@@ -932,7 +932,7 @@ void txCurrentPacket(void)
 #endif
 
     // signalling this event earlier, as this event can assert REQ (expecially for a
-    // non-CSMA transmit) giving the Coex master a little more time to grant or deny.
+    // non-CSMA transmit) giving the Coex host a little more time to grant or deny.
     if (getInternalFlag(FLAG_CURRENT_TX_USE_CSMA))
     {
         (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_TX_PENDED_PHY, (uint32_t) true);
