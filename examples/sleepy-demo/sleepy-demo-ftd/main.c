@@ -152,7 +152,7 @@ void setNetworkConfiguration(otInstance *aInstance)
     /*
      * Fields that can be configured in otOperationDataset to override defaults:
      *     Network Name, Mesh Local Prefix, Extended PAN ID, PAN ID, Delay Timer,
-     *     Channel, Channel Mask Page 0, Network Master Key, PSKc, Security Policy
+     *     Channel, Channel Mask Page 0, Network Key, PSKc, Security Policy
      */
     aDataset.mActiveTimestamp                      = 1;
     aDataset.mComponents.mIsActiveTimestampPresent = true;
@@ -170,11 +170,11 @@ void setNetworkConfiguration(otInstance *aInstance)
     memcpy(aDataset.mExtendedPanId.m8, extPanId, sizeof(aDataset.mExtendedPanId));
     aDataset.mComponents.mIsExtendedPanIdPresent = true;
 
-    /* Set master key to 1234C0DE1AB51234C0DE1AB51234C0DE */
-    uint8_t key[OT_MASTER_KEY_SIZE] = {0x12, 0x34, 0xC0, 0xDE, 0x1A, 0xB5, 0x12, 0x34,
-                                       0xC0, 0xDE, 0x1A, 0xB5, 0x12, 0x34, 0xC0, 0xDE};
-    memcpy(aDataset.mMasterKey.m8, key, sizeof(aDataset.mMasterKey));
-    aDataset.mComponents.mIsMasterKeyPresent = true;
+    /* Set network key to 1234C0DE1AB51234C0DE1AB51234C0DE */
+    uint8_t key[OT_NETWORK_KEY_SIZE] = {0x12, 0x34, 0xC0, 0xDE, 0x1A, 0xB5, 0x12, 0x34,
+                                        0xC0, 0xDE, 0x1A, 0xB5, 0x12, 0x34, 0xC0, 0xDE};
+    memcpy(aDataset.mNetworkKey.m8, key, sizeof(aDataset.mNetworkKey));
+    aDataset.mComponents.mIsNetworkKeyPresent = true;
 
     /* Set Network Name to SleepyEFR32 */
     size_t length = strlen(aNetworkName);
