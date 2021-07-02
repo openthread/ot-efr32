@@ -4,6 +4,7 @@
 
 - [OpenThread on EFR32](#openthread-on-efr32)
   - [Table of Contents](#table-of-contents)
+  - [Matching versions](#matching-versions)
   - [Prerequisites](#prerequisites)
     - [Toolchain](#toolchain)
     - [Flashing and debugging tools](#flashing-and-debugging-tools)
@@ -28,6 +29,14 @@ This directory contains example platform drivers for the [Silicon Labs EFR32MG][
 The example platform drivers are intended to present the minimal code necessary to support OpenThread. [EFR32MG][efr32mg] has rich memory and peripheral resources which can support all OpenThread capabilities.
 
 See [EFR32 Sleepy Demo Example](../examples/sleepy-demo/README.md) for instructions for an example that uses the low-energy modes of the EFR32MG when running as a Sleepy End Device.
+
+<a name="matching-versions"/>
+
+## Matching versions
+
+When using this repo to generate a solution that requires two different projects, such as an RCP & OTBR, make sure they are relying on the same OpenThread version to ensure maximum compatibility. You can check which commit this repo relies upon in the "openthread" submodule (in the root of this repo).
+
+If your OTBR project was generated using the Silabs GSDK / Simplicity Studio, we recommend to also use it to generate the RCP project and not this repo. This will mitigate potential incompatibility issues due to mismatched OpenThread versions.
 
 <a name="prerequisites"/>
 
