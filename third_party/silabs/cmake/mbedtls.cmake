@@ -56,6 +56,7 @@ target_include_directories(silabs-mbedtls
         ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/include
         ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/config
         ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/inc
+        ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_protocol_crypto/src/
         ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/inc
         ${PROJECT_SOURCE_DIR}/src/${PLATFORM_LOWERCASE}/crypto
         ${SILABS_GSDK_DIR}/util/silicon_labs/silabs_core/memory_manager

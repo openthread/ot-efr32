@@ -63,7 +63,6 @@ set(SILABS_GSDK_COMMON_SOURCES
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_timer.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_usart.c
     ${SILABS_GSDK_DIR}/platform/radio/rail_lib/hal/efr32/hal_efr.c
-    ${SILABS_GSDK_DIR}/platform/radio/rail_lib/hal/hal_common.c
     ${SILABS_GSDK_DIR}/platform/radio/rail_lib/plugin/pa-conversions/pa_conversions_efr32.c
     ${SILABS_GSDK_DIR}/platform/service/mpu/src/sl_mpu.c
     ${SILABS_GSDK_DIR}/platform/service/device_init/src/sl_device_init_nvic.c
@@ -72,7 +71,10 @@ set(SILABS_GSDK_COMMON_SOURCES
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_entropy.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_mbedtls.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_sha.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_cmac.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_driver_init.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_trng.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_trng_driver.c
 )
 
 # ==============================================================================
