@@ -80,9 +80,13 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
     {
         reason = OT_PLAT_RESET_REASON_FAULT;
     }
-    else if ((sResetCause & EMU_RSTCAUSE_AVDDBOD) || (sResetCause & EMU_RSTCAUSE_DECBOD)
-             || (sResetCause & EMU_RSTCAUSE_DVDDBOD) || (sResetCause & EMU_RSTCAUSE_DVDDLEBOD)
+    /* clang-format off */
+    else if ((sResetCause & EMU_RSTCAUSE_AVDDBOD)
+             || (sResetCause & EMU_RSTCAUSE_DECBOD)
+             || (sResetCause & EMU_RSTCAUSE_DVDDBOD)
+             || (sResetCause & EMU_RSTCAUSE_DVDDLEBOD)
              || (sResetCause & EMU_RSTCAUSE_EM4))
+    /* clang-format on */
     {
         reason = OT_PLAT_RESET_REASON_OTHER;
     }
@@ -108,8 +112,12 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
     {
         reason = OT_PLAT_RESET_REASON_FAULT;
     }
-    else if ((sResetCause & RMU_RSTCAUSE_AVDDBOD) || (sResetCause & RMU_RSTCAUSE_DECBOD)
-             || (sResetCause & RMU_RSTCAUSE_DVDDBOD) || (sResetCause & RMU_RSTCAUSE_EM4RST))
+    /* clang-format off */
+    else if ((sResetCause & RMU_RSTCAUSE_AVDDBOD)
+             || (sResetCause & RMU_RSTCAUSE_DECBOD)
+             || (sResetCause & RMU_RSTCAUSE_DVDDBOD)
+             || (sResetCause & RMU_RSTCAUSE_EM4RST))
+    /* clang-format on */
     {
         reason = OT_PLAT_RESET_REASON_OTHER;
     }
