@@ -57,6 +57,7 @@ set(SILABS_GSDK_COMMON_SOURCES
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_gpio.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_ldma.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_msc.c
+    ${SILABS_GSDK_DIR}/platform/emlib/src/em_prs.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_rmu.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_rtcc.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_system.c
