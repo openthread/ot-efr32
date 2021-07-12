@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
  *   This file implements the OpenThread platform abstraction for the non-volatile storage.
  */
 
-#include <openthread-core-config.h>
+#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
 #include <openthread/config.h>
 
 #if OPENTHREAD_CONFIG_PLATFORM_FLASH_API_ENABLE // Use OT NV system
@@ -115,21 +115,38 @@ void otPlatFlashRead(otInstance *aInstance, uint8_t aSwapIndex, uint32_t aOffset
 static otError          addSetting(uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength);
 static nvm3_ObjectKey_t makeNvm3ObjKey(uint16_t otSettingsKey, int index);
 static otError          mapNvm3Error(Ecode_t nvm3Res);
+static bool             nvmOpenedByOT;
 
 void otPlatSettingsInit(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
 
-    if (mapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit)) != OT_ERROR_NONE)
+    // Only call nmv3_open if it has not been opened yet.
+    if (nvm3_defaultHandle->hasBeenOpened)
     {
-        otLogDebgPlat("Error initializing nvm3 instance");
+        nvmOpenedByOT = false; // OT is not allowed to close NVM
+    }
+    else
+    {
+        if (mapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit)) != OT_ERROR_NONE)
+        {
+            otLogDebgPlat("Error initializing nvm3 instance");
+        }
+        else
+        {
+            nvmOpenedByOT = true;
+        }
     }
 }
 
 void otPlatSettingsDeinit(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
-    nvm3_close(nvm3_defaultHandle);
+    if (nvmOpenedByOT && nvm3_defaultHandle->hasBeenOpened)
+    {
+        nvm3_close(nvm3_defaultHandle);
+        nvmOpenedByOT = false;
+    }
 }
 
 otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint8_t *aValue, uint16_t *aValueLength)

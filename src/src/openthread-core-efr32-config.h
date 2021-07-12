@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,8 @@
 
 /**
  * @file
- *   This file includes efr32 compile-time configuration constants
- *   for OpenThread.
+ *   This file includes all compile-time configuration constants used by
+ *   efr32 applications for OpenThread.
  */
 
 #include "board_config.h"
@@ -54,6 +54,7 @@
  * @def OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT
  *
  * Define to 1 if you want to enable physical layer to support OQPSK modulation in 915MHz band.
+ * (currently not supported).
  *
  */
 #if RADIO_CONFIG_915MHZ_OQPSK_SUPPORT
@@ -74,13 +75,81 @@
 #define OPENTHREAD_CONFIG_RADIO_2P4GHZ_OQPSK_SUPPORT 0
 #endif
 
+/*
+ * @def OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_SUPPORT
+ *
+ * Define to 1 if you want to enable physical layer to support proprietary radio configurations.
+ *
+ * This configuration option is used by the Sub-GHz feature to specify proprietary radio parameters,
+ * currently not defined by the Thread spec.
+ */
+#if RADIO_CONFIG_SUBGHZ_SUPPORT
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_SUPPORT 1
+#else
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_SUPPORT 0
+#endif
+
+#if RADIO_CONFIG_SUBGHZ_SUPPORT
+/**
+ * @def OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_PAGE
+ *
+ * Channel Page value for (proprietary) Sub-GHz PHY using 2GFSK modulation in 915MHz band.
+ *
+ */
+#ifndef OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_PAGE
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_PAGE 	23
+#endif
+
+/**
+ * @def OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MIN
+ *
+ * Minimum Channel number supported with (proprietary) Sub-GHz PHY using 2GFSK modulation in 915MHz band.
+ *
+ */
+#ifndef OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MIN
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MIN 	0
+#endif
+
+/**
+ * @def OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MAX
+ *
+ * Maximum Channel number supported with (proprietary) Sub-GHz PHY using 2GFSK modulation in 915MHz band.
+ *
+ */
+#ifndef OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MAX
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MAX 	24
+#endif
+
+/**
+ * @def OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MASK
+ *
+ * Default Channel Mask for (proprietary) Sub-GHz PHY using 2GFSK modulation in 915MHz band.
+ *
+ */
+#ifndef OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MASK
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MASK 	0x1ffffff
+#endif
+
+/**
+ * @def OPENTHREAD_CONFIG_DEFAULT_CHANNEL
+ *
+ * Default channel to use when working with proprietary radio configurations.
+ *
+ */
+#ifndef OPENTHREAD_CONFIG_DEFAULT_CHANNEL
+#define OPENTHREAD_CONFIG_DEFAULT_CHANNEL OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MIN
+#endif
+#endif // RADIO_CONFIG_SUBGHZ_SUPPORT
+
 /**
  * @def OPENTHREAD_CONFIG_PLATFORM_INFO
  *
  * The platform-specific string to insert into the OpenThread version string.
  *
  */
+#ifndef OPENTHREAD_CONFIG_PLATFORM_INFO
 #define OPENTHREAD_CONFIG_PLATFORM_INFO "EFR32"
+#endif
 
 /*
  * @def OPENTHREAD_CONFIG_MAC_SOFTWARE_RETRANSMIT_ENABLE
@@ -88,7 +157,9 @@
  * Define to 1 if you want to enable software retransmission logic.
  *
  */
+#ifndef OPENTHREAD_CONFIG_MAC_SOFTWARE_RETRANSMIT_ENABLE
 #define OPENTHREAD_CONFIG_MAC_SOFTWARE_RETRANSMIT_ENABLE 1
+#endif
 
 /**
  * @def OPENTHREAD_CONFIG_MAC_SOFTWARE_CSMA_BACKOFF_ENABLE
@@ -96,7 +167,9 @@
  * Define to 1 if you want to enable software CSMA-CA backoff logic.
  *
  */
+#ifndef OPENTHREAD_CONFIG_MAC_SOFTWARE_CSMA_BACKOFF_ENABLE
 #define OPENTHREAD_CONFIG_MAC_SOFTWARE_CSMA_BACKOFF_ENABLE 0
+#endif
 
 /**
  * @def OPENTHREAD_CONFIG_MAC_SOFTWARE_TX_SECURITY_ENABLE
@@ -122,7 +195,9 @@
  * Define to 1 if you want to enable software energy scanning logic.
  *
  */
+#ifndef OPENTHREAD_CONFIG_MAC_SOFTWARE_ENERGY_SCAN_ENABLE
 #define OPENTHREAD_CONFIG_MAC_SOFTWARE_ENERGY_SCAN_ENABLE 0
+#endif
 
 /**
  * @def OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE
@@ -141,7 +216,9 @@
  * When defined to 1, the platform MUST implement the otPlatFlash* APIs instead of the otPlatSettings* APIs.
  *
  */
+#ifndef OPENTHREAD_CONFIG_PLATFORM_FLASH_API_ENABLE
 #define OPENTHREAD_CONFIG_PLATFORM_FLASH_API_ENABLE 0
+#endif
 
 /**
  * @def OPENTHREAD_CONFIG_NCP_HDLC_ENABLE
@@ -149,7 +226,9 @@
  * Define to 1 to enable the NCP HDLC interface.
  *
  */
+#ifndef OPENTHREAD_CONFIG_NCP_HDLC_ENABLE
 #define OPENTHREAD_CONFIG_NCP_HDLC_ENABLE 1
+#endif
 
 /**
  * @def OPENTHREAD_CONFIG_MIN_SLEEP_DURATION_MS
@@ -178,6 +257,28 @@
  * Value is in milliseconds
  *
  */
+#ifndef OPENTHREAD_CONFIG_EFR32_UART_TX_FLUSH_TIMEOUT_MS
 #define OPENTHREAD_CONFIG_EFR32_UART_TX_FLUSH_TIMEOUT_MS 500
+#endif
+
+/**
+* @def OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE
+*
+* Define to 1 to enable PSA CRYPTO support.
+*
+*/
+#ifndef OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE
+#define OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE   1
+#endif
+
+/**
+* @def OPENTHREAD_CONFIG_PSA_ITS_NVM_OFFSET
+*
+* This is the offset in ITS where the persistent keys are stored.
+* For Silabs OT applications, this needs to be in the range of 
+* 0x20000 to 0x2ffff.
+*
+*/
+#define OPENTHREAD_CONFIG_PSA_ITS_NVM_OFFSET  0x20000
 
 #endif // OPENTHREAD_CORE_EFR32_CONFIG_H_

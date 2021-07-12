@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,11 +32,12 @@
  *
  */
 
+#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
+
+#include "openthread-system.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
-
-#include "openthread-system.h"
 #include <openthread/config.h>
 #include <openthread/platform/alarm-micro.h>
 #include <openthread/platform/alarm-milli.h>
@@ -52,9 +53,14 @@
 
 #define XTAL_ACCURACY 200
 
+// millisecond timer (sleeptimer)
 static sl_sleeptimer_timer_handle_t sl_handle;
-static uint32_t                     sAlarm     = 0;
-static bool                         sIsRunning = false;
+static uint32_t                     sMsAlarm     = 0;
+static bool                         sIsMsRunning = false;
+
+// microsecond timer (RAIL timer)
+static uint32_t sUsAlarm     = 0;
+static bool     sIsUsRunning = false;
 
 static void AlarmCallback(sl_sleeptimer_timer_handle_t *aHandle, void *aData)
 {
@@ -63,9 +69,18 @@ static void AlarmCallback(sl_sleeptimer_timer_handle_t *aHandle, void *aData)
     otSysEventSignalPending();
 }
 
+static void radioTimerExpired(RAIL_Handle_t cbArg)
+{
+    OT_UNUSED_VARIABLE(cbArg);
+    otSysEventSignalPending();
+}
+
 void efr32AlarmInit(void)
 {
     memset(&sl_handle, 0, sizeof sl_handle);
+#if OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE
+    (void)RAIL_ConfigMultiTimer(true);
+#endif
 }
 
 uint32_t otPlatAlarmMilliGetNow(void)
@@ -94,9 +109,9 @@ void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 
     sl_sleeptimer_stop_timer(&sl_handle);
 
-    sAlarm     = aT0 + aDt;
-    remaining  = (int32_t)(sAlarm - otPlatAlarmMilliGetNow());
-    sIsRunning = true;
+    sMsAlarm     = aT0 + aDt;
+    remaining    = (int32_t)(sMsAlarm - otPlatAlarmMilliGetNow());
+    sIsMsRunning = true;
 
     if (remaining <= 0)
     {
@@ -113,56 +128,121 @@ void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
     }
 }
 
+uint32_t efr32AlarmPendingTime(void)
+{
+    uint32_t remaining = 0;
+    uint32_t now       = otPlatAlarmMilliGetNow();
+    if (sIsMsRunning && (sMsAlarm > now))
+    {
+        remaining = sMsAlarm - now;
+    }
+    return remaining;
+}
+
+bool efr32AlarmIsRunning(otInstance *aInstance)
+{
+    return (otInstanceIsInitialized(aInstance) ? sIsMsRunning : false);
+}
+
 void otPlatAlarmMilliStop(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
 
     sl_sleeptimer_stop_timer(&sl_handle);
-    sIsRunning = false;
+    sIsMsRunning = false;
 }
 
 void efr32AlarmProcess(otInstance *aInstance)
 {
     int32_t remaining;
+    bool    alarmMilliFired = false;
+#if OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE
+    bool alarmMicroFired = false;
+#endif
 
-    if (sIsRunning)
+    CORE_DECLARE_IRQ_STATE;
+    CORE_ENTER_ATOMIC();
+
+    if (sIsMsRunning)
     {
-        remaining = (int32_t)(sAlarm - otPlatAlarmMilliGetNow());
-
+        remaining = (int32_t)(sMsAlarm - otPlatAlarmMilliGetNow());
         if (remaining <= 0)
         {
-            sIsRunning = false;
-
-#if OPENTHREAD_CONFIG_DIAG_ENABLE
-            if (otPlatDiagModeGet())
-            {
-                otPlatDiagAlarmFired(aInstance);
-            }
-            else
-#endif
-            {
-                otPlatAlarmMilliFired(aInstance);
-            }
+            otPlatAlarmMilliStop(aInstance);
+            alarmMilliFired = true;
         }
     }
+
+#if OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE
+    if (sIsUsRunning)
+    {
+        remaining = (int32_t)(sUsAlarm - otPlatAlarmMicroGetNow());
+        if (remaining <= 0)
+        {
+            otPlatAlarmMicroStop(aInstance);
+            alarmMicroFired = true;
+        }
+    }
+#endif
+
+    CORE_EXIT_ATOMIC();
+
+    if (alarmMilliFired)
+    {
+#if OPENTHREAD_CONFIG_DIAG_ENABLE
+        if (otPlatDiagModeGet())
+        {
+            otPlatDiagAlarmFired(aInstance);
+        }
+        else
+#endif
+        {
+            otPlatAlarmMilliFired(aInstance);
+        }
+    }
+
+#if OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE
+    if (alarmMicroFired)
+    {
+        otPlatAlarmMicroFired(aInstance);
+    }
+#endif
 }
 
 uint32_t otPlatAlarmMicroGetNow(void)
 {
-    // TODO microsecond support
-    return otPlatAlarmMilliGetNow();
+    return RAIL_GetTime();
 }
 
+// Note: If we ever use OpenThread in a multi-instance scenario, we need to
+// switch to using RAIL_SetMultiTimer / RAIL_CancelMultiTimer calls below.
 void otPlatAlarmMicroStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 {
-    // TODO microsecond support
-    otPlatAlarmMilliStartAt(aInstance, aT0, aDt);
+    OT_UNUSED_VARIABLE(aInstance);
+    RAIL_Status_t status;
+    int32_t       remaining;
+
+    RAIL_CancelTimer(gRailHandle);
+
+    sUsAlarm     = aT0 + aDt;
+    remaining    = (int32_t)(sUsAlarm - otPlatAlarmMicroGetNow());
+    sIsUsRunning = true;
+
+    if (remaining <= 0)
+    {
+        otSysEventSignalPending();
+    }
+    else
+    {
+        status = RAIL_SetTimer(gRailHandle, remaining, RAIL_TIME_DELAY, &radioTimerExpired);
+        assert(status == RAIL_STATUS_NO_ERROR);
+    }
 }
 
 void otPlatAlarmMicroStop(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
 
-    sl_sleeptimer_stop_timer(&sl_handle);
-    sIsRunning = false;
+    RAIL_CancelTimer(gRailHandle);
+    sIsUsRunning = false;
 }

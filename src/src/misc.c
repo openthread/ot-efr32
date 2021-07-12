@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -120,4 +120,26 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
 void otPlatWakeHost(void)
 {
     // TODO: implement an operation to wake the host from sleep state.
+}
+
+OT_TOOL_WEAK void otCliOutputFormat(const char *aFmt, ...)
+{
+    OT_UNUSED_VARIABLE(aFmt);
+
+    // do nothing
+}
+
+OT_TOOL_WEAK void otCliPlatLogv(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, va_list aArgs)
+{
+    OT_UNUSED_VARIABLE(aLogLevel);
+    OT_UNUSED_VARIABLE(aLogRegion);
+    OT_UNUSED_VARIABLE(aFormat);
+    OT_UNUSED_VARIABLE(aArgs);
+
+    // do nothing
+}
+
+OT_TOOL_WEAK void efr32UartProcess(void)
+{
+    // do nothing
 }

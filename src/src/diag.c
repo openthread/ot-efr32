@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,13 +32,15 @@
  *
  */
 
+#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
+
 #include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
 #include <sys/time.h>
 
 #include <openthread/config.h>
 #include <openthread/platform/alarm-milli.h>
+#include <openthread/platform/diag.h>
 #include <openthread/platform/radio.h>
 
 #include "platform-efr32.h"
