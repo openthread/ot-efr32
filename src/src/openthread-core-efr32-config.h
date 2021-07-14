@@ -42,13 +42,13 @@
 #define OPENTHREAD_CORE_EFR32_CONFIG_H_
 
 // Use (user defined) application config file to define OpenThread configurations
-#ifdef   SL_OPENTHREAD_APPLICATION_CONFIG_FILE
+#ifdef SL_OPENTHREAD_APPLICATION_CONFIG_FILE
 #include SL_OPENTHREAD_APPLICATION_CONFIG_FILE
 #endif
 
 // Use (pre-defined) stack features config file available for applications built
 // with Simplicity Studio
-#ifdef   SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE
+#ifdef SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE
 #include SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE
 #endif
 
