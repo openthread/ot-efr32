@@ -31,6 +31,12 @@
 
 #include "board_config.h"
 
+#if RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT
+#if (RADIO_CONFIG_915MHZ_OQPSK_SUPPORT || RADIO_CONFIG_915MHZ_2GFSK_SUPPORT)
+#error "Platform does not support dual-band operation"
+#endif
+#endif
+
 #ifndef RADIO_CONFIG_915MHZ_OQPSK_SUPPORT
 #if OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT
 #error "Platform not configured to support configuration option: OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT"

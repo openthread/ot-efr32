@@ -210,7 +210,7 @@ static const RAIL_IEEE802154_Config_t sRailIeee802154Config = {
     false,                                  // defaultFramePendingInOutgoingAcks
 };
 
-#if RADIO_CONFIG_SUBGHZ_SUPPORT
+#if RADIO_CONFIG_915MHZ_2GFSK_SUPPORT
 #define PHY_HEADER_SIZE 2
 #else
 #define PHY_HEADER_SIZE 1
@@ -639,12 +639,12 @@ static void efr32ConfigInit(void (*aEventCallback)(RAIL_Handle_t railHandle, RAI
     sBandConfig.mChannelMin    = OT_RADIO_2P4GHZ_OQPSK_CHANNEL_MIN;
     sBandConfig.mChannelMax    = OT_RADIO_2P4GHZ_OQPSK_CHANNEL_MAX;
 
-#elif RADIO_CONFIG_SUBGHZ_SUPPORT
+#elif RADIO_CONFIG_915MHZ_2GFSK_SUPPORT
     sBandConfig.mChannelConfig          = channelConfigs[0];
     sBandConfig.mChannelMin             = OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MIN;
     sBandConfig.mChannelMax             = OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MAX;
 
-#elif RADIO_CONFIG_915MHZ_OQPSK_SUPPORT // Not supported
+#elif RADIO_CONFIG_915MHZ_OQPSK_SUPPORT
     sBandConfig.mChannelConfig = channelConfigs[0];
     sBandConfig.mChannelMin    = OT_RADIO_915MHZ_OQPSK_CHANNEL_MIN;
     sBandConfig.mChannelMax    = OT_RADIO_915MHZ_OQPSK_CHANNEL_MAX;

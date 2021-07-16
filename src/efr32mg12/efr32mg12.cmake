@@ -61,6 +61,7 @@ set(LD_FILE "${CMAKE_CURRENT_SOURCE_DIR}/efr32mg12/efr32mg12.ld")
 
 add_library(openthread-efr32mg12
     ${EFR32_COMMON_SOURCES}
+    ${EFR32MG12_915MHZ_PHY_SOURCES}
     $<TARGET_OBJECTS:openthread-platform-utils>
 )
 
