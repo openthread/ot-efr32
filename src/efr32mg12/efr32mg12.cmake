@@ -54,6 +54,15 @@ list(APPEND OT_PLATFORM_DEFINES "${MCU}")
 set(OT_PLATFORM_DEFINES ${OT_PLATFORM_DEFINES} PARENT_SCOPE)
 
 # ==============================================================================
+# Sub-GHz support
+# ==============================================================================
+
+set(EFR32MG12_915MHZ_PHY_SOURCES
+    efr32mg12/phy/PHY_IEEE802154_915MHZ_OQPSK_EFR32XG12.c
+    efr32mg12/phy/PHY_IEEE802154_915MHZ_2GFSK_EFR32XG12.c
+)
+
+# ==============================================================================
 # Platform library
 # ==============================================================================
 
