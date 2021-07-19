@@ -60,7 +60,6 @@ set(EFR32_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/${EFR32_PLATFORM}/crypto
     ${CMAKE_CURRENT_SOURCE_DIR}/${EFR32_PLATFORM}/${BOARD_LOWERCASE}
-    ${PROJECT_SOURCE_DIR}/third_party/silabs/rail_config
     ${SILABS_GSDK_INCLUDES}
     ${PROJECT_SOURCE_DIR}/openthread/examples/platforms
     ${PROJECT_SOURCE_DIR}/src/core

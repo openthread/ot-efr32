@@ -39,7 +39,6 @@ set(COMMON_FLAGS
 )
 
 set(SILABS_GSDK_COMMON_SOURCES
-    rail_config/rail_config.c
     ${SILABS_GSDK_DIR}/hardware/kit/common/bsp/bsp_bcc.c
     ${SILABS_GSDK_DIR}/hardware/kit/common/bsp/bsp_init.c
     ${SILABS_GSDK_DIR}/hardware/kit/common/bsp/bsp_stk.c
