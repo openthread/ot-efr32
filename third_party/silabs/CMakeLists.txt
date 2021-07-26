@@ -71,6 +71,7 @@ set(SILABS_GSDK_COMMON_SOURCES
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_entropy.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_mbedtls.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_sha.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_ccm.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_cmac.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_driver_init.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_trng.c
