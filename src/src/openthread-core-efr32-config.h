@@ -65,7 +65,6 @@
  * @def OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT
  *
  * Define to 1 if you want to enable physical layer to support OQPSK modulation in 915MHz band.
- * (currently not supported).
  *
  */
 #if RADIO_CONFIG_915MHZ_OQPSK_SUPPORT
