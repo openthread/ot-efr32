@@ -30,7 +30,6 @@
 # Series-level _SOURCES
 # ==============================================================================
 set(SILABS_EFR32MG1X_SOURCES
-    ${SILABS_GSDK_DIR}/platform/emlib/src/em_adc.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_crypto.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_leuart.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/crypto_aes.c
@@ -41,7 +40,6 @@ set(SILABS_EFR32MG1X_SOURCES
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_cipher.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_hash.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_mac.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_trng_driver.c
 )
 
 
@@ -51,13 +49,14 @@ set(SILABS_EFR32MG1X_SOURCES
 set(SILABS_EFR32MG1_SOURCES
     ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG1P/Source/system_efr32mg1p.c
     ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG1P/Source/GCC/startup_efr32mg1p.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_entropy_adc.c
     ${SILABS_EFR32MG1X_SOURCES}
 )
 
 set(SILABS_EFR32MG12_SOURCES
     ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG12P/Source/system_efr32mg12p.c
     ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG12P/Source/GCC/startup_efr32mg12p.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_trng_driver.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_trng.c
     ${SILABS_EFR32MG1X_SOURCES}
 )
 
@@ -65,5 +64,7 @@ set(SILABS_EFR32MG13_SOURCES
     ${SILABS_GSDK_DIR}/hardware/kit/common/drivers/mx25flash_spi.c
     ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG13P/Source/system_efr32mg13p.c
     ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG13P/Source/GCC/startup_efr32mg13p.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_trng_driver.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_trng.c
     ${SILABS_EFR32MG1X_SOURCES}
 )
