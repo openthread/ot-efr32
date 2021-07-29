@@ -70,12 +70,13 @@ set(SILABS_GSDK_COMMON_SOURCES
     ${SILABS_GSDK_DIR}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_entropy.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_mbedtls.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_sha.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_psa_its_nvm3.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_ccm.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_cmac.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_sha.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_driver_common.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_driver_init.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_trng.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_trng_driver.c
 )
 
 # ==============================================================================

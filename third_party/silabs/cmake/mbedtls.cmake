@@ -88,6 +88,7 @@ set(SILABS_MBEDTLS_SOURCES
     ${SILABS_MBEDTLS_DIR}/library/ecjpake.c
     ${SILABS_MBEDTLS_DIR}/library/ecp_curves.c
     ${SILABS_MBEDTLS_DIR}/library/ecp.c
+    ${SILABS_MBEDTLS_DIR}/library/entropy_poll.c
     ${SILABS_MBEDTLS_DIR}/library/entropy.c
     ${SILABS_MBEDTLS_DIR}/library/error.c
     ${SILABS_MBEDTLS_DIR}/library/hmac_drbg.c
@@ -100,6 +101,18 @@ set(SILABS_MBEDTLS_SOURCES
     ${SILABS_MBEDTLS_DIR}/library/pkwrite.c
     ${SILABS_MBEDTLS_DIR}/library/platform_util.c
     ${SILABS_MBEDTLS_DIR}/library/platform.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_aead.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_cipher.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_client.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_driver_wrappers.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_ecp.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_hash.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_mac.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_rsa.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_se.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_slot_management.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto_storage.c
+    ${SILABS_MBEDTLS_DIR}/library/psa_crypto.c
     ${SILABS_MBEDTLS_DIR}/library/rsa_internal.c
     ${SILABS_MBEDTLS_DIR}/library/rsa.c
     ${SILABS_MBEDTLS_DIR}/library/sha256.c

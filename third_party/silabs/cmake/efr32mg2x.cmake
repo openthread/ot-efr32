@@ -45,10 +45,11 @@ set(SILABS_EFR32MG2X_SOURCES
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_util.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_se_management.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_cmac.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_ecdsa_ecdh.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/se_aes.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/se_jpake.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_protocol_crypto/src/sli_protocol_crypto_radioaes.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_protocol_crypto/src/sli_radioaes_management.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_aead.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_builtin_keys.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_cipher.c
