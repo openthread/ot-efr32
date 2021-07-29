@@ -49,4 +49,8 @@
 #endif
 #endif
 
+#if OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE
+#error "PSA Crypto is not yet supported for efr32: OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE"
+#endif
+
 #endif /* OPENTHREAD_CORE_EFR32_CONFIG_CHECK_H_ */
