@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -50,16 +50,20 @@
 //------------------------------------------------------------------------
 // 802.15.4 Frame Control Field definitions for Beacon, Ack, Data, Command
 
-#define IEEE802154_FRAME_TYPE_MASK ((uint16_t)0x0007U)              // Bits 0..2
 #define IEEE802154_FRAME_TYPE_BEACON ((uint16_t)0x0000U)            // Beacon
 #define IEEE802154_FRAME_TYPE_DATA ((uint16_t)0x0001U)              // Data
 #define IEEE802154_FRAME_TYPE_ACK ((uint16_t)0x0002U)               // ACK
 #define IEEE802154_FRAME_TYPE_COMMAND ((uint16_t)0x0003U)           // Command
 #define IEEE802154_FRAME_TYPE_CONTROL IEEE802154_FRAME_TYPE_COMMAND // (synonym)
-#define IEEE802154_FRAME_TYPE_RESERVED_MASK ((uint16_t)0x0004U)     // Versions 0/1
 // 802.15.4E-2012 introduced MultiPurpose with different Frame Control Field
 // layout described in the MultiPurpose section below.
 #define IEEE802154_FRAME_TYPE_MULTIPURPOSE ((uint16_t)0x0005U) // MultiPurpose
+#define IEEE802154_FRAME_TYPE_RESERVED_1 ((uint16_t)0x0004U)
+#define IEEE802154_FRAME_TYPE_RESERVED_2 ((uint16_t)0x0006U)
+#define IEEE802154_FRAME_TYPE_RESERVED_3 ((uint16_t)0x0007U)
+#define IEEE802154_FRAME_TYPE_MASK ((uint16_t)0x0007U) // Bits 0..2
+// Use a reserved flag internally to check whether outgoing enh-ACK was secure
+#define IEEE802154_SECURED_OUTGOING_ENHANCED_ACK IEEE802154_FRAME_TYPE_RESERVED_1
 
 #define IEEE802154_FRAME_FLAG_SECURITY_ENABLED ((uint16_t)0x0008U) // Bit 3
 #define IEEE802154_FRAME_FLAG_FRAME_PENDING ((uint16_t)0x0010U)    // Bit 4

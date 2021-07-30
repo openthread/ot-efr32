@@ -39,7 +39,6 @@ set(COMMON_FLAGS
 )
 
 set(SILABS_GSDK_COMMON_SOURCES
-    rail_config/rail_config.c
     ${SILABS_GSDK_DIR}/hardware/kit/common/bsp/bsp_bcc.c
     ${SILABS_GSDK_DIR}/hardware/kit/common/bsp/bsp_init.c
     ${SILABS_GSDK_DIR}/hardware/kit/common/bsp/bsp_stk.c
@@ -57,13 +56,13 @@ set(SILABS_GSDK_COMMON_SOURCES
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_gpio.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_ldma.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_msc.c
+    ${SILABS_GSDK_DIR}/platform/emlib/src/em_prs.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_rmu.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_rtcc.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_system.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_timer.c
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_usart.c
     ${SILABS_GSDK_DIR}/platform/radio/rail_lib/hal/efr32/hal_efr.c
-    ${SILABS_GSDK_DIR}/platform/radio/rail_lib/hal/hal_common.c
     ${SILABS_GSDK_DIR}/platform/radio/rail_lib/plugin/pa-conversions/pa_conversions_efr32.c
     ${SILABS_GSDK_DIR}/platform/service/mpu/src/sl_mpu.c
     ${SILABS_GSDK_DIR}/platform/service/device_init/src/sl_device_init_nvic.c
@@ -71,7 +70,11 @@ set(SILABS_GSDK_COMMON_SOURCES
     ${SILABS_GSDK_DIR}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_entropy.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_mbedtls.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_psa_its_nvm3.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_ccm.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_cmac.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_sha.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_driver_common.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_driver_init.c
 )
 

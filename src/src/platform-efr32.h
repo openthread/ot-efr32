@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -46,13 +46,35 @@
 extern otInstance *sInstance;
 
 // Global reference to rail handle
-extern RAIL_Handle_t gRailHandle;
+extern RAIL_Handle_t emPhyRailHandle; // coex needs the emPhyRailHandle symbol.
+#define gRailHandle emPhyRailHandle   // use gRailHandle in the OpenThread PAL.
+
+/**
+ * This function performs all platform-specific initialization of
+ * OpenThread's drivers.
+ *
+ */
+void sl_ot_sys_init(void);
 
 /**
  * This function initializes the alarm service used by OpenThread.
  *
  */
 void efr32AlarmInit(void);
+
+/**
+ * This function provides the remaining time (in milliseconds) on an alarm service.
+ *
+ */
+uint32_t efr32AlarmPendingTime(void);
+
+/**
+ * This function checks if the alarm service is running.
+ *
+ * @param[in]  aInstance  The OpenThread instance structure.
+ *
+ */
+bool efr32AlarmIsRunning(otInstance *aInstance);
 
 /**
  * This function performs alarm driver processing.
@@ -87,6 +109,12 @@ void efr32RadioProcess(otInstance *aInstance);
  *
  */
 void efr32UartProcess(void);
+
+/**
+ * This function performs CPC driver processing.
+ *
+ */
+void efr32CpcProcess(void);
 
 /**
  * Initialization of Misc module.

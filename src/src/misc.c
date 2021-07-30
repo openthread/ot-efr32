@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -80,9 +80,13 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
     {
         reason = OT_PLAT_RESET_REASON_FAULT;
     }
-    else if ((sResetCause & EMU_RSTCAUSE_AVDDBOD) || (sResetCause & EMU_RSTCAUSE_DECBOD) ||
-             (sResetCause & EMU_RSTCAUSE_DVDDBOD) || (sResetCause & EMU_RSTCAUSE_DVDDLEBOD) ||
-             (sResetCause & EMU_RSTCAUSE_EM4))
+    /* clang-format off */
+    else if ((sResetCause & EMU_RSTCAUSE_AVDDBOD)
+             || (sResetCause & EMU_RSTCAUSE_DECBOD)
+             || (sResetCause & EMU_RSTCAUSE_DVDDBOD)
+             || (sResetCause & EMU_RSTCAUSE_DVDDLEBOD)
+             || (sResetCause & EMU_RSTCAUSE_EM4))
+    /* clang-format on */
     {
         reason = OT_PLAT_RESET_REASON_OTHER;
     }
@@ -108,8 +112,12 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
     {
         reason = OT_PLAT_RESET_REASON_FAULT;
     }
-    else if ((sResetCause & RMU_RSTCAUSE_AVDDBOD) || (sResetCause & RMU_RSTCAUSE_DECBOD) ||
-             (sResetCause & RMU_RSTCAUSE_DVDDBOD) || (sResetCause & RMU_RSTCAUSE_EM4RST))
+    /* clang-format off */
+    else if ((sResetCause & RMU_RSTCAUSE_AVDDBOD)
+             || (sResetCause & RMU_RSTCAUSE_DECBOD)
+             || (sResetCause & RMU_RSTCAUSE_DVDDBOD)
+             || (sResetCause & RMU_RSTCAUSE_EM4RST))
+    /* clang-format on */
     {
         reason = OT_PLAT_RESET_REASON_OTHER;
     }
@@ -120,4 +128,26 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
 void otPlatWakeHost(void)
 {
     // TODO: implement an operation to wake the host from sleep state.
+}
+
+OT_TOOL_WEAK void otCliOutputFormat(const char *aFmt, ...)
+{
+    OT_UNUSED_VARIABLE(aFmt);
+
+    // do nothing
+}
+
+OT_TOOL_WEAK void otCliPlatLogv(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, va_list aArgs)
+{
+    OT_UNUSED_VARIABLE(aLogLevel);
+    OT_UNUSED_VARIABLE(aLogRegion);
+    OT_UNUSED_VARIABLE(aFormat);
+    OT_UNUSED_VARIABLE(aArgs);
+
+    // do nothing
+}
+
+OT_TOOL_WEAK void efr32UartProcess(void)
+{
+    // do nothing
 }

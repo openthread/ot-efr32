@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,14 +31,26 @@
 
 #include "board_config.h"
 
-#if OPENTHREAD_CONFIG_TIME_SYNC_ENABLE
-#error "Platform doesn't support configuration option: OPENTHREAD_CONFIG_TIME_SYNC_ENABLE"
+#if RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT
+#if (RADIO_CONFIG_915MHZ_OQPSK_SUPPORT || RADIO_CONFIG_915MHZ_2GFSK_SUPPORT)
+#error "Platform does not support dual-band operation"
+#endif
 #endif
 
 #ifndef RADIO_CONFIG_915MHZ_OQPSK_SUPPORT
 #if OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT
 #error "Platform not configured to support configuration option: OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT"
 #endif
+#endif
+
+#ifndef RADIO_CONFIG_915MHZ_2GFSK_SUPPORT
+#if OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT
+#error "Platform not configured to support configuration option: OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT"
+#endif
+#endif
+
+#if OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE
+#error "PSA Crypto is not yet supported for efr32: OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE"
 #endif
 
 #endif /* OPENTHREAD_CORE_EFR32_CONFIG_CHECK_H_ */

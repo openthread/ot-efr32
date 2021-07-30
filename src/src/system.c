@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,7 @@
  *   This file includes the platform-specific initializers.
  */
 
-#include <openthread-core-config.h>
-#include <openthread/config.h>
-
+#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
 #include <assert.h>
 #include <string.h>
 
@@ -254,8 +252,14 @@ void otSysProcessDrivers(otInstance *aInstance)
 
     // should sleep and wait for interrupts here
 
+#if OPENTHREAD_CONFIG_NCP_HDLC_ENABLE
     efr32UartProcess();
+#elif OPENTHREAD_CONFIG_NCP_CPC_ENABLE
+    efr32CpcProcess();
+#endif
     efr32RadioProcess(aInstance);
+
+    // See alarm.c: Wrapped in a critical section
     efr32AlarmProcess(aInstance);
 }
 

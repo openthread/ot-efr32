@@ -35,8 +35,12 @@
 #ifndef __BOARD_CONFIG_H__
 #define __BOARD_CONFIG_H__
 
-#define RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT 1 /// Dev board suppports OQPSK modulation in 2.4GHz band.
-#define RADIO_CONFIG_915MHZ_OQPSK_SUPPORT 1 /// Dev board suppports OQPSK modulation in 915MHz band.
+// To enable board support on a specific band, enable the corresponding RADIO_CONFIG option
+// Please note that the platform does not support dual-band operation.
+
+#define RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT 1 /// Dev board supports OQPSK modulation in 2.4GHz band (default).
+#define RADIO_CONFIG_915MHZ_OQPSK_SUPPORT 0 /// Dev board supports OQPSK modulation in 915MHz band.
+#define RADIO_CONFIG_915MHZ_2GFSK_SUPPORT 0 /// Dev board supports 2GFSK modulation in 915MHz band.
 
 #ifndef RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
 #define RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT 0 /// Set to 1 to enable debug counters in radio.c
