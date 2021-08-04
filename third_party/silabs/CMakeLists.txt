@@ -109,4 +109,5 @@ include(${platform_sdk_cmake})
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/mbedtls.cmake)
 
 list(APPEND OT_PLATFORM_DEFINES "MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\"")
+list(APPEND OT_PLATFORM_DEFINES "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"psa_crypto_config.h\"")
 set(OT_PLATFORM_DEFINES ${OT_PLATFORM_DEFINES} PARENT_SCOPE)
