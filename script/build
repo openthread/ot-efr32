@@ -89,6 +89,32 @@ create_srec()
 
 main()
 {
+    local usage="usage: $0 [-h] [--skip-silabs-apps] <efr32 platform> -DBOARD=<brdXXXXy> [-D<OT_XXXX=ON> -D<OT_YYYY=OFF>]"
+
+    local skip_silabs_apps=false
+    # Parse flags
+    optspec=":h-:"
+    while getopts "$optspec" optchar; do
+        case "${optchar}" in
+            -)
+                case "${OPTARG}" in
+                    skip-silabs-apps)
+                        printf '\n\nSkipping silabs example apps...\n\n' >&2;
+                        skip_silabs_apps=true
+                        shift 1
+                        ;;
+                    *)
+                        echo "Unknown option --${OPTARG}" >&2
+                        exit 2
+                        ;;
+                esac;;
+            h)
+                echo ${usage} >&2
+                exit 2
+                ;;
+        esac
+    done
+
     local efr32_platforms
     efr32_platforms=$(efr32_get_platforms)
 
@@ -109,17 +135,11 @@ main()
         efr32mg1)
             OT_CMAKE_NINJA_TARGET=("ot-rcp")
             ;;
-        efr32mg12)
+        efr32mg12|efr32mg13|efr32mg21)
             OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
-            OT_CMAKE_NINJA_TARGET+=("sleepy-demo-ftd" "sleepy-demo-mtd")
-            ;;
-        efr32mg13)
-            OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
-            OT_CMAKE_NINJA_TARGET+=("sleepy-demo-ftd" "sleepy-demo-mtd")
-            ;;
-        efr32mg21)
-            OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
-            OT_CMAKE_NINJA_TARGET+=("sleepy-demo-ftd" "sleepy-demo-mtd")
+            if [ "${skip_silabs_apps}" = false ] ; then
+                OT_CMAKE_NINJA_TARGET+=("sleepy-demo-ftd" "sleepy-demo-mtd")
+            fi
             ;;
     esac
 
