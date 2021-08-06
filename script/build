@@ -99,7 +99,7 @@ main()
             -)
                 case "${OPTARG}" in
                     skip-silabs-apps)
-                        printf '\n\nSkipping silabs example apps...\n\n' >&2;
+                        printf '\n\nSkipping silabs example apps...\n\n' >&2
                         skip_silabs_apps=true
                         shift 1
                         ;;
@@ -107,9 +107,10 @@ main()
                         echo "Unknown option --${OPTARG}" >&2
                         exit 2
                         ;;
-                esac;;
+                esac
+                ;;
             h)
-                echo ${usage} >&2
+                echo "${usage}" >&2
                 exit 2
                 ;;
         esac
@@ -135,9 +136,9 @@ main()
         efr32mg1)
             OT_CMAKE_NINJA_TARGET=("ot-rcp")
             ;;
-        efr32mg12|efr32mg13|efr32mg21)
+        efr32mg12 | efr32mg13 | efr32mg21)
             OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
-            if [ "${skip_silabs_apps}" = false ] ; then
+            if [ "${skip_silabs_apps}" = false ]; then
                 OT_CMAKE_NINJA_TARGET+=("sleepy-demo-ftd" "sleepy-demo-mtd")
             fi
             ;;
