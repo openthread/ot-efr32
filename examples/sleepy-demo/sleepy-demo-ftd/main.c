@@ -245,7 +245,7 @@ void initUdp(void)
         return;
     }
 
-    error = otUdpBind(instance, &sFtdSocket, &sockaddr);
+    error = otUdpBind(instance, &sFtdSocket, &sockaddr, OT_NETIF_THREAD);
     if (error != OT_ERROR_NONE)
     {
         otUdpClose(instance, &sFtdSocket);
