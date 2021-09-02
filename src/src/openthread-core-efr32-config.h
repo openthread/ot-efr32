@@ -285,6 +285,15 @@
  */
 #define OPENTHREAD_CONFIG_PSA_ITS_NVM_OFFSET 0x20000
 
+/**
+* @def OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE
+*
+* This config enables key references to be used in Openthread stack instead of
+* literal keys.
+*
+* Platform needs to support PSA Crypto to enable this option.
+*
+*/
 #ifndef OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE
 #define OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE 0
 #endif

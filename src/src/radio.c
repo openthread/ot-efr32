@@ -356,12 +356,7 @@ static otError radioProcessTransmitSecurity(otRadioFrame *aFrame)
         otMacFrameSetFrameCounter(aFrame, sMacFrameCounter++);
     }
 
-#if defined(_SILICON_LABS_32B_SERIES_2) && OPENTHREAD_RADIO
-    efr32PlatProcessTransmitAesCcm(aFrame, &sExtAddress);
-#else
     otMacFrameProcessTransmitAesCcm(aFrame, &sExtAddress);
-#endif
-
     otEXPECT(aFrame->mInfo.mTxInfo.mIsSecurityProcessed);
 
 exit:
