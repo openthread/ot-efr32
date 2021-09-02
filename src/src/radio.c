@@ -250,13 +250,9 @@ enum
     MAC_KEY_COUNT
 };
 // Transmit Security
-static uint32_t sMacFrameCounter;
-static uint8_t  sKeyId;
-#if OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE
-static otMacKeyRef sMacKeyRefs[MAC_KEY_COUNT];
-#else
-static struct otMacKey sMacKeys[MAC_KEY_COUNT];
-#endif
+static uint32_t                sMacFrameCounter;
+static uint8_t                 sKeyId;
+static struct otMacKeyMaterial sMacKeys[MAC_KEY_COUNT];
 
 static uint32_t sAckFrameCounter;
 static uint8_t  sAckKeyId;
@@ -343,11 +339,7 @@ static otError radioProcessTransmitSecurity(otRadioFrame *aFrame)
         keyToUse = MAC_KEY_CURRENT;
     }
 
-#if OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE
-    aFrame->mInfo.mTxInfo.mAesKeyRef = sMacKeyRefs[keyToUse];
-#else
     aFrame->mInfo.mTxInfo.mAesKey = &sMacKeys[keyToUse];
-#endif
 
     if (!aFrame->mInfo.mTxInfo.mIsARetx)
     {
@@ -364,7 +356,12 @@ static otError radioProcessTransmitSecurity(otRadioFrame *aFrame)
         otMacFrameSetFrameCounter(aFrame, sMacFrameCounter++);
     }
 
+#if defined(_SILICON_LABS_32B_SERIES_2) && OPENTHREAD_RADIO
+    efr32PlatProcessTransmitAesCcm(aFrame, &sExtAddress);
+#else
     otMacFrameProcessTransmitAesCcm(aFrame, &sExtAddress);
+#endif
+
     otEXPECT(aFrame->mInfo.mTxInfo.mIsSecurityProcessed);
 
 exit:
@@ -1302,39 +1299,17 @@ otError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, uint1
 // Radio Config: Thread 1.2 transmit security support
 
 #if (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
-#if OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE
-void otPlatRadioSetMacKeyRef(otInstance *aInstance,
-                             uint8_t     aKeyIdMode,
-                             uint8_t     aKeyId,
-                             otMacKeyRef aPrevKeyRef,
-                             otMacKeyRef aCurrKeyRef,
-                             otMacKeyRef aNextKeyRef)
+void otPlatRadioSetMacKey(otInstance *            aInstance,
+                          uint8_t                 aKeyIdMode,
+                          uint8_t                 aKeyId,
+                          const otMacKeyMaterial *aPrevKey,
+                          const otMacKeyMaterial *aCurrKey,
+                          const otMacKeyMaterial *aNextKey,
+                          otRadioKeyType          aKeyType)
 {
     OT_UNUSED_VARIABLE(aInstance);
     OT_UNUSED_VARIABLE(aKeyIdMode);
-
-    assert(aPrevKeyRef != 0 && aCurrKeyRef != 0 && aNextKeyRef != 0);
-
-    CORE_DECLARE_IRQ_STATE;
-    CORE_ENTER_ATOMIC();
-
-    sKeyId                       = aKeyId;
-    sMacKeyRefs[MAC_KEY_PREV]    = aPrevKeyRef;
-    sMacKeyRefs[MAC_KEY_CURRENT] = aCurrKeyRef;
-    sMacKeyRefs[MAC_KEY_NEXT]    = aNextKeyRef;
-
-    CORE_EXIT_ATOMIC();
-}
-#else
-void otPlatRadioSetMacKey(otInstance *    aInstance,
-                          uint8_t         aKeyIdMode,
-                          uint8_t         aKeyId,
-                          const otMacKey *aPrevKey,
-                          const otMacKey *aCurrKey,
-                          const otMacKey *aNextKey)
-{
-    OT_UNUSED_VARIABLE(aInstance);
-    OT_UNUSED_VARIABLE(aKeyIdMode);
+    OT_UNUSED_VARIABLE(aKeyType);
 
     assert(aPrevKey != NULL && aCurrKey != NULL && aNextKey != NULL);
 
@@ -1342,13 +1317,12 @@ void otPlatRadioSetMacKey(otInstance *    aInstance,
     CORE_ENTER_ATOMIC();
 
     sKeyId = aKeyId;
-    memcpy(sMacKeys[MAC_KEY_PREV].m8, aPrevKey->m8, OT_MAC_KEY_SIZE);
-    memcpy(sMacKeys[MAC_KEY_CURRENT].m8, aCurrKey->m8, OT_MAC_KEY_SIZE);
-    memcpy(sMacKeys[MAC_KEY_NEXT].m8, aNextKey->m8, OT_MAC_KEY_SIZE);
+    memcpy(&sMacKeys[MAC_KEY_PREV], aPrevKey, sizeof(sMacKeys[MAC_KEY_PREV]));
+    memcpy(&sMacKeys[MAC_KEY_CURRENT], aCurrKey, sizeof(sMacKeys[MAC_KEY_PREV]));
+    memcpy(&sMacKeys[MAC_KEY_NEXT], aNextKey, sizeof(sMacKeys[MAC_KEY_PREV]));
 
     CORE_EXIT_ATOMIC();
 }
-#endif
 
 void otPlatRadioSetMacFrameCounter(otInstance *aInstance, uint32_t aMacFrameCounter)
 {

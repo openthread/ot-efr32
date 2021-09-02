@@ -276,16 +276,6 @@
 #endif
 
 /**
- * @def OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE
- *
- * Define to 1 to enable PSA CRYPTO support.
- *
- */
-#ifndef OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE
-#define OPENTHREAD_CONFIG_PSA_CRYPTO_ENABLE 0
-#endif
-
-/**
  * @def OPENTHREAD_CONFIG_PSA_ITS_NVM_OFFSET
  *
  * This is the offset in ITS where the persistent keys are stored.
@@ -294,5 +284,9 @@
  *
  */
 #define OPENTHREAD_CONFIG_PSA_ITS_NVM_OFFSET 0x20000
+
+#ifndef OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE
+#define OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE 0
+#endif
 
 #endif // OPENTHREAD_CORE_EFR32_CONFIG_H_
