@@ -43,9 +43,8 @@ efr32_get_platforms()
         return 1
     fi
 
-    cd "$repo_dir"/src/ || return
-    local platforms=(*efr32*/)
-    echo "${platforms[@]%/}"
+    local platform_dir="$repo_dir/src" \
+        && find "$platform_dir" -type d -name '*efr32*' -exec basename {} \; | sort
 }
 
 efr32_check_platform()
