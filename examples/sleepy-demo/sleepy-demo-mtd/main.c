@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
     assert(instance);
 
     otAppCliInit(instance);
+    otCliOutputFormat("sleepy-demo-mtd started\r\n");
 
     otLinkSetPollPeriod(instance, SLEEPY_POLL_PERIOD_MS);
     setNetworkConfiguration(instance);
@@ -154,12 +155,13 @@ void otTaskletsSignalPending(otInstance *aInstance)
     sTaskletsPendingSem = true;
 }
 
-/*
+/**
  * Override default network settings, such as panid, so the devices can join a network
  */
 void setNetworkConfiguration(otInstance *aInstance)
 {
     static char          aNetworkName[] = "SleepyEFR32";
+    otError              error;
     otOperationalDataset aDataset;
 
     memset(&aDataset, 0, sizeof(otOperationalDataset));
@@ -197,7 +199,13 @@ void setNetworkConfiguration(otInstance *aInstance)
     memcpy(aDataset.mNetworkName.m8, aNetworkName, length);
     aDataset.mComponents.mIsNetworkNamePresent = true;
 
-    otDatasetSetActive(aInstance, &aDataset);
+    /* Set the Active Operational Dataset to this dataset */
+    error = otDatasetSetActive(aInstance, &aDataset);
+    if (error != OT_ERROR_NONE)
+    {
+        otCliOutputFormat("otDatasetSetActive failed with: %d, %s\r\n", error, otThreadErrorToString(error));
+        return;
+    }
 }
 
 void handleNetifStateChanged(uint32_t aFlags, void *aContext)
@@ -309,10 +317,10 @@ void applicationTick(void)
     otLinkModeConfig config;
     otMessageInfo    messageInfo;
     otMessage *      message = NULL;
-    char *           payload = MTD_MESSAGE;
+    const char *     payload = MTD_MESSAGE;
 
     // Check for BTN0 button press
-    if (sRxOnIdleButtonPressed == true)
+    if (sRxOnIdleButtonPressed)
     {
         sRxOnIdleButtonPressed = false;
         sAllowDeepSleep        = !sAllowDeepSleep;
@@ -369,7 +377,6 @@ exit:
 void mtdReceiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
 {
     OT_UNUSED_VARIABLE(aContext);
-    OT_UNUSED_VARIABLE(aMessage);
     OT_UNUSED_VARIABLE(aMessageInfo);
     uint8_t buf[64];
     int     length;
