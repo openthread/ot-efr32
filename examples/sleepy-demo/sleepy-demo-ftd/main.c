@@ -34,6 +34,7 @@
 #include "hal_common.h"
 #include "openthread-system.h"
 #include <assert.h>
+#include <common/code_utils.hpp>
 #include <common/logging.hpp>
 #include <openthread-core-config.h>
 #include <string.h>
@@ -145,6 +146,7 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
 void setNetworkConfiguration(otInstance *aInstance)
 {
     static char          aNetworkName[] = "SleepyEFR32";
+    otError              error;
     otOperationalDataset aDataset;
 
     memset(&aDataset, 0, sizeof(otOperationalDataset));
@@ -182,7 +184,13 @@ void setNetworkConfiguration(otInstance *aInstance)
     memcpy(aDataset.mNetworkName.m8, aNetworkName, length);
     aDataset.mComponents.mIsNetworkNamePresent = true;
 
-    otDatasetSetActive(aInstance, &aDataset);
+    /* Set the Active Operational Dataset to this dataset */
+    error = otDatasetSetActive(aInstance, &aDataset);
+    if (error != OT_ERROR_NONE)
+    {
+        otCliOutputFormat("otDatasetSetActive failed with: %d, %s\r\n", error, otThreadErrorToString(error));
+        return;
+    }
 }
 
 void handleNetifStateChanged(uint32_t aFlags, void *aContext)
@@ -232,24 +240,26 @@ void gpioInit(void (*callback)(uint8_t pin))
 void initUdp(void)
 {
     otError    error;
-    otSockAddr sockaddr;
+    otSockAddr bindAddr;
 
-    memset(&sockaddr, 0, sizeof(sockaddr));
+    // Initialize bindAddr
+    memset(&bindAddr, 0, sizeof(bindAddr));
+    bindAddr.mPort = MULTICAST_PORT;
 
-    sockaddr.mPort = MULTICAST_PORT;
-
+    // Open the socket
     error = otUdpOpen(instance, &sFtdSocket, sFtdReceiveCallback, NULL);
     if (error != OT_ERROR_NONE)
     {
-        otCliOutputFormat("FTD failed to open udp multicast\r\n");
+        otCliOutputFormat("FTD failed to open udp multicast with: %d, %s\r\n", error, otThreadErrorToString(error));
         return;
     }
 
-    error = otUdpBind(instance, &sFtdSocket, &sockaddr, OT_NETIF_THREAD);
+    // Bind to the socket. Close the socket if bind fails.
+    error = otUdpBind(instance, &sFtdSocket, &bindAddr, OT_NETIF_THREAD);
     if (error != OT_ERROR_NONE)
     {
-        otUdpClose(instance, &sFtdSocket);
-        otCliOutputFormat("FTD failed to bind udp multicast\r\n");
+        otCliOutputFormat("FTD failed to bind udp multicast with: %d, %s\r\n", error, otThreadErrorToString(error));
+        IgnoreReturnValue(otUdpClose(instance, &sFtdSocket));
         return;
     }
 }
@@ -262,56 +272,64 @@ void buttonCallback(uint8_t pin)
 
 void applicationTick(void)
 {
-    otError       error = 0;
     otMessageInfo messageInfo;
     otMessage *   message = NULL;
-    char *        payload = FTD_MESSAGE;
+    const char *  payload = FTD_MESSAGE;
 
-    if (sFtdButtonPressed == true)
+    // Check for button press
+    if (sFtdButtonPressed)
     {
         sFtdButtonPressed = false;
 
-        if (sHaveSwitchAddress)
-        {
-            memset(&messageInfo, 0, sizeof(messageInfo));
-            memcpy(&messageInfo.mPeerAddr, &sSwitchAddress, sizeof messageInfo.mPeerAddr);
-            messageInfo.mPeerPort = RECV_PORT;
+        // Get a message buffer
+        VerifyOrExit((message = otUdpNewMessage(instance, NULL)) != NULL);
 
-            message = otUdpNewMessage(instance, NULL);
+        // Setup messageInfo
+        VerifyOrExit(sHaveSwitchAddress);
+        memset(&messageInfo, 0, sizeof(messageInfo));
+        memcpy(&messageInfo.mPeerAddr, &sSwitchAddress, sizeof messageInfo.mPeerAddr);
+        messageInfo.mPeerPort = RECV_PORT;
 
-            if (message != NULL)
-            {
-                error = otMessageAppend(message, payload, (uint16_t)strlen(payload));
+        // Append the FTD_MESSAGE payload to the message buffer
+        SuccessOrExit(otMessageAppend(message, payload, (uint16_t)strlen(payload)));
 
-                if (error == OT_ERROR_NONE)
-                {
-                    error = otUdpSend(instance, &sFtdSocket, message, &messageInfo);
+        // Send the button press message
+        SuccessOrExit(otUdpSend(instance, &sFtdSocket, message, &messageInfo));
 
-                    if (error == OT_ERROR_NONE)
-                    {
-                        return;
-                    }
-                }
-            }
-
-            if (message != NULL)
-            {
-                otMessageFree(message);
-            }
-        }
+        // Set message pointer to NULL so it doesn't get free'd by this function.
+        // otUdpSend() executing successfully means OpenThread has taken ownership
+        // of the message buffer.
+        message = NULL;
     }
+
+exit:
+    if (message != NULL)
+    {
+        otMessageFree(message);
+    }
+    return;
 }
 
 void sFtdReceiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
 {
     OT_UNUSED_VARIABLE(aContext);
-    OT_UNUSED_VARIABLE(aMessage);
     OT_UNUSED_VARIABLE(aMessageInfo);
-    uint8_t buf[1500];
+    uint8_t buf[64];
     int     length;
 
-    sLedOn = !sLedOn;
+    // Read the received message's payload
+    length      = otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, sizeof(buf) - 1);
+    buf[length] = '\0';
 
+    // Check that the payload matches MTD_MESSAGE
+    VerifyOrExit(strncmp((char *)buf, MTD_MESSAGE, sizeof(MTD_MESSAGE)) == 0);
+
+    // Store the MTD's address
+    sHaveSwitchAddress = true;
+    memcpy(&sSwitchAddress, &aMessageInfo->mPeerAddr, sizeof sSwitchAddress);
+
+    // Toggle LED0
+    sLedOn = !sLedOn;
     if (sLedOn)
     {
         BSP_LedSet(0);
@@ -320,11 +338,8 @@ void sFtdReceiveCallback(void *aContext, otMessage *aMessage, const otMessageInf
     {
         BSP_LedClear(0);
     }
-
-    length      = otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, sizeof(buf) - 1);
-    buf[length] = '\0';
     otCliOutputFormat("Message Received: %s\r\n", buf);
 
-    sHaveSwitchAddress = true;
-    memcpy(&sSwitchAddress, &aMessageInfo->mPeerAddr, sizeof sSwitchAddress);
+exit:
+    return;
 }
