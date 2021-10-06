@@ -37,6 +37,7 @@
 #include "hal_common.h"
 #include "openthread-system.h"
 #include "platform-efr32.h"
+#include <common/code_utils.hpp>
 #include <common/logging.hpp>
 #include <openthread-core-config.h>
 #include <openthread/cli.h>
@@ -87,7 +88,6 @@ extern void otAppCliInit(otInstance *aInstance);
 // Variables
 static otInstance *        instance;
 static otUdpSocket         sMtdSocket;
-static otSockAddr          sMulticastSockAddr;
 static const ButtonArray_t sButtonArray[BSP_BUTTON_COUNT] = BSP_BUTTON_INIT;
 static bool                sButtonPressed                 = false;
 static bool                sRxOnIdleButtonPressed         = false;
@@ -268,27 +268,26 @@ void gpioInit(void (*callback)(uint8_t pin))
 void initUdp(void)
 {
     otError    error;
-    otSockAddr sockaddr;
+    otSockAddr bindAddr;
 
-    memset(&sMulticastSockAddr, 0, sizeof sMulticastSockAddr);
-    otIp6AddressFromString(MULTICAST_ADDR, &sMulticastSockAddr.mAddress);
-    sMulticastSockAddr.mPort = MULTICAST_PORT;
+    // Initialize bindAddr
+    memset(&bindAddr, 0, sizeof(bindAddr));
+    bindAddr.mPort = RECV_PORT;
 
-    memset(&sockaddr, 0, sizeof(sockaddr));
-    sockaddr.mPort = RECV_PORT;
-
+    // Open the socket
     error = otUdpOpen(instance, &sMtdSocket, mtdReceiveCallback, NULL);
-
     if (error != OT_ERROR_NONE)
     {
+        otCliOutputFormat("MTD failed to open udp socket with: %d, %s\r\n", error, otThreadErrorToString(error));
         return;
     }
 
-    error = otUdpBind(instance, &sMtdSocket, &sockaddr, OT_NETIF_THREAD);
-
+    // Bind to the socket. Close the socket if bind fails.
+    error = otUdpBind(instance, &sMtdSocket, &bindAddr, OT_NETIF_THREAD);
     if (error != OT_ERROR_NONE)
     {
-        otUdpClose(instance, &sMtdSocket);
+        otCliOutputFormat("MTD failed to bind udp socket with: %d, %s\r\n", error, otThreadErrorToString(error));
+        IgnoreReturnValue(otUdpClose(instance, &sMtdSocket));
         return;
     }
 }
@@ -307,12 +306,12 @@ void buttonCallback(uint8_t pin)
 
 void applicationTick(void)
 {
-    otError          error = 0;
+    otLinkModeConfig config;
     otMessageInfo    messageInfo;
     otMessage *      message = NULL;
     char *           payload = MTD_MESSAGE;
-    otLinkModeConfig config;
 
+    // Check for BTN0 button press
     if (sRxOnIdleButtonPressed == true)
     {
         sRxOnIdleButtonPressed = false;
@@ -320,39 +319,51 @@ void applicationTick(void)
         config.mRxOnWhenIdle   = !sAllowDeepSleep;
         config.mDeviceType     = 0;
         config.mNetworkData    = 0;
-        otThreadSetLinkMode(instance, config);
+        SuccessOrExit(otThreadSetLinkMode(instance, config));
+
+#if (defined(SL_CATALOG_KERNEL_PRESENT) && defined(SL_CATALOG_POWER_MANAGER_PRESENT))
+        if (sAllowSleep)
+        {
+            sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+        }
+        else
+        {
+            sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+        }
+#endif
     }
 
-    if (sButtonPressed == true)
+    // Check for BTN1 button press
+    if (sButtonPressed)
     {
         sButtonPressed = false;
 
+        // Get a message buffer
+        VerifyOrExit((message = otUdpNewMessage(instance, NULL)) != NULL);
+
+        // Setup messageInfo
         memset(&messageInfo, 0, sizeof(messageInfo));
-        memcpy(&messageInfo.mPeerAddr, &sMulticastSockAddr.mAddress, sizeof messageInfo.mPeerAddr);
-        messageInfo.mPeerPort = sMulticastSockAddr.mPort;
+        SuccessOrExit(otIp6AddressFromString(MULTICAST_ADDR, &messageInfo.mPeerAddr));
+        messageInfo.mPeerPort = MULTICAST_PORT;
 
-        message = otUdpNewMessage(instance, NULL);
+        // Append the MTD_MESSAGE payload to the message buffer
+        SuccessOrExit(otMessageAppend(message, payload, (uint16_t)strlen(payload)));
 
-        if (message != NULL)
-        {
-            error = otMessageAppend(message, payload, (uint16_t)strlen(payload));
+        // Send the button press message
+        SuccessOrExit(otUdpSend(instance, &sMtdSocket, message, &messageInfo));
 
-            if (error == OT_ERROR_NONE)
-            {
-                error = otUdpSend(instance, &sMtdSocket, message, &messageInfo);
-
-                if (error == OT_ERROR_NONE)
-                {
-                    return;
-                }
-            }
-        }
-
-        if (message != NULL)
-        {
-            otMessageFree(message);
-        }
+        // Set message pointer to NULL so it doesn't get free'd by this function.
+        // otUdpSend() executing successfully means OpenThread has taken ownership
+        // of the message buffer.
+        message = NULL;
     }
+
+exit:
+    if (message != NULL)
+    {
+        otMessageFree(message);
+    }
+    return;
 }
 
 void mtdReceiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
@@ -360,23 +371,28 @@ void mtdReceiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo
     OT_UNUSED_VARIABLE(aContext);
     OT_UNUSED_VARIABLE(aMessage);
     OT_UNUSED_VARIABLE(aMessageInfo);
-    uint8_t buf[1500];
+    uint8_t buf[64];
     int     length;
 
+    // Read the received message's payload
     length      = otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, sizeof(buf) - 1);
     buf[length] = '\0';
 
-    if (strcmp((char *)buf, FTD_MESSAGE) == 0)
-    {
-        sLedOn = !sLedOn;
+    // Check that the payload matches FTD_MESSAGE
+    VerifyOrExit(strncmp((char *)buf, FTD_MESSAGE, sizeof(FTD_MESSAGE)) == 0);
 
-        if (sLedOn)
-        {
-            BSP_LedSet(0);
-        }
-        else
-        {
-            BSP_LedClear(0);
-        }
+    // Toggle LED0
+    sLedOn = !sLedOn;
+    if (sLedOn)
+    {
+        BSP_LedSet(0);
     }
+    else
+    {
+        BSP_LedClear(0);
+    }
+    otCliOutputFormat("Message Received: %s\r\n", buf);
+
+exit:
+    return;
 }
