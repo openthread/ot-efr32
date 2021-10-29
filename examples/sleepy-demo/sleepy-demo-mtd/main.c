@@ -56,7 +56,7 @@
 #define MULTICAST_ADDR "ff03::1"
 #define MULTICAST_PORT 123
 #define RECV_PORT 234
-#define SLEEPY_POLL_PERIOD_MS 5000
+#define SLEEPY_POLL_PERIOD_MS 2000
 #define MTD_MESSAGE "mtd button"
 #define FTD_MESSAGE "ftd button"
 
@@ -95,6 +95,27 @@ static bool                sLedOn                         = false;
 static bool                sAllowDeepSleep                = false;
 static bool                sTaskletsPendingSem            = true;
 
+void sleepyInit(void)
+{
+    otError error;
+    otCliOutputFormat("sleepy-demo-mtd started\r\n");
+
+    otLinkModeConfig config;
+    SuccessOrExit(error = otLinkSetPollPeriod(instance, SLEEPY_POLL_PERIOD_MS));
+
+    config.mRxOnWhenIdle = true;
+    config.mDeviceType   = 0;
+    config.mNetworkData  = 0;
+    SuccessOrExit(error = otThreadSetLinkMode(instance, config));
+
+exit:
+    if (error != OT_ERROR_NONE)
+    {
+        otCliOutputFormat("Initialization failed with: %d, %s\r\n", error, otThreadErrorToString(error));
+    }
+    return;
+}
+
 int main(int argc, char *argv[])
 {
     otLinkModeConfig config;
@@ -106,16 +127,10 @@ int main(int argc, char *argv[])
     assert(instance);
 
     otAppCliInit(instance);
-    otCliOutputFormat("sleepy-demo-mtd started\r\n");
 
-    otLinkSetPollPeriod(instance, SLEEPY_POLL_PERIOD_MS);
+    sleepyInit();
     setNetworkConfiguration(instance);
     otSetStateChangedCallback(instance, handleNetifStateChanged, instance);
-
-    config.mRxOnWhenIdle = true;
-    config.mDeviceType   = 0;
-    config.mNetworkData  = 0;
-    otThreadSetLinkMode(instance, config);
 
     initUdp();
     otIp6SetEnabled(instance, true);
@@ -223,10 +238,6 @@ void handleNetifStateChanged(uint32_t aFlags, void *aContext)
             break;
 
         case OT_DEVICE_ROLE_CHILD:
-            config.mRxOnWhenIdle = 0;
-            config.mDeviceType   = 0;
-            config.mNetworkData  = 0;
-            otThreadSetLinkMode(instance, config);
             sAllowDeepSleep = false;
             break;
 
