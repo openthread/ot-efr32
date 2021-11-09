@@ -91,7 +91,6 @@ static otUdpSocket         sMtdSocket;
 static const ButtonArray_t sButtonArray[BSP_BUTTON_COUNT] = BSP_BUTTON_INIT;
 static bool                sButtonPressed                 = false;
 static bool                sRxOnIdleButtonPressed         = false;
-static bool                sLedOn                         = false;
 static bool                sAllowDeepSleep                = false;
 static bool                sTaskletsPendingSem            = true;
 
@@ -278,10 +277,6 @@ void gpioInit(void (*callback)(uint8_t pin))
     GPIOINT_CallbackRegister(sButtonArray[1].pin, callback);
     GPIO_IntConfig(sButtonArray[0].port, sButtonArray[0].pin, false, true, true);
     GPIO_IntConfig(sButtonArray[1].port, sButtonArray[1].pin, false, true, true);
-
-    BSP_LedsInit();
-    BSP_LedClear(0);
-    BSP_LedClear(1);
 }
 
 void initUdp(void)
@@ -399,16 +394,6 @@ void mtdReceiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo
     // Check that the payload matches FTD_MESSAGE
     VerifyOrExit(strncmp((char *)buf, FTD_MESSAGE, sizeof(FTD_MESSAGE)) == 0);
 
-    // Toggle LED0
-    sLedOn = !sLedOn;
-    if (sLedOn)
-    {
-        BSP_LedSet(0);
-    }
-    else
-    {
-        BSP_LedClear(0);
-    }
     otCliOutputFormat("Message Received: %s\r\n", buf);
 
 exit:

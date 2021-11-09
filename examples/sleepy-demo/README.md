@@ -54,17 +54,15 @@ Done
 
 Pressing button 0 on the MTD toggles between operating as a Minimal End Device (MED) and a Sleepy End Device (SED) with the RX off when idle.
 
-Pressing button 1 on the MTD sends a multicast UDP message containing the string `mtd button`. The FTD listens on the multicast address and will toggle LED 0 and display a message in the CLI showing `Message Received: mtd button`.
+Pressing button 1 on the MTD sends a multicast UDP message containing the string `mtd button`. The FTD listens on the multicast address and will display `Message Received: mtd button` in the CLI.
 
 ## 4. Buttons on the FTD
 
 Pressing either button 0 or 1 on the FTD will send a UDP message to the FTD containing the string `ftd button`. The MTD must first send a multicast message by pressing the MTD's button 1 so that the FTD knows the address of the MTD to send messages to.
 
-This will toggle the state of LED0 on the MTD. If the MTD is operating as a sleepy end device then the MTD polls the parent every 2 seconds for messages and will update the LED state on the next poll.
-
 ## 5. Monitoring power consumption of the MTD
 
-Open the Energy Profiler within Silicon Labs Simplicity Studio. Within the Quick Access menu select Start Energy Capture... and select the MTD device. When operating as a Sleepy End Device with no LEDs on the current should be under 20 microamps with occasional spikes during waking and polling the parent. With the LED on the MTD has a current consumption of approximately 1mA.
+Open the Energy Profiler within Silicon Labs Simplicity Studio. Within the Quick Access menu select Start Energy Capture... and select the MTD device. When operating as a Sleepy End Device, the current should be under 20 microamps with occasional spikes during waking and polling the parent.
 
 When operating as a Minimal End Device with the Rx on Idle observe that the current is in the order of 10mA.
 

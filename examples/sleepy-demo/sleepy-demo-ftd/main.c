@@ -83,7 +83,6 @@ extern void otAppCliInit(otInstance *aInstance);
 // Variables
 static otInstance *        instance;
 static otUdpSocket         sFtdSocket;
-static bool                sLedOn             = false;
 static bool                sHaveSwitchAddress = false;
 static otIp6Address        sSwitchAddress;
 static bool                sFtdButtonPressed              = false;
@@ -231,10 +230,6 @@ void gpioInit(void (*callback)(uint8_t pin))
     GPIOINT_CallbackRegister(sButtonArray[1].pin, callback);
     GPIO_IntConfig(sButtonArray[0].port, sButtonArray[0].pin, false, true, true);
     GPIO_IntConfig(sButtonArray[1].port, sButtonArray[1].pin, false, true, true);
-
-    BSP_LedsInit();
-    BSP_LedClear(0);
-    BSP_LedClear(1);
 }
 
 void initUdp(void)
@@ -328,16 +323,6 @@ void sFtdReceiveCallback(void *aContext, otMessage *aMessage, const otMessageInf
     sHaveSwitchAddress = true;
     memcpy(&sSwitchAddress, &aMessageInfo->mPeerAddr, sizeof sSwitchAddress);
 
-    // Toggle LED0
-    sLedOn = !sLedOn;
-    if (sLedOn)
-    {
-        BSP_LedSet(0);
-    }
-    else
-    {
-        BSP_LedClear(0);
-    }
     otCliOutputFormat("Message Received: %s\r\n", buf);
 
 exit:
