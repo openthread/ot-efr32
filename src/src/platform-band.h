@@ -81,8 +81,12 @@ typedef struct efr32CommonConfig
 #if RADIO_CONFIG_DMP_SUPPORT
     RAILSched_Config_t mRailSchedState;
 #endif
-    uint8_t
-        mRailTxFifo[RAIL_TX_FIFO_SIZE]; // must be 2 power between 64 and 4096, and bigger than OT_RADIO_FRAME_MAX_SIZE
+    union
+    {
+        // Used to align this buffer as needed
+        RAIL_FIFO_ALIGNMENT_TYPE align[RAIL_TX_FIFO_SIZE / RAIL_FIFO_ALIGNMENT];
+        uint8_t fifo[RAIL_TX_FIFO_SIZE]; // must be 2 power between 64 and 4096, and bigger than OT_RADIO_FRAME_MAX_SIZE
+    } mRailTxFifo;
 } efr32CommonConfig;
 
 typedef struct efr32BandConfig

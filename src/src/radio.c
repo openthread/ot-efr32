@@ -547,8 +547,9 @@ static RAIL_Handle_t efr32RailInit(efr32CommonConfig *aCommonConfig)
     assert(status == RAIL_STATUS_NO_ERROR);
 #endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 
-    uint16_t actualLength = RAIL_SetTxFifo(handle, aCommonConfig->mRailTxFifo, 0, sizeof(aCommonConfig->mRailTxFifo));
-    assert(actualLength == sizeof(aCommonConfig->mRailTxFifo));
+    uint16_t actualLength =
+        RAIL_SetTxFifo(handle, aCommonConfig->mRailTxFifo.fifo, 0, sizeof(aCommonConfig->mRailTxFifo.fifo));
+    assert(actualLength == sizeof(aCommonConfig->mRailTxFifo.fifo));
 
     return handle;
 }
