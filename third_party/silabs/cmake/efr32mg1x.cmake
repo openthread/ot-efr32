@@ -34,14 +34,12 @@ set(SILABS_EFR32MG1X_SOURCES
     ${SILABS_GSDK_DIR}/platform/emlib/src/em_leuart.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/crypto_aes.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/crypto_ecp.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_protocol_crypto/src/sli_protocol_crypto_crypto.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/crypto_management.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_aead.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_cipher.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_hash.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_mac.c
 )
-
 
 # ==============================================================================
 # Platform-level _SOURCES
@@ -56,15 +54,16 @@ set(SILABS_EFR32MG12_SOURCES
     ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG12P/Source/system_efr32mg12p.c
     ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG12P/Source/GCC/startup_efr32mg12p.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_trng_driver.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_trng.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_protocol_crypto/src/sli_protocol_crypto_crypto.c
     ${SILABS_EFR32MG1X_SOURCES}
 )
 
 set(SILABS_EFR32MG13_SOURCES
+	${SILABS_GSDK_DIR}/platform/service/sleeptimer/src/sl_sleeptimer_hal_prortc.c
     ${SILABS_GSDK_DIR}/hardware/kit/common/drivers/mx25flash_spi.c
     ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG13P/Source/system_efr32mg13p.c
     ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG13P/Source/GCC/startup_efr32mg13p.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_trng_driver.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_trng.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_protocol_crypto/src/sli_protocol_crypto_crypto.c
     ${SILABS_EFR32MG1X_SOURCES}
 )

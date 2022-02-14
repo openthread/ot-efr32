@@ -74,6 +74,7 @@ target_compile_options(ot-config INTERFACE
 )
 
 target_include_directories(ot-config INTERFACE
+    ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/src
     ${PROJECT_SOURCE_DIR}/src/${EFR32_PLATFORM}
     ${PROJECT_SOURCE_DIR}/src/${EFR32_PLATFORM}/crypto

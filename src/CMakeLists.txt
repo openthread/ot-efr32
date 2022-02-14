@@ -77,7 +77,7 @@ set(EFR32_CFLAGS
 if(NOT OT_EXTERNAL_MBEDTLS)
     message(FATAL_ERROR "OT_EXTERNAL_MBEDTLS is not set. Please include the define when running cmake\n\t-DOT_EXTERNAL_MBEDTLS=silabs-mbedtls")
 else()
-    list(APPEND OT_PLATFORM_DEFINES "MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\"")
+    list(APPEND OT_PLATFORM_DEFINES "MBEDTLS_CONFIG_FILE=\"src/mbedtls_config.h\"")
     list(APPEND OT_PLATFORM_DEFINES "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"psa_crypto_config.h\"")
 endif()
 set(OT_PLATFORM_DEFINES ${OT_PLATFORM_DEFINES} PARENT_SCOPE)

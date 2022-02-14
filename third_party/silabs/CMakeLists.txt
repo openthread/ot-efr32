@@ -68,14 +68,15 @@ set(SILABS_GSDK_COMMON_SOURCES
     ${SILABS_GSDK_DIR}/platform/service/device_init/src/sl_device_init_nvic.c
     ${SILABS_GSDK_DIR}/platform/service/sleeptimer/src/sl_sleeptimer.c
     ${SILABS_GSDK_DIR}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_entropy.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_mbedtls.c
-    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_alt/source/sl_psa_its_nvm3.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_ccm.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_cmac.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/mbedtls_sha.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/sl_entropy_hardware.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/sl_mbedtls.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_driver_common.c
     ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_driver_init.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_trng.c
+    ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c
 )
 
 # ==============================================================================
@@ -108,6 +109,6 @@ include(${platform_sdk_cmake})
 # ==============================================================================
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/mbedtls.cmake)
 
-list(APPEND OT_PLATFORM_DEFINES "MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\"")
+list(APPEND OT_PLATFORM_DEFINES "MBEDTLS_CONFIG_FILE=\"src/mbedtls_config.h\"")
 list(APPEND OT_PLATFORM_DEFINES "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"psa_crypto_config.h\"")
 set(OT_PLATFORM_DEFINES ${OT_PLATFORM_DEFINES} PARENT_SCOPE)

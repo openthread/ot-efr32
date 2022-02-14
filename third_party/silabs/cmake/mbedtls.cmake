@@ -50,6 +50,9 @@ target_link_libraries(silabs-mbedtls
 
 target_include_directories(silabs-mbedtls
     PUBLIC
+        ${PROJECT_SOURCE_DIR}/src
+        ${PROJECT_SOURCE_DIR}/src/src
+        ${PROJECT_SOURCE_DIR}/src/${PLATFORM_LOWERCASE}/crypto
         ${SILABS_MBEDTLS_DIR}/include
         ${SILABS_MBEDTLS_DIR}/include/mbedtls
         ${SILABS_MBEDTLS_DIR}/library
@@ -58,7 +61,6 @@ target_include_directories(silabs-mbedtls
         ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_mbedtls_support/inc
         ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_protocol_crypto/src/
         ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/sl_psa_driver/inc
-        ${PROJECT_SOURCE_DIR}/src/${PLATFORM_LOWERCASE}/crypto
         ${SILABS_GSDK_DIR}/util/silicon_labs/silabs_core/memory_manager
     PRIVATE
         ${SILABS_GSDK_DIR}/platform/CMSIS/Include
@@ -68,7 +70,6 @@ target_include_directories(silabs-mbedtls
         ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/se_manager/inc
         ${SILABS_GSDK_DIR}/util/third_party/crypto/sl_component/se_manager/src
         ${gsdk_platform_device_silicon_labs_include_dir}
-        ${PROJECT_SOURCE_DIR}/src/src
 )
 
 set(SILABS_MBEDTLS_SOURCES
@@ -90,7 +91,6 @@ set(SILABS_MBEDTLS_SOURCES
     ${SILABS_MBEDTLS_DIR}/library/ecp.c
     ${SILABS_MBEDTLS_DIR}/library/entropy_poll.c
     ${SILABS_MBEDTLS_DIR}/library/entropy.c
-    ${SILABS_MBEDTLS_DIR}/library/error.c
     ${SILABS_MBEDTLS_DIR}/library/hmac_drbg.c
     ${SILABS_MBEDTLS_DIR}/library/md.c
     ${SILABS_MBEDTLS_DIR}/library/oid.c
@@ -113,8 +113,6 @@ set(SILABS_MBEDTLS_SOURCES
     ${SILABS_MBEDTLS_DIR}/library/psa_crypto_slot_management.c
     ${SILABS_MBEDTLS_DIR}/library/psa_crypto_storage.c
     ${SILABS_MBEDTLS_DIR}/library/psa_crypto.c
-    ${SILABS_MBEDTLS_DIR}/library/rsa_internal.c
-    ${SILABS_MBEDTLS_DIR}/library/rsa.c
     ${SILABS_MBEDTLS_DIR}/library/sha256.c
     ${SILABS_MBEDTLS_DIR}/library/ssl_cache.c
     ${SILABS_MBEDTLS_DIR}/library/ssl_ciphersuites.c
