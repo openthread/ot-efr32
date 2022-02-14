@@ -32,9 +32,14 @@
  *
  */
 
+#include <stddef.h>
 #include <openthread/platform/entropy.h>
-#include "mbedtls/entropy_poll.h"
 #include "utils/code_utils.h"
+
+// The mbedtls_hardware_poll() function is meant for internal use by Mbed TLS
+// and is not declared in any external header files. We will therefore declare
+// it as an extern function here.
+extern int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen);
 
 otError otPlatEntropyGet(uint8_t *aOutput, uint16_t aOutputLength)
 {

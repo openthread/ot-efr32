@@ -3,8 +3,6 @@
 #ifndef MBEDTLS_CONFIG_AUTOGEN_H
 #define MBEDTLS_CONFIG_AUTOGEN_H
 
-#define MBEDTLS_ECP_MAX_BITS 256
-
 #define MBEDTLS_MPI_MAX_SIZE 32
 
 #define MBEDTLS_AES_C
@@ -22,8 +20,9 @@
 #define MBEDTLS_ECP_C
 #define MBEDTLS_ECP_DP_SECP256R1_ENABLED
 #define MBEDTLS_ECDH_C
-#define MBEDTLS_ECDH_LEGACY_CONTEXT
 #define MBEDTLS_ECDSA_C
+#define MBEDTLS_ECDSA_DETERMINISTIC
+#define MBEDTLS_HMAC_DRBG_C
 #define MBEDTLS_ENTROPY_HARDWARE_ALT
 #define MBEDTLS_ENTROPY_RAIL_PRESENT
 #define MBEDTLS_MD_C
@@ -32,12 +31,16 @@
 #define MBEDTLS_BIGNUM_C
 #define MBEDTLS_PEM_PARSE_C
 #define MBEDTLS_PEM_WRITE_C
+#define MBEDTLS_PK_C
+#define MBEDTLS_PK_PARSE_C
+#define MBEDTLS_PK_WRITE_C
 #define MBEDTLS_ENTROPY_C
 #define MBEDTLS_ENTROPY_FORCE_SHA256
 #define MBEDTLS_ENTROPY_MAX_SOURCES 2
 #define MBEDTLS_NO_PLATFORM_ENTROPY
 #define MBEDTLS_CTR_DRBG_C
 #define MBEDTLS_SHA256_C
+#define MBEDTLS_SHA224_C
 #define MBEDTLS_SSL_TLS_C
 #define MBEDTLS_SSL_CLI_C
 #define MBEDTLS_SSL_PROTO_TLS1_2
@@ -51,9 +54,7 @@
 #define MBEDTLS_X509_CSR_PARSE_C
 #define MBEDTLS_X509_CSR_WRITE_C
 #define MBEDTLS_OID_C
-#define MBEDTLS_PK_C
-#define MBEDTLS_PK_PARSE_C
-#define MBEDTLS_PK_WRITE_C
+#define MBEDTLS_USE_PSA_CRYPTO
 #define MBEDTLS_PSA_CRYPTO_C
 #define MBEDTLS_PSA_CRYPTO_CONFIG
 #define MBEDTLS_PSA_CRYPTO_DRIVERS
@@ -61,10 +62,22 @@
 
 #include "config-device-acceleration.h"
 
+#if defined(SL_SE_ASSUME_FW_AT_LEAST_1_2_10) || defined(SL_SE_ASSUME_FW_AT_LEAST_2_1_7)
+#undef MBEDTLS_ECP_DP_CURVE25519_ENABLED
+#if !(defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED) || defined(MBEDTLS_ECP_DP_SECP224R1_ENABLED)    \
+      || defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED) || defined(MBEDTLS_ECP_DP_SECP384R1_ENABLED) \
+      || defined(MBEDTLS_ECP_DP_SECP521R1_ENABLED))
+#undef MBEDTLS_ECDH_C
+#undef MBEDTLS_ECP_C
+#undef MBEDTLS_BIGNUM_C
+#endif /* !MBEDTLS_ECP_DP_SECPxR1_ENABLED */
+#endif /* SL_SE_ASSUME_FW_AT_LEAST_x */
+
 #if !defined(TEST_SUITE_MEMORY_BUFFER_ALLOC)
 #if !defined(MBEDTLS_PLATFORM_FREE_MACRO) && !defined(MBEDTLS_PLATFORM_CALLOC_MACRO)
-#if defined(CONFIG_MEDTLS_USE_AFR_MEMORY)
-/* Amazon FreeRTOS requires custom memory allocator hooks */
+#if defined(CONFIG_MBEDTLS_USE_FREERTOS_PVCALLOC)
+/* In FreeRTOS, use pvCalloc (and vPortFree) for dynamic memory allocation.
+   E.g. Amazon FreeRTOS implements pvCalloc for dynamic memory allocation. */
 #include <stddef.h>
 
 extern void *pvCalloc(size_t xNumElements, size_t xSize);
