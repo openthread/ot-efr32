@@ -125,7 +125,7 @@ main()
     fi
 
     local platform="$1"
-    echo "$efr32_platforms" | grep -wq "${platform}" || die "Unsupported platform ${platform}"
+    efr32_check_platform "${platform}" || die "Unsupported platform ${platform}"
     shift
 
     local options=("${OT_OPTIONS[@]}")
