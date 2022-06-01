@@ -36,5 +36,5 @@ set(SILABS_GSDK_DIR ${PROJECT_SOURCE_DIR}/third_party/silabs/gecko_sdk)
 
 # Check if GSDK exists
 if(NOT EXISTS "${SILABS_GSDK_DIR}")
-    message(FATAL_ERROR "Cannot find: ${SILABS_GSDK_DIR}\nPlease make sure the 'third_party/silabs/gecko_sdk' submodule is initialized")
+    message(FATAL_ERROR "Cannot find: ${SILABS_GSDK_DIR}\nPlease make sure the submodule is initialized")
 endif()

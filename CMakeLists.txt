@@ -29,7 +29,8 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(ot-efr32 VERSION 0.2.0)
 
-include("${PROJECT_SOURCE_DIR}/openthread/etc/cmake/functions.cmake")
+include(${PROJECT_SOURCE_DIR}/openthread/etc/cmake/functions.cmake)
+include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
 
 set(OT_PACKAGE_VERSION "" CACHE STRING "OpenThread Package Version")
 if(OT_PACKAGE_VERSION STREQUAL "")
@@ -80,5 +81,4 @@ target_include_directories(ot-config INTERFACE
 )
 
 add_subdirectory(examples)
-add_subdirectory(src)
 add_subdirectory(third_party)
