@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2021, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,43 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "hal-config.h"
+/**
+ * @file
+ *   This file includes the initializers for supporting Security manager.
+ *
+ */
 
-#if (HAL_FEM_ENABLE)
-#include "util/plugin/plugin-common/fem-control/fem-control.c"
+#ifndef SL_PACKET_HANDLER_H
+#define SL_PACKET_HANDLER_H
+
+#include <openthread/platform/radio.h>
+
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+/**
+ * This function performs AES CCM on the frame which is going to be sent.
+ *
+ * @param[in]  aFrame       A pointer to the MAC frame buffer that is going to be sent.
+ * @param[in]  aExtAddress  A pointer to the extended address, which will be used to generate nonce
+ *                          for AES CCM computation.
+ *
+ */
+void efr32PlatProcessTransmitAesCcm(otRadioFrame *aFrame, const otExtAddress *aExtAddress);
+
+/**
+ * This function returns if the Frame Pending bit is set in any given frame.
+ *
+ * @param[in]  aFrame       A pointer to the MAC frame buffer.
+ *
+ * @retval  true    Frame Pending is set.
+ * @retval  false   Frame Pending is not set.
+ */
+bool efr32IsFramePending(otRadioFrame *aFrame);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+#endif /* SL_PACKET_HANDLER_H */

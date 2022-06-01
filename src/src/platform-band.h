@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2018, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -55,25 +55,28 @@
 
 typedef struct efr32RadioCounters
 {
-    uint64_t mRailPlatTxTriggered;
-    uint64_t mRailPlatRadioReceiveDoneCbCount;
-    uint64_t mRailPlatRadioEnergyScanDoneCbCount;
-    uint64_t mRailPlatRadioTxDoneCbCount;
-    uint64_t mRailTxStarted;
-    uint64_t mRailTxStartFailed;
-    uint64_t mRailEventConfigScheduled;
-    uint64_t mRailEventConfigUnScheduled;
-    uint64_t mRailEventPacketSent;
-    uint64_t mRailEventChannelBusy;
-    uint64_t mRailEventEnergyScanCompleted;
-    uint64_t mRailEventCalNeeded;
-    uint64_t mRailEventPacketReceived;
-    uint64_t mRailEventNoAck;
-    uint64_t mRailEventTxAbort;
-    uint64_t mRailEventSchedulerStatusError;
-    uint64_t mRailEventsSchedulerStatusTransmitBusy;
+    uint32_t mRailPlatTxTriggered;
+    uint32_t mRailPlatRadioReceiveDoneCbCount;
+    uint32_t mRailPlatRadioEnergyScanDoneCbCount;
+    uint32_t mRailPlatRadioTxDoneCbCount;
+    uint32_t mRailTxStarted;
+    uint32_t mRailTxStartFailed;
+    uint32_t mRailEventAcksReceived;
+    uint32_t mRailEventConfigScheduled;
+    uint32_t mRailEventConfigUnScheduled;
+    uint32_t mRailEventPacketSent;
+    uint32_t mRailEventChannelBusy;
+    uint32_t mRailEventEnergyScanCompleted;
+    uint32_t mRailEventCalNeeded;
+    uint32_t mRailEventPacketReceived;
+    uint32_t mRailEventNoAck;
+    uint32_t mRailEventTxAbort;
+    uint32_t mRailEventSchedulerStatusError;
+    uint32_t mRailEventsSchedulerStatusTransmitBusy;
     uint32_t mRailEventsSchedulerStatusLastStatus;
+    uint32_t mRailEventsEnhAckTxFailed;
 } efr32RadioCounters;
+
 
 typedef struct efr32CommonConfig
 {
@@ -81,8 +84,7 @@ typedef struct efr32CommonConfig
 #if RADIO_CONFIG_DMP_SUPPORT
     RAILSched_Config_t mRailSchedState;
 #endif
-    union
-    {
+    union {
         // Used to align this buffer as needed
         RAIL_FIFO_ALIGNMENT_TYPE align[RAIL_TX_FIFO_SIZE / RAIL_FIFO_ALIGNMENT];
         uint8_t fifo[RAIL_TX_FIFO_SIZE]; // must be 2 power between 64 and 4096, and bigger than OT_RADIO_FRAME_MAX_SIZE

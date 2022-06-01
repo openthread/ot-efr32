@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2019, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,7 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
 
     otPlatResetReason reason = OT_PLAT_RESET_REASON_UNKNOWN;
 
-#if defined(_EMU_RSTCAUSE_MASK)
+    #if defined(_EMU_RSTCAUSE_MASK)
     if (sResetCause & EMU_RSTCAUSE_POR)
     {
         reason = OT_PLAT_RESET_REASON_POWER_ON;
@@ -80,18 +80,14 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
     {
         reason = OT_PLAT_RESET_REASON_FAULT;
     }
-    /* clang-format off */
-    else if ((sResetCause & EMU_RSTCAUSE_AVDDBOD)
-             || (sResetCause & EMU_RSTCAUSE_DECBOD)
-             || (sResetCause & EMU_RSTCAUSE_DVDDBOD)
-             || (sResetCause & EMU_RSTCAUSE_DVDDLEBOD)
-             || (sResetCause & EMU_RSTCAUSE_EM4))
-    /* clang-format on */
+    else if ((sResetCause & EMU_RSTCAUSE_AVDDBOD) || (sResetCause & EMU_RSTCAUSE_DECBOD) ||
+             (sResetCause & EMU_RSTCAUSE_DVDDBOD) || (sResetCause & EMU_RSTCAUSE_DVDDLEBOD) ||
+             (sResetCause & EMU_RSTCAUSE_EM4))
     {
         reason = OT_PLAT_RESET_REASON_OTHER;
     }
-#endif
-#if defined(_RMU_RSTCAUSE_MASK)
+    #endif
+    #if defined(_RMU_RSTCAUSE_MASK)
     if (sResetCause & RMU_RSTCAUSE_PORST)
     {
         reason = OT_PLAT_RESET_REASON_POWER_ON;
@@ -112,16 +108,12 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
     {
         reason = OT_PLAT_RESET_REASON_FAULT;
     }
-    /* clang-format off */
-    else if ((sResetCause & RMU_RSTCAUSE_AVDDBOD)
-             || (sResetCause & RMU_RSTCAUSE_DECBOD)
-             || (sResetCause & RMU_RSTCAUSE_DVDDBOD)
-             || (sResetCause & RMU_RSTCAUSE_EM4RST))
-    /* clang-format on */
+    else if ((sResetCause & RMU_RSTCAUSE_AVDDBOD) || (sResetCause & RMU_RSTCAUSE_DECBOD) ||
+             (sResetCause & RMU_RSTCAUSE_DVDDBOD) || (sResetCause & RMU_RSTCAUSE_EM4RST))
     {
         reason = OT_PLAT_RESET_REASON_OTHER;
     }
-#endif
+    #endif
     return reason;
 }
 

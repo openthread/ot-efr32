@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2019, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -28,62 +28,15 @@
 
 /**
  * @file
- *   This file implements the OpenThread platform abstraction for the diagnostics.
+ *   This file includes the initializers for supporting OpenThread with
+ * power manager.
  *
  */
 
-#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
+#ifndef SLEEP_H_
+#define SLEEP_H_
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <sys/time.h>
+void sl_ot_sleep_init(void);
+bool sl_ot_is_ok_to_sleep(void);
 
-#include "common/code_utils.hpp"
-#include <openthread/cli.h>
-#include <openthread/config.h>
-#include <openthread/platform/alarm-milli.h>
-#include <openthread/platform/diag.h>
-#include <openthread/platform/radio.h>
-#include "platform-efr32.h"
-
-#if OPENTHREAD_CONFIG_DIAG_ENABLE
-
-/**
- * Diagnostics mode variables.
- *
- */
-static bool sDiagMode = false;
-
-void otPlatDiagModeSet(bool aMode)
-{
-    sDiagMode = aMode;
-}
-
-bool otPlatDiagModeGet()
-{
-    return sDiagMode;
-}
-
-void otPlatDiagChannelSet(uint8_t aChannel)
-{
-    OT_UNUSED_VARIABLE(aChannel);
-}
-
-void otPlatDiagTxPowerSet(int8_t aTxPower)
-{
-    OT_UNUSED_VARIABLE(aTxPower);
-}
-
-void otPlatDiagRadioReceived(otInstance *aInstance, otRadioFrame *aFrame, otError aError)
-{
-    OT_UNUSED_VARIABLE(aInstance);
-    OT_UNUSED_VARIABLE(aFrame);
-    OT_UNUSED_VARIABLE(aError);
-}
-
-void otPlatDiagAlarmCallback(otInstance *aInstance)
-{
-    OT_UNUSED_VARIABLE(aInstance);
-}
-
-#endif // #if OPENTHREAD_CONFIG_DIAG_ENABLE
+#endif // SLEEP_H_

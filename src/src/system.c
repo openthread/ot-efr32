@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2019, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -37,153 +37,45 @@
 #include <string.h>
 
 #include "openthread-system.h"
-
-#include "common/logging.hpp"
 #include "utils/uart.h"
 
-#include "bsp.h"
-#include "bsp_init.h"
-#include "dmadrv.h"
-#include "ecode.h"
+#include "common/logging.hpp"
+
 #include "em_chip.h"
-#include "em_cmu.h"
-#include "em_core.h"
-#include "em_device.h"
 #include "em_emu.h"
 #include "em_system.h"
-#include "hal-config.h"
-#include "hal_common.h"
-#include "platform-efr32.h"
 #include "rail.h"
-#include "sl_device_init_nvic.h"
 #include "sl_mpu.h"
 #include "sl_sleeptimer.h"
-
-#if (HAL_FEM_ENABLE)
-#include "fem-control.h"
+#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
+#include "sl_malloc.h"
+#include "openthread/heap.h"
 #endif
+
+#include "platform-efr32.h"
+#include "sl_openthread.h"
 
 #define USE_EFR32_LOG (OPENTHREAD_CONFIG_LOG_OUTPUT == OPENTHREAD_CONFIG_LOG_OUTPUT_PLATFORM_DEFINED)
 
-void initAntenna(void);
-
-static void boardDisableSpiFlash(void)
-{
-#if defined(BSP_EXTFLASH_USART) && !defined(HAL_DISABLE_EXTFLASH)
-#include "mx25flash_spi.h"
-    MX25_init();
-    MX25_DP();
-#endif
-}
-
-static void boardLowPowerInit(void)
-{
-    boardDisableSpiFlash();
-}
-
-static void halInitChipSpecific(void)
-{
-#if defined(BSP_DK) && !defined(RAIL_IC_SIM_BUILD)
-    BSP_Init(BSP_INIT_DK_SPI);
-#endif
-    BSP_initDevice();
-
-#if !defined(RAIL_IC_SIM_BUILD)
-    BSP_initBoard();
-#endif
-
-#if HAL_PTI_ENABLE
-    RAIL_PtiConfig_t railPtiConfig = {
-#if HAL_PTI_MODE == HAL_PTI_MODE_SPI
-        .mode = RAIL_PTI_MODE_SPI,
-#elif HAL_PTI_MODE == HAL_PTI_MODE_UART
-        .mode = RAIL_PTI_MODE_UART,
-#elif HAL_PTI_MODE == HAL_PTI_MODE_UART_ONEWIRE
-        .mode = RAIL_PTI_MODE_UART_ONEWIRE,
-#else
-        .mode = RAIL_PTI_MODE_DISABLED,
-#endif
-        .baud = HAL_PTI_BAUD_RATE,
-#ifdef BSP_PTI_DOUT_LOC
-        .doutLoc = BSP_PTI_DOUT_LOC,
-#endif
-        .doutPort = (uint8_t)BSP_PTI_DOUT_PORT,
-        .doutPin  = BSP_PTI_DOUT_PIN,
-#if HAL_PTI_MODE == HAL_PTI_MODE_SPI
-#ifdef BSP_PTI_DCLK_LOC
-        .dclkLoc = BSP_PTI_DCLK_LOC,
-#endif
-        .dclkPort = (uint8_t)BSP_PTI_DCLK_PORT,
-        .dclkPin  = BSP_PTI_DCLK_PIN,
-#endif
-#if HAL_PTI_MODE != HAL_PTI_MODE_UART_ONEWIRE
-#ifdef BSP_PTI_DFRAME_LOC
-        .dframeLoc = BSP_PTI_DFRAME_LOC,
-#endif
-        .dframePort = (uint8_t)BSP_PTI_DFRAME_PORT,
-        .dframePin  = BSP_PTI_DFRAME_PIN
-#endif
-    };
-
-    RAIL_ConfigPti(RAIL_EFR32_HANDLE, &railPtiConfig);
-#endif // HAL_PTI_ENABLE
-
-#if !defined(RAIL_IC_SIM_BUILD)
-    initAntenna();
-
-    // Disable any unused peripherals to ensure we enter a low power mode
-    boardLowPowerInit();
-#endif
-
-#if RAIL_DMA_CHANNEL == DMA_CHANNEL_DMADRV
-    Ecode_t dmaError = DMADRV_Init();
-    if ((dmaError == ECODE_EMDRV_DMADRV_ALREADY_INITIALIZED) || (dmaError == ECODE_EMDRV_DMADRV_OK))
-    {
-        unsigned int channel;
-        dmaError = DMADRV_AllocateChannel(&channel, NULL);
-        if (dmaError == ECODE_EMDRV_DMADRV_OK)
-        {
-            RAIL_UseDma(channel);
-        }
-    }
-#elif defined(RAIL_DMA_CHANNEL) && (RAIL_DMA_CHANNEL != DMA_CHANNEL_INVALID)
-    LDMA_Init_t ldmaInit = LDMA_INIT_DEFAULT;
-    LDMA_Init(&ldmaInit);
-    RAIL_UseDma(RAIL_DMA_CHANNEL);
-#endif
-}
-
 otInstance *sInstance;
-static bool (*sCanSleepCallback)(void);
+
+#ifndef SL_COMPONENT_CATALOG_PRESENT
+__WEAK void sl_openthread_init(void)
+{
+    // Place holder for enabling Silabs specific features available only through Simplicity Studio
+}
+#endif // SL_COMPONENT_CATALOG_PRESENT
 
 void otSysInit(int argc, char *argv[])
 {
     OT_UNUSED_VARIABLE(argc);
     OT_UNUSED_VARIABLE(argv);
-    sl_status_t status;
+    sl_ot_sys_init();
+}
 
-    __disable_irq();
-
-    CHIP_Init();
-    sl_device_init_nvic();
-    halInitChipSpecific();
-    BSP_Init(BSP_INIT_BCC);
-
-    // Enable LE peripheral clock. Needed for RTCC initialization in sl_sleeptimer_init()
-#if !defined(_SILICON_LABS_32B_SERIES_2)
-    CMU_ClockEnable(cmuClock_HFLE, true);
-    CMU_OscillatorEnable(cmuOsc_LFRCO, true, true);
-#endif // !defined(_SILICON_LABS_32B_SERIES_2)
-
-    status = sl_sleeptimer_init();
-    assert(status == SL_STATUS_OK);
-
-#if (HAL_FEM_ENABLE)
-    initFem();
-    wakeupFem();
-#endif
-
-    __enable_irq();
+void sl_ot_sys_init(void)
+{
+    sl_openthread_init();
 
 #if USE_EFR32_LOG
     efr32LogInit();
@@ -207,45 +99,6 @@ void otSysDeinit(void)
 #endif
 }
 
-void efr32SetSleepCallback(bool (*aCallback)(void))
-{
-    sCanSleepCallback = aCallback;
-}
-
-void efr32Sleep(void)
-{
-    bool canDeepSleep      = false;
-    int  wakeupProcessTime = 1000;
-    CORE_DECLARE_IRQ_STATE;
-
-    if (RAIL_Sleep(wakeupProcessTime, &canDeepSleep) == RAIL_STATUS_NO_ERROR)
-    {
-        if (canDeepSleep)
-        {
-            CORE_ENTER_ATOMIC();
-            if (sCanSleepCallback != NULL && sCanSleepCallback())
-            {
-                EMU_EnterEM2(true);
-            }
-            CORE_EXIT_ATOMIC();
-            // TODO OT will handle an interrupt here and it mustn't call any RAIL APIs
-
-            while (RAIL_Wake(0) != RAIL_STATUS_NO_ERROR)
-            {
-            }
-        }
-        else
-        {
-            CORE_ENTER_ATOMIC();
-            if (sCanSleepCallback != NULL && sCanSleepCallback())
-            {
-                EMU_EnterEM1();
-            }
-            CORE_EXIT_ATOMIC();
-        }
-    }
-}
-
 void otSysProcessDrivers(otInstance *aInstance)
 {
     sInstance = aInstance;
@@ -256,6 +109,8 @@ void otSysProcessDrivers(otInstance *aInstance)
     efr32UartProcess();
 #elif OPENTHREAD_CONFIG_NCP_CPC_ENABLE
     efr32CpcProcess();
+#elif OPENTHREAD_CONFIG_NCP_SPI_ENABLE
+    efr32SpiProcess();
 #endif
     efr32RadioProcess(aInstance);
 

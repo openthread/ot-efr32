@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2019, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -28,62 +28,27 @@
 
 /**
  * @file
- *   This file implements the OpenThread platform abstraction for the diagnostics.
+ *   This file includes compile-time configuration constants for efr32.
  *
  */
 
-#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
+#ifndef __BOARD_CONFIG_H__
+#define __BOARD_CONFIG_H__
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <sys/time.h>
+#if     (!defined(RADIO_CONFIG_SUBGHZ_SUPPORT) || !RADIO_CONFIG_SUBGHZ_SUPPORT)
+#define RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT	    1  /// Enable OQPSK modulation in 2.4GHz band
+#endif
 
-#include "common/code_utils.hpp"
-#include <openthread/cli.h>
-#include <openthread/config.h>
-#include <openthread/platform/alarm-milli.h>
-#include <openthread/platform/diag.h>
-#include <openthread/platform/radio.h>
-#include "platform-efr32.h"
+#ifndef RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+#define RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT     0 /// Set to 1 to enable debug counters in radio.c
+#endif
 
-#if OPENTHREAD_CONFIG_DIAG_ENABLE
+#ifndef RADIO_CONFIG_ENABLE_CUSTOM_EUI_SUPPORT
+#define RADIO_CONFIG_ENABLE_CUSTOM_EUI_SUPPORT  1 /// Set to 1 to enable custom EUI support (enabled by default)
+#endif
 
-/**
- * Diagnostics mode variables.
- *
- */
-static bool sDiagMode = false;
+#ifndef RADIO_CONFIG_DMP_SUPPORT
+#define RADIO_CONFIG_DMP_SUPPORT                0 /// Set to 1 to enable Dynamic Multi-Protocol support in radio.c
+#endif
 
-void otPlatDiagModeSet(bool aMode)
-{
-    sDiagMode = aMode;
-}
-
-bool otPlatDiagModeGet()
-{
-    return sDiagMode;
-}
-
-void otPlatDiagChannelSet(uint8_t aChannel)
-{
-    OT_UNUSED_VARIABLE(aChannel);
-}
-
-void otPlatDiagTxPowerSet(int8_t aTxPower)
-{
-    OT_UNUSED_VARIABLE(aTxPower);
-}
-
-void otPlatDiagRadioReceived(otInstance *aInstance, otRadioFrame *aFrame, otError aError)
-{
-    OT_UNUSED_VARIABLE(aInstance);
-    OT_UNUSED_VARIABLE(aFrame);
-    OT_UNUSED_VARIABLE(aError);
-}
-
-void otPlatDiagAlarmCallback(otInstance *aInstance)
-{
-    OT_UNUSED_VARIABLE(aInstance);
-}
-
-#endif // #if OPENTHREAD_CONFIG_DIAG_ENABLE
+#endif // __BOARD_CONFIG_H__

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2019, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -34,10 +34,10 @@
 
 #include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
 
-#include "openthread-system.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "openthread-system.h"
 #include <openthread/config.h>
 #include <openthread/platform/alarm-micro.h>
 #include <openthread/platform/alarm-milli.h>
@@ -51,7 +51,10 @@
 #include "rail.h"
 #include "sl_sleeptimer.h"
 
-#define XTAL_ACCURACY 200
+// According to EFR datasheets, HFXO is ± 40 ppm and LFXO (at least for MG12) is
+// -8 to +40 ppm.  Assuming average as worst case.
+#define HFXO_ACCURACY 40
+#define LFXO_ACCURACY 24
 
 // millisecond timer (sleeptimer)
 static sl_sleeptimer_timer_handle_t sl_handle;
@@ -79,7 +82,7 @@ void efr32AlarmInit(void)
 {
     memset(&sl_handle, 0, sizeof sl_handle);
 #if OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE
-    (void)RAIL_ConfigMultiTimer(true);
+    (void) RAIL_ConfigMultiTimer(true);
 #endif
 }
 
@@ -97,7 +100,16 @@ uint32_t otPlatAlarmMilliGetNow(void)
 
 uint32_t otPlatTimeGetXtalAccuracy(void)
 {
-    return XTAL_ACCURACY;
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    // For sleepies, we need to account for the low-frequency crystal
+    // accuracy when they go to sleep.  Accounting for that as well,
+    // for the worst case.
+    if (efr32AllowSleepCallback())
+    {
+        return HFXO_ACCURACY + LFXO_ACCURACY;
+    }
+#endif
+    return HFXO_ACCURACY;
 }
 
 void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
@@ -110,7 +122,7 @@ void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
     sl_sleeptimer_stop_timer(&sl_handle);
 
     sMsAlarm     = aT0 + aDt;
-    remaining    = (int32_t)(sMsAlarm - otPlatAlarmMilliGetNow());
+    remaining  = (int32_t)(sMsAlarm - otPlatAlarmMilliGetNow());
     sIsMsRunning = true;
 
     if (remaining <= 0)
@@ -131,7 +143,7 @@ void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 uint32_t efr32AlarmPendingTime(void)
 {
     uint32_t remaining = 0;
-    uint32_t now       = otPlatAlarmMilliGetNow();
+    uint32_t now = otPlatAlarmMilliGetNow();
     if (sIsMsRunning && (sMsAlarm > now))
     {
         remaining = sMsAlarm - now;
@@ -141,7 +153,7 @@ uint32_t efr32AlarmPendingTime(void)
 
 bool efr32AlarmIsRunning(otInstance *aInstance)
 {
-    return (otInstanceIsInitialized(aInstance) ? sIsMsRunning : false);
+    return (otInstanceIsInitialized(aInstance) ? sIsMsRunning :  false);
 }
 
 void otPlatAlarmMilliStop(otInstance *aInstance)
@@ -155,7 +167,7 @@ void otPlatAlarmMilliStop(otInstance *aInstance)
 void efr32AlarmProcess(otInstance *aInstance)
 {
     int32_t remaining;
-    bool    alarmMilliFired = false;
+    bool alarmMilliFired = false;
 #if OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE
     bool alarmMicroFired = false;
 #endif
@@ -212,6 +224,26 @@ void efr32AlarmProcess(otInstance *aInstance)
 uint32_t otPlatAlarmMicroGetNow(void)
 {
     return RAIL_GetTime();
+}
+
+// Note: This function should be called at least once per wrap
+// period for the wrap-around logic to work below
+uint64_t otPlatTimeGet(void)
+{
+  static uint32_t timerWraps = 0U;
+  static uint32_t prev32TimeUs = 0U;
+  uint32_t now32TimeUs;
+  uint64_t now64TimeUs;
+  CORE_DECLARE_IRQ_STATE;
+  CORE_ENTER_CRITICAL();
+  now32TimeUs = RAIL_GetTime();
+  if (now32TimeUs < prev32TimeUs) {
+    timerWraps += 1U;
+  }
+  prev32TimeUs = now32TimeUs;
+  now64TimeUs = ((uint64_t)timerWraps << 32) + now32TimeUs;
+  CORE_EXIT_CRITICAL();
+  return now64TimeUs;
 }
 
 // Note: If we ever use OpenThread in a multi-instance scenario, we need to
