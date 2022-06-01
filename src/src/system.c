@@ -47,6 +47,19 @@
 #include "rail.h"
 #include "sl_mpu.h"
 #include "sl_sleeptimer.h"
+
+#if defined(SL_COMPONENT_CATALOG_PRESENT)
+#include "sl_component_catalog.h"
+#endif
+
+#include "sl_system_init.h"
+
+#if defined(SL_CATALOG_KERNEL_PRESENT)
+#include "sl_system_kernel.h"
+#else
+#include "sl_system_process_action.h"
+#endif
+
 #if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 #include "sl_malloc.h"
 #include "openthread/heap.h"
@@ -62,14 +75,31 @@ otInstance *sInstance;
 #ifndef SL_COMPONENT_CATALOG_PRESENT
 __WEAK void sl_openthread_init(void)
 {
-    // Place holder for enabling Silabs specific features available only through Simplicity Studio
+    // Placeholder for enabling Silabs specific features available only through Simplicity Studio
 }
 #endif // SL_COMPONENT_CATALOG_PRESENT
+
+/**
+ * @brief Application initialization
+ */
+OT_TOOL_WEAK void app_init(void)
+{
+    // Placeholder for any application specific initialization
+}
 
 void otSysInit(int argc, char *argv[])
 {
     OT_UNUSED_VARIABLE(argc);
     OT_UNUSED_VARIABLE(argv);
+    // Initialize Silicon Labs device, system, service(s) and protocol stack(s).
+    // Note that if the kernel is present, processing task(s) will be created by
+    // this call.
+    sl_system_init();
+
+    // Initialize the application. For example, create periodic timer(s) or
+    // task(s) if the kernel is present.
+    app_init();
+
     sl_ot_sys_init();
 }
 
@@ -105,6 +135,12 @@ void otSysProcessDrivers(otInstance *aInstance)
 
     // should sleep and wait for interrupts here
 
+#if !defined(SL_CATALOG_KERNEL_PRESENT)
+    // Do not remove this call: Silicon Labs components process action routine
+    // must be called from the super loop.
+    sl_system_process_action();
+#endif
+
 #if OPENTHREAD_CONFIG_NCP_HDLC_ENABLE
     efr32UartProcess();
 #elif OPENTHREAD_CONFIG_NCP_CPC_ENABLE
@@ -116,6 +152,11 @@ void otSysProcessDrivers(otInstance *aInstance)
 
     // See alarm.c: Wrapped in a critical section
     efr32AlarmProcess(aInstance);
+
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    // Let the CPU go to sleep if the system allows it.
+    sl_power_manager_sleep();
+#endif
 }
 
 __WEAK void otSysEventSignalPending(void)
