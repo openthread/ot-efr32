@@ -47,7 +47,6 @@
 #endif
 
 #include "board_config.h"
-#include "em_msc.h"
 
 /**
  * @def OPENTHREAD_CONFIG_CLI_MAX_LINE_LENGTH
@@ -383,7 +382,11 @@
  *
  */
 #ifndef OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE
+#if OPENTHREAD_RADIO
+#define OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE 0
+#else
 #define OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE 1
+#endif
 #endif
 
 /**
