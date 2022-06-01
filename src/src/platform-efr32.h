@@ -51,7 +51,7 @@ extern otInstance *sInstance;
 
 // Global reference to rail handle
 #ifndef SL_CATALOG_RAIL_MULTIPLEXER_PRESENT
-#define gRailHandle emPhyRailHandle   // use gRailHandle in the OpenThread PAL.
+#define gRailHandle emPhyRailHandle // use gRailHandle in the OpenThread PAL.
 #endif
 
 extern RAIL_Handle_t gRailHandle; // coex needs the emPhyRailHandle symbol.

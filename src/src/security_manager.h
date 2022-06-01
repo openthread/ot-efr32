@@ -71,9 +71,9 @@ sl_sec_man_status_t sl_sec_man_init(void);
  * PSA will create a key_id and returns the same to the application. All the keys will be wrapped
  * before storage and the key_id is further used for all the security operations.
  *
- * @param[out]  sl_psa_key_id                       Pointer to Key Id to be used for persistent keys. If the key is stored
- *                                                  in RAM, PSA will allocate the key ID and pass it to the application. For
- *                                                  non-volatile keys, key ID provided by application will be assigned as the reference.
+ * @param[out]  sl_psa_key_id                       Pointer to Key Id to be used for persistent keys. If the key is
+ * stored in RAM, PSA will allocate the key ID and pass it to the application. For non-volatile keys, key ID provided by
+ * application will be assigned as the reference.
  * @param[in]   sl_psa_key_type                     Key type encoding for the key.
  * @param[in]   sl_psa_key_algorithm                Key algorithm encoding for the key.
  * @param[in]   sl_psa_key_usage                    Key Usage encoding for the key.
@@ -102,9 +102,9 @@ sl_sec_man_status_t sl_sec_man_import_key(psa_key_id_t *        sl_psa_key_id,
  * PSA will create a key_id and returns the same to the application. All the keys will be wrapped
  * before storage and the key_id is further used for all the security operations.
  *
- * @param[out]  sl_psa_key_id                       Pointer to Key Id to be used for persistent keys. If the key is stored
- *                                                  in RAM, PSA will allocate the key ID and pass it to the application. For
- *                                                  non-volatile keys, key ID provided by application will be assigned as the reference.
+ * @param[out]  sl_psa_key_id                       Pointer to Key Id to be used for persistent keys. If the key is
+ * stored in RAM, PSA will allocate the key ID and pass it to the application. For non-volatile keys, key ID provided by
+ * application will be assigned as the reference.
  * @param[in]   sl_psa_key_type                     Key type encoding for the key.
  * @param[in]   sl_psa_key_algorithm                Key algorithm encoding for the key.
  * @param[in]   sl_psa_key_usage                    Key Usage encoding for the key.
@@ -129,9 +129,8 @@ sl_sec_man_status_t sl_sec_man_generate_key(psa_key_id_t *        sl_psa_key_id,
  * This API can be used to export the key stored in the PSA. Only keys marked as exportable can be
  * read back from the storage as plaintext.
  *
- * @param[in]   sl_psa_key_id                       Key ID used as a reference to the key. This is either passed to import key,
- *                                                  for persistent keys, or returned to the application in the key context, for
- *                                                  volatile keys.
+ * @param[in]   sl_psa_key_id                       Key ID used as a reference to the key. This is either passed to
+ * import key, for persistent keys, or returned to the application in the key context, for volatile keys.
  * @param[in]   sl_psa_key_buffer                   Pointer to the buffer to store the key.
  * @param[in]   sl_psa_key_buffer_len               Length of the buffer.
  * @param[out]  sl_psa_key_len                      Length of the exported key.
@@ -365,7 +364,6 @@ sl_sec_man_status_t sl_sec_man_hash_finish(psa_hash_operation_t *sl_psa_hash_ctx
  * @retval SL_SECURITY_MAN_ERROR                    There was some error during entropy generation.
  * @retval SL_SECURITY_MAN_INVALID_PARAMS           There was an error in the params passed.
  */
-sl_sec_man_status_t sl_sec_man_get_random( uint8_t               *sl_psa_output_buffer, 
-                                           uint16_t              sl_psa_output_size);
+sl_sec_man_status_t sl_sec_man_get_random(uint8_t *sl_psa_output_buffer, uint16_t sl_psa_output_size);
 
 #endif /* SECURITY_MANAGER_H_ */

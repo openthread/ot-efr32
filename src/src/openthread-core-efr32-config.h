@@ -36,13 +36,13 @@
 #define OPENTHREAD_CORE_EFR32_CONFIG_H_
 
 // Use (user defined) application config file to define OpenThread configurations
-#ifdef   SL_OPENTHREAD_APPLICATION_CONFIG_FILE
+#ifdef SL_OPENTHREAD_APPLICATION_CONFIG_FILE
 #include SL_OPENTHREAD_APPLICATION_CONFIG_FILE
 #endif
 
 // Use (pre-defined) stack features config file available for applications built
 // with Simplicity Studio
-#ifdef   SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE
+#ifdef SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE
 #include SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE
 #endif
 
@@ -110,7 +110,7 @@
  *
  */
 #ifndef OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_PAGE
-#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_PAGE 	23
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_PAGE 23
 #endif
 
 /**
@@ -120,7 +120,7 @@
  *
  */
 #ifndef OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MIN
-#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MIN 	0
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MIN 0
 #endif
 
 /**
@@ -130,7 +130,7 @@
  *
  */
 #ifndef OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MAX
-#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MAX 	24
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MAX 24
 #endif
 
 /**
@@ -140,7 +140,7 @@
  *
  */
 #ifndef OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MASK
-#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MASK 	0x1ffffff
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MASK 0x1ffffff
 #endif
 
 /**
@@ -240,7 +240,8 @@
  *
  */
 #ifndef OPENTHREAD_CONFIG_MAC_SOFTWARE_TX_SECURITY_ENABLE
-#define OPENTHREAD_CONFIG_MAC_SOFTWARE_TX_SECURITY_ENABLE OPENTHREAD_RADIO && (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
+#define OPENTHREAD_CONFIG_MAC_SOFTWARE_TX_SECURITY_ENABLE \
+    OPENTHREAD_RADIO && (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 #endif
 
 /**
@@ -251,16 +252,17 @@
  *
  */
 #ifndef OPENTHREAD_CONFIG_MAC_SOFTWARE_TX_TIMING_ENABLE
-#define OPENTHREAD_CONFIG_MAC_SOFTWARE_TX_TIMING_ENABLE OPENTHREAD_RADIO && (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
+#define OPENTHREAD_CONFIG_MAC_SOFTWARE_TX_TIMING_ENABLE \
+    OPENTHREAD_RADIO && (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 #endif
 
 /**
-  * @def OPENTHREAD_CONFIG_MAC_SOFTWARE_RX_TIMING_ENABLE
-  *
-  * Define to 1 to enable software reception target time logic.
-  * RCPs only.
-  *
-  */
+ * @def OPENTHREAD_CONFIG_MAC_SOFTWARE_RX_TIMING_ENABLE
+ *
+ * Define to 1 to enable software reception target time logic.
+ * RCPs only.
+ *
+ */
 #ifndef OPENTHREAD_CONFIG_MAC_SOFTWARE_RX_TIMING_ENABLE
 #define OPENTHREAD_CONFIG_MAC_SOFTWARE_RX_TIMING_ENABLE 0
 #endif
@@ -299,11 +301,11 @@
 #endif
 
 /**
-  * @def OPENTHREAD_CONFIG_TCP_ENABLE
-  *
-  * Define as 1 to enable TCPlp (low power TCP defined in Thread spec).
-  *
-  */
+ * @def OPENTHREAD_CONFIG_TCP_ENABLE
+ *
+ * Define as 1 to enable TCPlp (low power TCP defined in Thread spec).
+ *
+ */
 #ifndef OPENTHREAD_CONFIG_TCP_ENABLE
 #define OPENTHREAD_CONFIG_TCP_ENABLE 0
 #endif
@@ -362,14 +364,14 @@
 #endif
 
 /**
-* @def OPENTHREAD_CONFIG_PSA_ITS_NVM_OFFSET
-*
-* This is the offset in ITS where the persistent keys are stored.
-* For Silabs OT applications, this needs to be in the range of 
-* 0x20000 to 0x2ffff.
-*
-*/
-#define OPENTHREAD_CONFIG_PSA_ITS_NVM_OFFSET  0x20000
+ * @def OPENTHREAD_CONFIG_PSA_ITS_NVM_OFFSET
+ *
+ * This is the offset in ITS where the persistent keys are stored.
+ * For Silabs OT applications, this needs to be in the range of
+ * 0x20000 to 0x2ffff.
+ *
+ */
+#define OPENTHREAD_CONFIG_PSA_ITS_NVM_OFFSET 0x20000
 
 /**
  * @def OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE
@@ -385,18 +387,18 @@
 #endif
 
 /**
-  * @def OPENTHREAD_CONFIG_CRYPTO_LIB
-  *
-  * Selects the crypto backend library for OpenThread.
-  *
-  * There are several options available, but we enable PSA if key references are
-  * available.  Otherwise, mbedTLS is used as default (see src/core/config/crypto.h)
-  *
-  * - @sa OPENTHREAD_CONFIG_CRYPTO_LIB_MBEDTLS
-  * - @sa OPENTHREAD_CONFIG_CRYPTO_LIB_PSA
-  * - @sa OPENTHREAD_CONFIG_CRYPTO_LIB_PLATFORM
-  *
-  */
+ * @def OPENTHREAD_CONFIG_CRYPTO_LIB
+ *
+ * Selects the crypto backend library for OpenThread.
+ *
+ * There are several options available, but we enable PSA if key references are
+ * available.  Otherwise, mbedTLS is used as default (see src/core/config/crypto.h)
+ *
+ * - @sa OPENTHREAD_CONFIG_CRYPTO_LIB_MBEDTLS
+ * - @sa OPENTHREAD_CONFIG_CRYPTO_LIB_PSA
+ * - @sa OPENTHREAD_CONFIG_CRYPTO_LIB_PLATFORM
+ *
+ */
 #if OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE
 #define OPENTHREAD_CONFIG_CRYPTO_LIB OPENTHREAD_CONFIG_CRYPTO_LIB_PSA
 #endif

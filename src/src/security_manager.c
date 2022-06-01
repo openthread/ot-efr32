@@ -71,10 +71,10 @@ sl_sec_man_status_t sl_sec_man_init(void)
 
     if (!is_security_manager_initialised)
     {
-        psa_status_t status             = psa_crypto_init();
-        retStatus                       = SEC_MAN_GET_STATUS(status);
+        psa_status_t status = psa_crypto_init();
+        retStatus           = SEC_MAN_GET_STATUS(status);
 
-        if(retStatus == SL_SECURITY_MAN_SUCCESS)
+        if (retStatus == SL_SECURITY_MAN_SUCCESS)
         {
             is_security_manager_initialised = true;
         }
@@ -215,8 +215,8 @@ sl_sec_man_status_t sl_sec_man_aes_encrypt(psa_key_id_t    sl_psa_key_id,
                                            const uint8_t * sl_psa_aes_input,
                                            uint8_t *       sl_psa_aes_output)
 {
-    size_t                 sl_psa_aes_enc_len = 0;
-    sl_sec_man_status_t    status = SL_SECURITY_MAN_SUCCESS;
+    size_t              sl_psa_aes_enc_len = 0;
+    sl_sec_man_status_t status             = SL_SECURITY_MAN_SUCCESS;
 
     if ((sl_psa_aes_input == NULL) || (sl_psa_aes_output == NULL))
     {
@@ -224,8 +224,9 @@ sl_sec_man_status_t sl_sec_man_aes_encrypt(psa_key_id_t    sl_psa_key_id,
         goto exit;
     }
 
-    status = SEC_MAN_GET_STATUS(psa_cipher_encrypt(sl_psa_key_id, sl_psa_aes_alg, sl_psa_aes_input, SL_MAN_AES_BLOCK_SIZE, sl_psa_aes_output,
-                                                    SL_MAN_AES_BLOCK_SIZE, &sl_psa_aes_enc_len));
+    status =
+        SEC_MAN_GET_STATUS(psa_cipher_encrypt(sl_psa_key_id, sl_psa_aes_alg, sl_psa_aes_input, SL_MAN_AES_BLOCK_SIZE,
+                                              sl_psa_aes_output, SL_MAN_AES_BLOCK_SIZE, &sl_psa_aes_enc_len));
 
 exit:
     return status;
@@ -471,8 +472,7 @@ exit:
     return status;
 }
 
-sl_sec_man_status_t sl_sec_man_get_random( uint8_t               *sl_psa_output_buffer, 
-                                           uint16_t              sl_psa_output_size)
+sl_sec_man_status_t sl_sec_man_get_random(uint8_t *sl_psa_output_buffer, uint16_t sl_psa_output_size)
 {
     sl_sec_man_status_t status = SL_SECURITY_MAN_SUCCESS;
 

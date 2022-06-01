@@ -34,28 +34,28 @@
 
 #include "security_manager.h"
 #include <openthread-core-config.h>
+#include <stddef.h>
 #include <openthread/platform/entropy.h>
 #include "utils/code_utils.h"
-#include <stddef.h>
 
 #if OPENTHREAD_CONFIG_CRYPTO_LIB == OPENTHREAD_CONFIG_CRYPTO_LIB_PSA
 void otPlatCryptoRandomInit(void)
- {
-    //Security manager is initialised by OT stack, in key_manager.
-    //But Random manager is initialised much before this, so we 
-    //initialise security manager here. Later initialisation by
-    //stack is ignored by security manager.
+{
+    // Security manager is initialised by OT stack, in key_manager.
+    // But Random manager is initialised much before this, so we
+    // initialise security manager here. Later initialisation by
+    // stack is ignored by security manager.
 
-    (void) sl_sec_man_init();
- }
+    (void)sl_sec_man_init();
+}
 
- void otPlatCryptoRandomDeinit(void)
- {
-    //Intentionally left blank, nothing to deinit
- }
+void otPlatCryptoRandomDeinit(void)
+{
+    // Intentionally left blank, nothing to deinit
+}
 
- otError otPlatCryptoRandomGet(uint8_t *aBuffer, uint16_t aSize)
- {
+otError otPlatCryptoRandomGet(uint8_t *aBuffer, uint16_t aSize)
+{
     otError             error = OT_ERROR_NONE;
     sl_sec_man_status_t status;
 
@@ -65,15 +65,12 @@ void otPlatCryptoRandomInit(void)
 
 exit:
     return error;
- }
+}
 #else
 // The mbedtls_hardware_poll() function is meant for internal use by Mbed TLS
 // and is not declared in any external header files. We will therefore declare
 // it as an extern function here.
-extern int mbedtls_hardware_poll(void *data,
-                                 unsigned char *output,
-                                 size_t len,
-                                 size_t *olen);
+extern int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen);
 
 otError otPlatEntropyGet(uint8_t *aOutput, uint16_t aOutputLength)
 {
