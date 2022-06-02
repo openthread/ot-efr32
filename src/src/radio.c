@@ -163,6 +163,13 @@
 #define DEVICE_CAPABILITY_MCU_EN (DEVINFO->SWCAPA1 & _DEVINFO_SWCAPA1_RFMCUEN_MASK)
 #endif
 
+// ! NOTE: This is a workaround. Should be removed once multipan support is added to `soft_source_match_table.c`
+#define utilsSoftSrcMatchSetPanId(iid, ...)         utilsSoftSrcMatchSetPanId(__VA_ARGS__)
+#define utilsSoftSrcMatchExtFindEntry(iid, ...)     utilsSoftSrcMatchExtFindEntry(__VA_ARGS__)
+#define utilsSoftSrcMatchShortFindEntry(iid, ...)   utilsSoftSrcMatchShortFindEntry(__VA_ARGS__)
+#define utilsSoftSrcMatchExtFindEntry(iid, ...)     utilsSoftSrcMatchExtFindEntry(__VA_ARGS__)
+#define utilsSoftSrcMatchShortFindEntry(iid, ...)   utilsSoftSrcMatchShortFindEntry(__VA_ARGS__)
+
 // Energy Scan
 typedef enum
 {
@@ -2050,6 +2057,7 @@ static void dataRequestCommandCallback(RAIL_Handle_t aRailHandle)
         otEXPECT(status == RAIL_STATUS_NO_ERROR);
 
         uint8_t iid = getIidFromFilterMask(packetInfo.filterMask);
+        OT_UNUSED_VARIABLE(iid);
         if ((sourceAddress.length == RAIL_IEEE802154_LongAddress
              && utilsSoftSrcMatchExtFindEntry(iid, (otExtAddress *)sourceAddress.longAddress) >= 0)
             || (sourceAddress.length == RAIL_IEEE802154_ShortAddress
@@ -2583,7 +2591,9 @@ static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
         sReceiveAckFrame.mInfo.mRxInfo.mRssi      = pPacketDetails->rssi;
         sReceiveAckFrame.mInfo.mRxInfo.mLqi       = pPacketDetails->lqi;
         sReceiveAckFrame.mInfo.mRxInfo.mTimestamp = pPacketDetails->timeReceived.packetTime;
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
         sReceiveAckFrame.mIid                     = iid;
+#endif
     }
     else
     {
@@ -2594,7 +2604,9 @@ static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
         sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck = securedOutgoingEnhancedAck;
         // Set this flag only when the packet is really acknowledged with frame pending set.
         sReceiveFrame.mInfo.mRxInfo.mAckedWithFramePending = framePendingSetInOutgoingAck;
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
         sReceiveFrame.mIid                                 = iid;
+#endif
 
 #if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
         // Use stored values for these
