@@ -36,69 +36,57 @@ fi
 script_dir="$(dirname "$(realpath "$script_path")")"
 repo_dir="$(dirname "$script_dir")"
 
-efr32_get_platforms()
-{
-    if [ $# -ne 0 ]; then
-        printf "Gets a list of platforms\n\nUsage:\n\t%s\n" "$(basename "$0")" >&2
-        return 1
-    fi
+# slc-cli installation dir
+[ -n "${SLC_INSTALL_DIR:-}" ] || SLC_INSTALL_DIR="${repo_dir}/third_party/silabs/slc"
 
-    local platform_dir="$repo_dir/src" \
-        && find "$platform_dir" -type d -name '*efr32*' -exec basename {} \; | sort
+slc_cmd=""
+slc_exporter_templates_dir=""
+need_to_restore_templates=0
+
+# Set to 0 to force using slc-cli from 'third_party'/silabs/slc.
+use_slc_from_path=1
+
+# Wrapper function to execute an slc command
+run_slc()
+{
+    IFS=" " read -r -a slc_args <<<"${@}"
+    "${slc_cmd}" "${slc_args[@]}"
 }
 
-efr32_check_platform()
+# Find the command to use for slc
+slc_init()
 {
-    # Checks if a value is a valid efr32 platform
-    #
-    # Arg $1 -- value
-    local match=false
-    local platform="${1:-}"
 
-    for efr32_platform in $(efr32_get_platforms); do
-        if [[ $efr32_platform == "$platform" ]]; then
-            match=true
-            break
+    # 0 - Use slc-cli from ${repo_dir}/third_party/silabs/slc
+    # 1 - Use slc-cli or slc from PATH
+    if command -v slc && [ "$use_slc_from_path" -eq "1" ]; then
+        slc_cmd="slc"
+    else
+        if command -v slc-cli && [ "$use_slc_from_path" -eq "1" ]; then
+            slc_cmd="slc-cli"
+        else
+            echo "The 'slc-cli' command could not be found in your PATH."
+
+            # Find the slc executable
+            slc_cmd=$(find "${repo_dir}/third_party/silabs/slc" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f)
+
+            # Automatically download slc if not found
+            if [ -z "${slc_cmd}" ]; then
+                "${repo_dir}"/script/bootstrap_silabs
+            fi
+
+            # Find the slc executable
+            slc_cmd=$(find "${repo_dir}/third_party/silabs/slc" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f)
+
         fi
-    done
-
-    if ! $match; then
-        set +x
-        printf "\n\nERROR: Invalid platform\n" >&2
-        printf "Valid platforms:\n" >&2
-        for platform in $(efr32_get_platforms); do
-            printf " - %s\n" "${platform}" >&2
-        done
-        set -x
-        return 2
     fi
-    return 0
 }
 
-efr32_get_jlink_device()
+cleanup()
 {
-    # Gets the J-Link device type for a efr32 platform
-    #
-    # Arg $1 -- efr32 platform
-    if [ -z "$1" ] || [ $# -ne 1 ]; then
-        printf "Gets the J-Link device type for a efr32 platform\n\nUsage:\n\t%s <efr32_platform> \n" "$(basename "$0")" >&2
-        return 1
+    if [ "$?" -eq "14" ]; then
+        echo "Please make sure Java 11 installed and the JAVA_11_HOME environment variable is set."
     fi
-
-    local platform="$1"
-    efr32_check_platform "$platform" \
-        && case $platform in
-            "efr32mg1")
-                echo "EFR32MG1PxxxF256"
-                ;;
-            "efr32mg12")
-                echo "EFR32MG12PxxxF1024"
-                ;;
-            "efr32mg13")
-                echo "EFR32MG13PxxxF1024"
-                ;;
-            "efr32mg21")
-                echo "EFR32MG21AxxxF1024"
-                ;;
-        esac
 }
+
+trap cleanup EXIT
