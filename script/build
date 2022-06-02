@@ -212,7 +212,7 @@ main()
                 ;;
             h)
                 echo "${usage}" >&2
-                exit 2
+                exit 0
                 ;;
         esac
     done
@@ -227,6 +227,11 @@ main()
             | sed 's/board:device:\(efr32\)*\([[:alpha:]]\{2\}\)m*\([[:digit:]]\{1,2\}\).*/efr32\2\3/' \
             | head -n 1
     )
+    if [ -z "$platform" ]; then
+        echo "Error parsing platform"
+        exit 3
+    fi
+
     efr32_check_platform "${platform}" || die "Unsupported platform ${platform}"
 
     shift

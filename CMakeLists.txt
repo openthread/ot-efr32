@@ -26,12 +26,23 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
+
+# ==============================================================================
+# CMake project definitions
+# ==============================================================================
 cmake_minimum_required(VERSION 3.16.0)
 project(ot-efr32 VERSION 1.0.0)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
+# ==============================================================================
+# OpenThread
+# ==============================================================================
 include(${PROJECT_SOURCE_DIR}/openthread/etc/cmake/functions.cmake)
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
 
+# Package Version
 set(OT_PACKAGE_VERSION "" CACHE STRING "OpenThread Package Version")
 if(OT_PACKAGE_VERSION STREQUAL "")
     ot_git_version(OT_PACKAGE_VERSION)
@@ -39,6 +50,7 @@ if(OT_PACKAGE_VERSION STREQUAL "")
 endif()
 message(STATUS "Package Version: ${OT_PACKAGE_VERSION}")
 
+# Platform library names
 set(OT_PLATFORM_LIB "openthread-efr32")
 set(OT_PLATFORM_LIB_RCP openthread-efr32-rcp)
 
@@ -51,25 +63,28 @@ set(OT_EXTERNAL_MBEDTLS "silabs-mbedtls-soc" CACHE STRING "use silabs mbedtls" F
 set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls management" FORCE)
 set(OT_MBEDTLS ${OT_EXTERNAL_MBEDTLS})
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-
+# NOTE: The "openthread" subdirectory needs to be added after all OT_* variables are defined
 add_subdirectory(openthread)
+
+# Add any efr32 example projects
+add_subdirectory(examples)
+
 
 target_compile_options(ot-config INTERFACE
     -Wno-shadow
     -Wno-pedantic
 )
 
-add_subdirectory(examples)
-
+# ==============================================================================
+# Generated platform projects
+# ==============================================================================
 set(slc_generated_projects
     ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc/platform
     ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc/mbedtls
     ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp/platform
     ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp/mbedtls
 )
+
 foreach(slc_project IN LISTS slc_generated_projects)
     message("Checking ${slc_project}")
     if(EXISTS ${slc_project})
@@ -79,4 +94,16 @@ foreach(slc_project IN LISTS slc_generated_projects)
         message("......... NOT EXISTS")
     endif()
 endforeach()
+
+# Sub-GHz support
+set(EFR32MG12_915MHZ_PHY_SOURCES
+    ${PROJECT_SOURCE_DIR}/src/efr32mg12/phy/PHY_IEEE802154_915MHZ_OQPSK_EFR32XG12.c
+    ${PROJECT_SOURCE_DIR}/src/efr32mg12/phy/PHY_IEEE802154_915MHZ_2GFSK_EFR32XG12.c
+)
+string(COMPARE EQUAL "${PLATFORM_LOWERCASE}" "efr32mg12" _cmp)
+if (_cmp)
+    target_sources(${OT_PLATFORM_LIB} PUBLIC ${EFR32MG12_915MHZ_PHY_SOURCES})
+endif()
+
+
 add_subdirectory(third_party)
