@@ -1,21 +1,18 @@
 ####################################################################
 # Automatically-generated file. Do not edit!                       #
-# CMake Version 0                                                  #
-#                                                                  #
+# CMake Version 1                                                  #
 #                                                                  #
 # This file will be used to generate a .cmake file that will       #
 # replace all existing CMake files for the GSDK.                   #
 #                                                                  #
 ####################################################################
-{% from 'macros.jinja' import prepare_path,compile_flags,linker_flags with context -%}
+{% from 'macros.jinja' import prepare_path,compile_flags,print_linker_flags,print_all_jinja_vars with context -%}
 
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
 
 # ==============================================================================
-# Platform library
+# Library of platform dependencies from GSDK and generated config files
 # ==============================================================================
-set(slc_gen_dir ${PROJECT_BINARY_DIR}/slc)
-
 add_library(silabs-efr32-sdk-rcp)
 
 set_target_properties(silabs-efr32-sdk-rcp
@@ -35,49 +32,42 @@ target_include_directories(silabs-efr32-sdk-rcp PUBLIC
 {%- endfor %}
 )
 
-target_include_directories(silabs-efr32-sdk-rcp
-    PRIVATE
-        ${OT_PUBLIC_INCLUDES}
+target_include_directories(silabs-efr32-sdk-rcp PRIVATE
+    ${OT_PUBLIC_INCLUDES}
 )
 
 # ==============================================================================
 # Sources
 # ==============================================================================
-target_sources(silabs-efr32-sdk-rcp
-    PRIVATE
+target_sources(silabs-efr32-sdk-rcp PRIVATE
 {%- for source in (ALL_SOURCES | sort) %}
     {%- set source = prepare_path(source) -%}
 
-    {#- Ignore crypto sources #}
-    {%- if ('util/third_party/crypto/mbedtls' not in source) and ('${PROJECT_SOURCE_DIR}/src/src' not in source) and ('coprocessor' not in source) and ('${PROJECT_SOURCE_DIR}/openthread' not in source) %}
+    {#- Ignore crypto sources, PAL sources, and openthread sources #}
+    {%- if ('util/third_party/crypto/mbedtls' not in source)
+            and ('${PROJECT_SOURCE_DIR}/src/src' not in source)
+            and ('${PROJECT_SOURCE_DIR}/openthread' not in source) %}
         {%- if source.endswith('.c') or source.endswith('.cpp') or source.endswith('.h') or source.endswith('.hpp') %}
-        {{source}}
+    {{source}}
         {%- endif %}
     {%- endif %}
 {%- endfor %}
 )
 
-{% for source in (ALL_SOURCES | sort) %}
+{%- for source in (ALL_SOURCES | sort) %}
     {%- set source = prepare_path(source) -%}
 
-    {#- Ignore crypto sources #}
-    {%- if ('util/third_party/crypto/mbedtls' not in source) and ('${PROJECT_SOURCE_DIR}/src/src' not in source) and ('coprocessor' not in source) and ('${PROJECT_SOURCE_DIR}/openthread' not in source) %}
+    {#- Ignore crypto sources, PAL sources, and openthread sources #}
+    {%- if ('util/third_party/crypto/mbedtls' not in source)
+            and ('${PROJECT_SOURCE_DIR}/src/src' not in source)
+            and ('${PROJECT_SOURCE_DIR}/openthread' not in source) %}
         {%- if source.endswith('.s') or source.endswith('.S') %}
+
 target_sources(silabs-efr32-sdk-rcp PRIVATE {{source}})
 set_property(SOURCE {{source}} PROPERTY LANGUAGE C)
         {%- endif %}
     {%- endif %}
 {%- endfor %}
-
-target_link_libraries(silabs-efr32-sdk-rcp
-    PUBLIC
-        silabs-mbedtls-rcp
-{%- for source in SYS_LIBS+USER_LIBS %}
-        {{prepare_path(source)}}
-{%- endfor %}
-        openthread-efr32-rcp-config
-        ot-config
-)
 
 {% if EXT_CFLAGS+EXT_CXX_FLAGS -%}
 # ==============================================================================
@@ -90,97 +80,35 @@ target_compile_options(silabs-efr32-sdk-rcp PRIVATE
 )
 {%- endif %} {# compile_options #}
 
+# ==============================================================================
+# Linking
+# ==============================================================================
+target_link_libraries(silabs-efr32-sdk-rcp
+    PUBLIC
+        silabs-mbedtls-rcp
+    PRIVATE
+{%- for source in SYS_LIBS+USER_LIBS %}
+        {{prepare_path(source)}}
+{%- endfor %}
+        openthread-efr32-rcp-config
+        ot-config
+)
 
-{%- if (EXT_LD_FLAGS + EXT_DEBUG_LD_FLAGS + EXT_RELEASE_LD_FLAGS) %}
+{% set linker_flags = EXT_LD_FLAGS + EXT_DEBUG_LD_FLAGS + EXT_RELEASE_LD_FLAGS %}
+{%- if linker_flags -%}
 # ==============================================================================
 #  Linker Flags
 # ==============================================================================
-target_link_options(silabs-efr32-sdk-rcp PRIVATE {{ linker_flags() }}
+target_link_options(silabs-efr32-sdk-rcp PRIVATE {{ print_linker_flags() }}
 )
 {%- endif %} {# linker_flags #}
 
+{#- ========================================================================= #}
+{#- Debug                                                                     #}
+{#- ========================================================================= #}
 
-
-# ==============================================================================
-#  EXT_C_FLAGS
-# ==============================================================================
-{%- for flag in EXT_C_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_DEBUG_C_FLAGS
-# ==============================================================================
-{%- for flag in EXT_DEBUG_C_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_RELEASE_C_FLAGS
-# ==============================================================================
-{%- for flag in EXT_RELEASE_C_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_CXX_FLAGS
-# ==============================================================================
-{%- for flag in EXT_CXX_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_DEBUG_CXX_FLAGS
-# ==============================================================================
-{%- for flag in EXT_DEBUG_CXX_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_RELEASE_CXX_FLAGS
-# ==============================================================================
-{%- for flag in EXT_RELEASE_CXX_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_ASM_FLAGS
-# ==============================================================================
-{%- for flag in EXT_ASM_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_DEBUG_ASM_FLAGS
-# ==============================================================================
-{%- for flag in EXT_DEBUG_ASM_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_RELEASE_ASM_FLAGS
-# ==============================================================================
-{%- for flag in EXT_RELEASE_ASM_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_LD_FLAGS
-# ==============================================================================
-{%- for flag in EXT_LD_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_DEBUG_LD_FLAGS
-# ==============================================================================
-{%- for flag in EXT_DEBUG_LD_FLAGS %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_RELEASE_LD_FLAGS
-# ==============================================================================
-{%- for flag in EXT_RELEASE_LD_FLAGS %}
-#    {{flag}}
-{%- endfor %}
+{#- Change debug_template to true to print all jinja vars #}
+{%- set debug_template = false %}
+{%- if debug_template %}
+{{ print_all_jinja_vars() }}
+{%- endif %}

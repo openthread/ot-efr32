@@ -29,9 +29,9 @@
 
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
 
-add_library(silabs-mbedtls-rcp)
+add_library(openthread-efr32-rcp-mbedtls)
 
-set_target_properties(silabs-mbedtls-rcp
+set_target_properties(openthread-efr32-rcp-mbedtls
     PROPERTIES
         C_STANDARD 99
         CXX_STANDARD 11
@@ -39,29 +39,25 @@ set_target_properties(silabs-mbedtls-rcp
 
 set(SILABS_MBEDTLS_DIR "${SILABS_GSDK_DIR}/util/third_party/crypto/mbedtls")
 
-target_compile_definitions(silabs-mbedtls-rcp
-    PRIVATE
-        # ${EFR32_PLATFORM_DEFINES_RCP}
-        ${OT_PLATFORM_DEFINES}
-)
+target_compile_definitions(openthread-efr32-rcp-mbedtls PRIVATE ${OT_PLATFORM_DEFINES})
 
 {%- set linker_flags = EXT_LD_FLAGS + EXT_DEBUG_LD_FLAGS %}
 {%- if linker_flags %}
-target_link_options(silabs-mbedtls-rcp PRIVATE
+target_link_options(openthread-efr32-rcp-mbedtls PRIVATE
 {%- for flag in linker_flags %}
     {{ prepare_path(flag) }}
 {%- endfor %}
 )
 {%- endif %}
 
-target_link_libraries(silabs-mbedtls-rcp
+target_link_libraries(openthread-efr32-rcp-mbedtls
     PRIVATE
         ot-config
         openthread-efr32-rcp-config
 )
 
 {%- if C_CXX_INCLUDES %}
-target_include_directories(silabs-mbedtls-rcp
+target_include_directories(openthread-efr32-rcp-mbedtls
     PUBLIC
 {%- for include in C_CXX_INCLUDES %}
 {%- if ('util/third_party/crypto' in include) or ('platform' in include) %}
@@ -82,7 +78,7 @@ set(SILABS_MBEDTLS_SOURCES
 {%- endfor %}
 )
 
-target_sources(silabs-mbedtls-rcp PRIVATE ${SILABS_MBEDTLS_SOURCES})
+target_sources(openthread-efr32-rcp-mbedtls PRIVATE ${SILABS_MBEDTLS_SOURCES})
 
 
 

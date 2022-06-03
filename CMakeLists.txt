@@ -50,8 +50,7 @@ if(OT_PACKAGE_VERSION STREQUAL "")
 endif()
 message(STATUS "Package Version: ${OT_PACKAGE_VERSION}")
 
-# Platform library names
-set(OT_PLATFORM_LIB "openthread-efr32")
+set(OT_PLATFORM_LIB "openthread-efr32-soc")
 set(OT_PLATFORM_LIB_RCP openthread-efr32-rcp)
 
 set(OT_PLATFORM "external" CACHE STRING "disable example platforms" FORCE)
@@ -59,7 +58,7 @@ set(OT_PLATFORM "external" CACHE STRING "disable example platforms" FORCE)
 # ==============================================================================
 # mbedtls
 # ==============================================================================
-set(OT_EXTERNAL_MBEDTLS "silabs-mbedtls-soc" CACHE STRING "use silabs mbedtls" FORCE)
+set(OT_EXTERNAL_MBEDTLS "openthread-efr32-soc-mbedtls" CACHE STRING "use silabs mbedtls" FORCE)
 set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls management" FORCE)
 set(OT_MBEDTLS ${OT_EXTERNAL_MBEDTLS})
 
@@ -68,7 +67,6 @@ add_subdirectory(openthread)
 
 # Add any efr32 example projects
 add_subdirectory(examples)
-
 
 target_compile_options(ot-config INTERFACE
     -Wno-shadow

@@ -25,13 +25,18 @@
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #  POSSIBILITY OF SUCH DAMAGE.
 #
-{% from 'macros.jinja' import prepare_path %}
+{%  from
+        'macros.jinja'
+    import
+        prepare_path,
+        print_all_jinja_vars
+    with context -%}
 
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
 
-add_library(silabs-mbedtls-soc)
+add_library({{PROJECT_NAME}}-mbedtls)
 
-set_target_properties(silabs-mbedtls-soc
+set_target_properties({{PROJECT_NAME}}-mbedtls
     PROPERTIES
         C_STANDARD 99
         CXX_STANDARD 11
@@ -39,29 +44,25 @@ set_target_properties(silabs-mbedtls-soc
 
 set(SILABS_MBEDTLS_DIR "${SILABS_GSDK_DIR}/util/third_party/crypto/mbedtls")
 
-target_compile_definitions(silabs-mbedtls-soc
-    PRIVATE
-        # ${EFR32_PLATFORM_DEFINES_SOC}
-        ${OT_PLATFORM_DEFINES}
-)
+target_compile_definitions({{PROJECT_NAME}}-mbedtls PRIVATE ${OT_PLATFORM_DEFINES})
 
 {%- set linker_flags = EXT_LD_FLAGS + EXT_DEBUG_LD_FLAGS %}
 {%- if linker_flags %}
-target_link_options(silabs-mbedtls-soc PRIVATE
+target_link_options({{PROJECT_NAME}}-mbedtls PRIVATE
 {%- for flag in linker_flags %}
     {{ prepare_path(flag) }}
 {%- endfor %}
 )
 {%- endif %}
 
-target_link_libraries(silabs-mbedtls-soc
+target_link_libraries({{PROJECT_NAME}}-mbedtls
     PRIVATE
         ot-config
-        openthread-efr32-config
+        {{PROJECT_NAME}}-config
 )
 
 {%- if C_CXX_INCLUDES %}
-target_include_directories(silabs-mbedtls-soc
+target_include_directories({{PROJECT_NAME}}-mbedtls
     PUBLIC
 {%- for include in C_CXX_INCLUDES %}
 {%- if ('util/third_party/crypto' in include) or ('platform' in include) %}
@@ -82,50 +83,14 @@ set(SILABS_MBEDTLS_SOURCES
 {%- endfor %}
 )
 
-target_sources(silabs-mbedtls-soc PRIVATE ${SILABS_MBEDTLS_SOURCES})
+target_sources({{PROJECT_NAME}}-mbedtls PRIVATE ${SILABS_MBEDTLS_SOURCES})
 
+{#- ========================================================================= #}
+{#- Debug                                                                     #}
+{#- ========================================================================= #}
 
-
-# ==============================================================================
-#  C_CXX_INCLUDES
-# ==============================================================================
-{%- for include in C_CXX_INCLUDES %}
-#    {{ prepare_path(include) | replace('-I', '') | replace('\"', '') }}
-{%- endfor %}
-
-# ==============================================================================
-#  SOURCES
-# ==============================================================================
-{%- for source in (ALL_SOURCES | sort) %}
-#    {{ prepare_path(source) }}
-{%- endfor %}
-
-# ==============================================================================
-#  C_CXX_DEFINES
-# ==============================================================================
-{%- for define in C_CXX_DEFINES %}
-#    {{define}}={{C_CXX_DEFINES[define]}}
-{%- endfor %}
-
-# ==============================================================================
-#  SYS_LIBS+USER_LIBS
-# ==============================================================================
-{%- for lib_name in SYS_LIBS+USER_LIBS %}
-#    {{ prepare_path(lib_name) | replace('\\', '/') | replace(' ', '\\ ') | replace('"','') }}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_CFLAGS + EXT_CXX_FLAGS
-# ==============================================================================
-{%- set compile_options = EXT_CFLAGS + EXT_CXX_FLAGS %}
-{%- for flag in compile_options %}
-#    {{flag}}
-{%- endfor %}
-
-# ==============================================================================
-#  EXT_CFLAGS + EXT_CXX_FLAGS
-# ==============================================================================
-{%- set linker_flags = EXT_LD_FLAGS + EXT_DEBUG_LD_FLAGS %}
-{%- for flag in linker_flags %}
-#    {{ prepare_path(flag) }}
-{%- endfor %}
+{#- Change debug_template to true to print all jinja vars #}
+{%- set debug_template = false %}
+{%- if debug_template %}
+{{ print_all_jinja_vars() }}
+{%- endif %}
