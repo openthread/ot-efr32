@@ -222,7 +222,12 @@ main()
     board=$([[ ${lowercase_args} =~ (brd[0-9]{4}[a-z]{1}) ]] && echo "${BASH_REMATCH[1]}")
 
     # Determine board's platform and exit if unsupported
-    local board_slcc=$(find "${sdk_dir}"/hardware/board/component -name "${board}*" | sort --version-sort | tail -n 1)
+    local board_slcc=$(
+        find "${sdk_dir}"/hardware/board/component -type f \( -name "${board}*" ! -name '*_support.slcc' \) \
+            | sort --version-sort \
+            | tail -n 1
+    )
+
     local platform=$(
         grep -Po 'board:device:.*' "${board_slcc}" \
             | sed 's/board:device:\(efr32\)*\([[:alpha:]]\{2\}\)m*\([[:digit:]]\{1,2\}\).*/efr32\2\3/' \
