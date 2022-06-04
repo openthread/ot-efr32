@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2022, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,78 +31,50 @@
  *   This file implements the OpenThread platform abstraction for UART communication.
  *
  */
+
+#ifdef SL_COMPONENT_CATALOG_PRESENT
+#include "sl_component_catalog.h"
+#endif // SL_COMPONENT_CATALOG_PRESENT
+
+#include "em_core.h"
+#include "openthread-system.h"
+#include "sl_uartdrv_instances.h"
+#include "sl_uartdrv_usart_vcom_config.h"
+#include "uartdrv.h"
+#include <openthread-core-config.h>
 #include <stddef.h>
 #include <string.h>
-
-#include "openthread-system.h"
-#include <openthread-core-config.h>
-
 #include "utils/code_utils.h"
 #include "utils/uart.h"
 
 #include "ecode.h"
-#include "em_core.h"
+#include "em_gpio.h"
+#include "gpiointerrupt.h"
+#include "platform-efr32.h"
 #include "sl_sleeptimer.h"
 #include "sl_status.h"
-#include "uartdrv.h"
 
-#include "hal-config.h"
-#include "platform-efr32.h"
-#include "sl_uartdrv_usart_vcom_config.h"
+#ifdef SL_CATALOG_KERNEL_PRESENT
 
-#define HELPER1(x) USART##x##_RX_IRQn
-#define HELPER2(x) HELPER1(x)
-#define USART_IRQ HELPER2(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
+static unsigned int sGpioIntContext = 0;
 
-#define HELPER3(x) USART##x##_RX_IRQHandler
-#define HELPER4(x) HELPER3(x)
-#define USART_IRQHandler HELPER4(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
+static void gpioSerialWakeupCallback(uint8_t interrupt_no, void *context)
+{
+    unsigned int *pin = (unsigned int *)context;
+
+    (void)interrupt_no;
+
+    if (*pin == SL_UARTDRV_USART_VCOM_RX_PIN)
+    {
+        otSysEventSignalPending();
+    }
+}
+#endif // SL_CATALOG_KERNEL_PRESENT
 
 enum
 {
     kReceiveFifoSize = 128,
 };
-
-DEFINE_BUF_QUEUE(EMDRV_UARTDRV_MAX_CONCURRENT_RX_BUFS, sUartRxQueue);
-DEFINE_BUF_QUEUE(EMDRV_UARTDRV_MAX_CONCURRENT_TX_BUFS, sUartTxQueue);
-
-static const UARTDRV_InitUart_t USART_INIT = {
-    .port     = USART0,                   /* USART port */
-    .baudRate = HAL_SERIAL_APP_BAUD_RATE, /* Baud rate */
-#if defined(_USART_ROUTELOC0_MASK)
-    .portLocationTx = BSP_SERIAL_APP_TX_LOC, /* USART Tx pin location number */
-    .portLocationRx = BSP_SERIAL_APP_RX_LOC, /* USART Rx pin location number */
-#elif defined(_USART_ROUTE_MASK)
-#error This configuration is not supported
-// .portLocation    = NULL;
-#elif defined(_GPIO_USART_ROUTEEN_MASK)
-    .txPort  = BSP_SERIAL_APP_TX_PORT, /* USART Tx port number */
-    .rxPort  = BSP_SERIAL_APP_RX_PORT, /* USART Rx port number */
-    .txPin   = BSP_SERIAL_APP_TX_PIN,  /* USART Tx pin number */
-    .rxPin   = BSP_SERIAL_APP_RX_PIN,  /* USART Rx pin number */
-    .uartNum = 0,                      /* UART instance number */
-#endif
-    .stopBits     = (USART_Stopbits_TypeDef)USART_FRAME_STOPBITS_ONE, /* Stop bits */
-    .parity       = (USART_Parity_TypeDef)USART_FRAME_PARITY_NONE,    /* Parity */
-    .oversampling = (USART_OVS_TypeDef)USART_CTRL_OVS_X16,            /* Oversampling mode*/
-#if defined(USART_CTRL_MVDIS)
-    .mvdis = false,                                         /* Majority vote disable */
-#endif                                                      // USART_CTRL_MVDIS
-    .fcType  = HAL_SERIAL_APP_FLOW_CONTROL,                 /* Flow control */
-    .ctsPort = BSP_SERIAL_APP_CTS_PORT,                     /* CTS port number */
-    .ctsPin  = BSP_SERIAL_APP_CTS_PIN,                      /* CTS pin number */
-    .rtsPort = BSP_SERIAL_APP_RTS_PORT,                     /* RTS port number */
-    .rtsPin  = BSP_SERIAL_APP_RTS_PIN,                      /* RTS pin number */
-    .rxQueue = (UARTDRV_Buffer_FifoQueue_t *)&sUartRxQueue, /* RX operation queue */
-    .txQueue = (UARTDRV_Buffer_FifoQueue_t *)&sUartTxQueue, /* TX operation queue */
-#if defined(_USART_ROUTELOC1_MASK)
-    .portLocationCts = BSP_SERIAL_APP_CTS_LOC, /* CTS location */
-    .portLocationRts = BSP_SERIAL_APP_RTS_LOC  /* RTS location */
-#endif                                         // _USART_ROUTELOC1_MASK
-};
-
-static UARTDRV_HandleData_t sUartHandleData;
-static UARTDRV_Handle_t     sUartHandle = &sUartHandleData;
 
 // In order to reduce the probability of data loss due to disabled interrupts, we use
 // two duplicate receive buffers so we can always have one "active" receive request.
@@ -152,7 +124,6 @@ static void transmitDone(UARTDRV_Handle_t aHandle, Ecode_t aStatus, uint8_t *aDa
 
     // This value will be used later in processTransmit() to call otPlatUartSendDone()
     sTxComplete = true;
-
     otSysEventSignalPending();
 }
 
@@ -160,8 +131,7 @@ static void processReceive(void)
 {
     uint8_t *       aData;
     UARTDRV_Count_t aCount, remaining;
-    CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(sUartHandle, &aData, &aCount, &remaining);
-
+    CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(sl_uartdrv_usart_vcom_handle, &aData, &aCount, &remaining);
                         if (aCount > lastCount) {
                             memcpy(sReceiveFifo.mBuffer + sReceiveFifo.mTail, aData + lastCount, aCount - lastCount);
                             sReceiveFifo.mTail = (sReceiveFifo.mTail + aCount - lastCount) % kReceiveFifoSize;
@@ -188,6 +158,60 @@ static void processReceive(void)
         // Set mHead to the local tail we have cached
         sReceiveFifo.mHead = tail;
     }
+}
+
+static void processTransmit(void)
+{
+    // NOTE: This check needs to be done in here and cannot be done in transmitDone because the transmit may not be
+    // fully complete when the transmitDone callback is called.
+    if (!sTxComplete)
+    {
+        return;
+    }
+    sTxComplete = false;
+    otPlatUartSendDone();
+}
+
+void efr32UartProcess(void)
+{
+    processReceive();
+    processTransmit();
+}
+
+otError otPlatUartEnable(void)
+{
+    otError error = OT_ERROR_NONE;
+
+#ifdef SL_CATALOG_KERNEL_PRESENT
+    unsigned int intNo;
+
+    GPIOINT_Init();
+
+    sGpioIntContext = SL_UARTDRV_USART_VCOM_RX_PIN;
+    intNo = GPIOINT_CallbackRegisterExt(SL_UARTDRV_USART_VCOM_RX_PIN, gpioSerialWakeupCallback, &sGpioIntContext);
+
+    otEXPECT_ACTION(intNo != INTERRUPT_UNAVAILABLE, error = OT_ERROR_FAILED);
+
+    GPIO_ExtIntConfig(SL_UARTDRV_USART_VCOM_RX_PORT, SL_UARTDRV_USART_VCOM_RX_PIN, intNo, false, true, true);
+#endif
+
+    sReceiveFifo.mHead = 0;
+    sReceiveFifo.mTail = 0;
+
+    // When one receive request is completed, the other buffer is used for a separate receive request, issued
+    // immediately.
+    UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, sReceiveBuffer1, RECEIVE_BUFFER_SIZE, receiveDone);
+    UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, sReceiveBuffer2, RECEIVE_BUFFER_SIZE, receiveDone);
+
+#ifdef SL_CATALOG_KERNEL_PRESENT
+exit:
+#endif
+    return error;
+}
+
+otError otPlatUartDisable(void)
+{
+    return OT_ERROR_NOT_IMPLEMENTED;
 }
 
 static void flushTimeoutAlarmCallback(sl_sleeptimer_timer_handle_t *aHandle, void *aData)
@@ -217,9 +241,10 @@ otError otPlatUartFlush(void)
     do
     {
         // Check both peripheral status and queue depth
-        transmitQueueDepth = UARTDRV_GetTransmitDepth(sUartHandle);
-        uartIdle           = UARTDRV_GetPeripheralStatus(sUartHandle) & (UARTDRV_STATUS_TXIDLE | UARTDRV_STATUS_TXC);
-        uartFullyFlushed   = uartIdle && (transmitQueueDepth == 0);
+        transmitQueueDepth = UARTDRV_GetTransmitDepth(sl_uartdrv_usart_vcom_handle);
+        uartIdle =
+            (UARTDRV_GetPeripheralStatus(sl_uartdrv_usart_vcom_handle) & (UARTDRV_STATUS_TXIDLE | UARTDRV_STATUS_TXC));
+        uartFullyFlushed = uartIdle && (transmitQueueDepth == 0);
     } while (!uartFullyFlushed && !flushTimedOut);
 
     sl_sleeptimer_stop_timer(&flushTimer);
@@ -227,56 +252,18 @@ otError otPlatUartFlush(void)
     if (flushTimedOut)
     {
         // Abort all transmits
-        UARTDRV_Abort(sUartHandle, uartdrvAbortTransmit);
+        UARTDRV_Abort(sl_uartdrv_usart_vcom_handle, uartdrvAbortTransmit);
     }
     sTxComplete = false;
 exit:
     return error;
 }
 
-static void processTransmit(void)
+OT_TOOL_WEAK void otPlatUartReceived(const uint8_t *aBuf, uint16_t aBufLength)
 {
-    // NOTE: This check needs to be done in here and cannot be done in transmitDone because the transmit may not be
-    // fully complete when the transmitDone callback is called.
-    if (!sTxComplete)
-    {
-        return;
-    }
-
-    sTxComplete = false;
-    otPlatUartSendDone();
-}
-
-void USART_IRQHandler(void)
-{
-    otSysEventSignalPending();
-}
-
-otError otPlatUartEnable(void)
-{
-    UARTDRV_InitUart_t uartInit = USART_INIT;
-
-    sReceiveFifo.mHead = 0;
-    sReceiveFifo.mTail = 0;
-
-    UARTDRV_Init(sUartHandle, &uartInit);
-
-    // When one receive request is completed, the other buffer is used for a separate receive request, issued
-    // immediately.
-    UARTDRV_Receive(sUartHandle, sReceiveBuffer1, RECEIVE_BUFFER_SIZE, receiveDone);
-    UARTDRV_Receive(sUartHandle, sReceiveBuffer2, RECEIVE_BUFFER_SIZE, receiveDone);
-
-    // Enable USART0 interrupt to wake OT task when data arrives
-    NVIC_ClearPendingIRQ(USART_IRQ);
-    NVIC_EnableIRQ(USART_IRQ);
-    USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
-
-    return OT_ERROR_NONE;
-}
-
-otError otPlatUartDisable(void)
-{
-    return OT_ERROR_NOT_IMPLEMENTED;
+    OT_UNUSED_VARIABLE(aBuf);
+    OT_UNUSED_VARIABLE(aBufLength);
+    // do nothing
 }
 
 otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
@@ -284,15 +271,14 @@ otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
     otError error  = OT_ERROR_NONE;
     Ecode_t status = ECODE_EMDRV_UARTDRV_OK;
 
-    status = UARTDRV_Transmit(sUartHandle, (uint8_t *)aBuf, aBufLength, transmitDone);
+    status = UARTDRV_Transmit(sl_uartdrv_usart_vcom_handle, (uint8_t *)aBuf, aBufLength, transmitDone);
     otEXPECT_ACTION(status == ECODE_EMDRV_UARTDRV_OK, error = OT_ERROR_FAILED);
 
 exit:
     return error;
 }
 
-void efr32UartProcess(void)
+OT_TOOL_WEAK void otPlatUartSendDone(void)
 {
-    processReceive();
-    processTransmit();
+    // do nothing
 }

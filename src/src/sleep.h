@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2022, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,17 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "hal-config.h"
+/**
+ * @file
+ *   This file includes the initializers for supporting OpenThread with
+ * power manager.
+ *
+ */
 
-#if (HAL_FEM_ENABLE)
-#include "util/plugin/plugin-common/fem-control/fem-control.c"
-#endif
+#ifndef SLEEP_H_
+#define SLEEP_H_
+
+void sl_ot_sleep_init(void);
+bool sl_ot_is_ok_to_sleep(void);
+
+#endif // SLEEP_H_

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2022, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@
     4 // Technically, a version 2 packet / ACK
       // can be 4 bytes with seq# suppression
 #define IEEE802154_MAX_LENGTH 127
-#define IEEE802154_ACK_LENGTH 5
+#define IEEE802154_MIN_DATA_LENGTH 5
 
 // FCF + DSN + dest PANID + dest addr + src PANID + src addr (without security header)
 #define IEEE802154_MAX_MHR_LENGTH (2 + 1 + 2 + 8 + 2 + 8)

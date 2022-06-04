@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2022, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -47,10 +47,6 @@
 #if OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT
 #error "Platform not configured to support configuration option: OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT"
 #endif
-#endif
-
-#if OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE
-#error "PSA Crypto is not yet supported for efr32: OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE"
 #endif
 
 #endif /* OPENTHREAD_CORE_EFR32_CONFIG_CHECK_H_ */

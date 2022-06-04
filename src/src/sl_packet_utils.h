@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, The OpenThread Authors.
+ *  Copyright (c) 2022, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -28,24 +28,41 @@
 
 /**
  * @file
- *   This file includes dev board compile-time configuration constants for efr32.
+ *   This file includes the initializers for supporting Security manager.
  *
  */
 
-#ifndef __BOARD_CONFIG_H__
-#define __BOARD_CONFIG_H__
+#ifndef SL_PACKET_HANDLER_H
+#define SL_PACKET_HANDLER_H
 
-#define RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT 1 /// Dev board suppports OQPSK modulation in 2.4GHz band.
-#define RADIO_CONFIG_915MHZ_OQPSK_SUPPORT 0 /// Dev board doesn't support OQPSK modulation in 915MHz band.
+#include <openthread/platform/radio.h>
 
-#ifndef RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
-#define RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT 0 /// Set to 1 to enable debug counters in radio.c
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#ifndef RADIO_CONFIG_DMP_SUPPORT
-#define RADIO_CONFIG_DMP_SUPPORT 0 /// Set to 1 to enable Dynamic Multi-Protocol support in radio.c
+/**
+ * This function performs AES CCM on the frame which is going to be sent.
+ *
+ * @param[in]  aFrame       A pointer to the MAC frame buffer that is going to be sent.
+ * @param[in]  aExtAddress  A pointer to the extended address, which will be used to generate nonce
+ *                          for AES CCM computation.
+ *
+ */
+void efr32PlatProcessTransmitAesCcm(otRadioFrame *aFrame, const otExtAddress *aExtAddress);
+
+/**
+ * This function returns if the Frame Pending bit is set in any given frame.
+ *
+ * @param[in]  aFrame       A pointer to the MAC frame buffer.
+ *
+ * @retval  true    Frame Pending is set.
+ * @retval  false   Frame Pending is not set.
+ */
+bool efr32IsFramePending(otRadioFrame *aFrame);
+
+#ifdef __cplusplus
+} // extern "C"
 #endif
 
-#define RADIO_CONFIG_PA_USES_DCDC 0 /// The PA(s) is(are) fed from VBAT
-
-#endif // __BOARD_CONFIG_H__
+#endif /* SL_PACKET_HANDLER_H */
