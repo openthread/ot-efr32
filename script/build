@@ -248,8 +248,6 @@ main()
             OT_CMAKE_NINJA_TARGET=("ot-rcp")
             ;;
         efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
-            # OT_CMAKE_NINJA_TARGET=("ot-cli-ftd")
-            # OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" )
             OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
             if [ "${skip_silabs_apps}" = false ]; then
                 OT_CMAKE_NINJA_TARGET+=("sleepy-demo-ftd" "sleepy-demo-mtd")
