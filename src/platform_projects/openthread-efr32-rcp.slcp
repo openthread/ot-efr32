@@ -1,9 +1,9 @@
 project_name: openthread-efr32-rcp
-label: openthread-efr32-rcp
+label: ot-efr32
 package: OpenThread
 description: This is the platform project that will enable the ot-efr32 repo on GitHub to generate a CMake library for EFR32 RCPs
 category: OpenThread Examples
-quality: internal
+quality: production
 
 component:
   - id: brd4001a
