@@ -88,7 +88,7 @@ build()
             --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc.slcp" \
             --output-type=makefile \
             --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/soc \
+            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
             --export-destination="${current_project_export_dir}" \
             --with "${board}"
 
@@ -107,7 +107,7 @@ build()
             --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc.slcp" \
             --output-type=makefile \
             --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/soc/mbedtls \
+            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/mbedtls \
             --export-destination="${current_project_export_dir}" \
             --with "${board}"
 
@@ -127,7 +127,7 @@ build()
             --project-file="${repo_dir}/src/platform_projects/openthread-efr32-rcp.slcp" \
             --output-type=makefile \
             --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/soc \
+            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
             --export-destination="${current_project_export_dir}" \
             --with "${board}"
 
@@ -148,7 +148,7 @@ build()
             --project-file="${repo_dir}/src/platform_projects/openthread-efr32-rcp.slcp" \
             --output-type=makefile \
             --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/rcp/mbedtls \
+            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/mbedtls \
             --export-destination="${current_project_export_dir}" \
             --with "${board}"
 
