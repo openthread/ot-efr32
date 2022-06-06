@@ -1,5 +1,9 @@
+####################################################################
+# Automatically-generated file. Do not edit!                       #
+# CMake Version 1                                                  #
+####################################################################
 #
-#  Copyright (c) 2021, The OpenThread Authors.
+#  Copyright (c) 2022, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -34,6 +38,9 @@
 
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
 
+# ==============================================================================
+# mbedtls library
+# ==============================================================================
 add_library({{PROJECT_NAME}}-mbedtls)
 
 set_target_properties({{PROJECT_NAME}}-mbedtls
@@ -42,10 +49,46 @@ set_target_properties({{PROJECT_NAME}}-mbedtls
         CXX_STANDARD 11
 )
 
+# ==============================================================================
+# Includes
+# ==============================================================================
 set(SILABS_MBEDTLS_DIR "${SILABS_GSDK_DIR}/util/third_party/crypto/mbedtls")
 
+{%- if C_CXX_INCLUDES %}
+target_include_directories({{PROJECT_NAME}}-mbedtls
+    PUBLIC
+{%- for include in C_CXX_INCLUDES %}
+{%- if ('util/third_party/crypto' in include) or ('platform' in include) %}
+        {{ prepare_path(include) | replace('-I', '') | replace('\"', '') }}
+{%- endif %}
+{%- endfor %}
+)
+{%- endif %}
+
+# ==============================================================================
+# Sources
+# ==============================================================================
+set(SILABS_MBEDTLS_SOURCES
+{%- for source in (ALL_SOURCES | sort) %}
+    {%- set source = prepare_path(source) -%}
+
+    {#- Filter-out non-mbedtls sources #}
+    {%- if 'SILABS_MBEDTLS_DIR' in source %}
+    {{source}}
+    {%- endif %}
+{%- endfor %}
+)
+
+target_sources({{PROJECT_NAME}}-mbedtls PRIVATE ${SILABS_MBEDTLS_SOURCES})
+
+# ==============================================================================
+# Compile definitions
+# ==============================================================================
 target_compile_definitions({{PROJECT_NAME}}-mbedtls PRIVATE ${OT_PLATFORM_DEFINES})
 
+# ==============================================================================
+# Linking
+# ==============================================================================
 {%- set linker_flags = EXT_LD_FLAGS + EXT_DEBUG_LD_FLAGS %}
 {%- if linker_flags %}
 target_link_options({{PROJECT_NAME}}-mbedtls PRIVATE
@@ -60,30 +103,6 @@ target_link_libraries({{PROJECT_NAME}}-mbedtls
         ot-config
         {{PROJECT_NAME}}-config
 )
-
-{%- if C_CXX_INCLUDES %}
-target_include_directories({{PROJECT_NAME}}-mbedtls
-    PUBLIC
-{%- for include in C_CXX_INCLUDES %}
-{%- if ('util/third_party/crypto' in include) or ('platform' in include) %}
-        {{ prepare_path(include) | replace('-I', '') | replace('\"', '') }}
-{%- endif %}
-{%- endfor %}
-)
-{%- endif %}
-
-set(SILABS_MBEDTLS_SOURCES
-{%- for source in (ALL_SOURCES | sort) %}
-    {%- set source = prepare_path(source) -%}
-
-    {#- Filter-out non-mbedtls sources #}
-    {%- if 'SILABS_MBEDTLS_DIR' in source %}
-    {{source}}
-    {%- endif %}
-{%- endfor %}
-)
-
-target_sources({{PROJECT_NAME}}-mbedtls PRIVATE ${SILABS_MBEDTLS_SOURCES})
 
 {#- ========================================================================= #}
 {#- Debug                                                                     #}
