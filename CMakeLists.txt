@@ -93,7 +93,7 @@ foreach(slc_project IN LISTS slc_generated_projects)
     endif()
 endforeach()
 
-# Sub-GHz support
+# efr32mg12 Sub-GHz support
 set(EFR32MG12_915MHZ_PHY_SOURCES
     ${PROJECT_SOURCE_DIR}/src/efr32mg12/phy/PHY_IEEE802154_915MHZ_OQPSK_EFR32XG12.c
     ${PROJECT_SOURCE_DIR}/src/efr32mg12/phy/PHY_IEEE802154_915MHZ_2GFSK_EFR32XG12.c

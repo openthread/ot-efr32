@@ -52,7 +52,7 @@ source "$script_dir/slc_cli"
 OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET:-}
 
 readonly OT_OPTIONS=(
-    "-DCMAKE_BUILD_TYPE=Debug"
+    "-DCMAKE_BUILD_TYPE=MinSizeRel"
     "-DOT_DIAGNOSTIC=ON"
     "-DOT_EXTERNAL_HEAP=ON"
     "-DOT_SLAAC=ON"
@@ -79,7 +79,6 @@ build()
         # ==============================================================================================================
         # Generate openthread-efr32-soc and openthread-efr32-soc-sdk libs
         # ==============================================================================================================
-        # TODO: This will change once IOTREQ-4050 is completed
         current_project_export_dir="${slc_generated_projects_dir}/soc/platform"
 
         run_slc -v 1 generate \
@@ -138,8 +137,6 @@ build()
         # ==============================================================================================================
         # Generate openthread-efr32-rcp-mbedtls lib
         # ==============================================================================================================
-        # TODO: I think when IOTREQ-4050 is finished, we won't need to generate twice
-        # TODO: Instead, I believe we should be able to pass in any number of jinja files all at once
         current_project_export_dir="${slc_generated_projects_dir}/rcp/mbedtls"
 
         run_slc -v 1 generate \
@@ -251,8 +248,6 @@ main()
             OT_CMAKE_NINJA_TARGET=("ot-rcp")
             ;;
         efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
-            # OT_CMAKE_NINJA_TARGET=("ot-cli-ftd")
-            # OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" )
             OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
             if [ "${skip_silabs_apps}" = false ]; then
                 OT_CMAKE_NINJA_TARGET+=("sleepy-demo-ftd" "sleepy-demo-mtd")

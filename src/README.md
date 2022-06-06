@@ -319,4 +319,4 @@ The following toolchain has been used for testing and verification:
 
 The EFR32 example has been verified with following Silicon Labs Gecko SDK Library version:
 
-- Silicon Labs Gecko SDK v4.0.x
+- Silicon Labs Gecko SDK v4.1.x
