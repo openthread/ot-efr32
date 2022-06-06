@@ -32,6 +32,6 @@
 option(EFR32_APP_SLEEPY_DEMO "enable sleepy-demo app" ON)
 
 if(EFR32_APP_SLEEPY_DEMO)
-    # add_subdirectory(sleepy-demo)
+    add_subdirectory(sleepy-demo)
 endif()
 

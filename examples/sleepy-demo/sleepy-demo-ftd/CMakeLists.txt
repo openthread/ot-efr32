@@ -45,9 +45,7 @@ target_link_libraries(sleepy-demo-ftd PRIVATE
 
 target_compile_options(sleepy-demo-ftd
     PRIVATE
-        -Wno-sign-compare
-        -Wno-unused-parameter
-        -Wno-missing-field-initializers
+        ${EFR32_CFLAGS}
 )
 
 install(TARGETS sleepy-demo-ftd
