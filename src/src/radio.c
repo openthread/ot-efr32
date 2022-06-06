@@ -163,14 +163,12 @@
 #define DEVICE_CAPABILITY_MCU_EN (DEVINFO->SWCAPA1 & _DEVINFO_SWCAPA1_RFMCUEN_MASK)
 #endif
 
-// ! NOTE: This is a workaround. Remove once the multipan source match table is upstreamed.
-#if !(OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1)
+// ! NOTE: This is a workaround. Should be removed once multipan support is added to `soft_source_match_table.c`
 #define utilsSoftSrcMatchSetPanId(iid, ...)         utilsSoftSrcMatchSetPanId(__VA_ARGS__)
 #define utilsSoftSrcMatchExtFindEntry(iid, ...)     utilsSoftSrcMatchExtFindEntry(__VA_ARGS__)
 #define utilsSoftSrcMatchShortFindEntry(iid, ...)   utilsSoftSrcMatchShortFindEntry(__VA_ARGS__)
 #define utilsSoftSrcMatchExtFindEntry(iid, ...)     utilsSoftSrcMatchExtFindEntry(__VA_ARGS__)
 #define utilsSoftSrcMatchShortFindEntry(iid, ...)   utilsSoftSrcMatchShortFindEntry(__VA_ARGS__)
-#endif
 
 // Energy Scan
 typedef enum
