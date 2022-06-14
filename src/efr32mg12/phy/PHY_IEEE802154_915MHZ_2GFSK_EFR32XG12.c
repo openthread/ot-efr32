@@ -210,8 +210,15 @@ const RAIL_ChannelConfigEntry_t generated_channels[] = {
      .attr                  = &generated_entryAttr},
 };
 
-const RAIL_ChannelConfig_t  generated_channelConfig = {generated, NULL, generated_channels, 1};
-const RAIL_ChannelConfig_t *channelConfigs[]        = {
+const RAIL_ChannelConfig_t generated_channelConfig = {
+    .phyConfigBase          = generated,
+    .phyConfigDeltaSubtract = NULL,
+    .configs                = generated_channels,
+    .length                 = 1,
+    .signature              = 0U,
+};
+
+const RAIL_ChannelConfig_t *channelConfigs[] = {
     &generated_channelConfig,
 };
 

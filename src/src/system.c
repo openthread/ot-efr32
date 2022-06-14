@@ -105,8 +105,6 @@ void otSysInit(int argc, char *argv[])
 
 void sl_ot_sys_init(void)
 {
-    sl_openthread_init();
-
 #if USE_EFR32_LOG
     efr32LogInit();
 #endif

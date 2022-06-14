@@ -164,11 +164,11 @@
 #endif
 
 // ! NOTE: This is a workaround. Should be removed once multipan support is added to `soft_source_match_table.c`
-#define utilsSoftSrcMatchSetPanId(iid, ...)         utilsSoftSrcMatchSetPanId(__VA_ARGS__)
-#define utilsSoftSrcMatchExtFindEntry(iid, ...)     utilsSoftSrcMatchExtFindEntry(__VA_ARGS__)
-#define utilsSoftSrcMatchShortFindEntry(iid, ...)   utilsSoftSrcMatchShortFindEntry(__VA_ARGS__)
-#define utilsSoftSrcMatchExtFindEntry(iid, ...)     utilsSoftSrcMatchExtFindEntry(__VA_ARGS__)
-#define utilsSoftSrcMatchShortFindEntry(iid, ...)   utilsSoftSrcMatchShortFindEntry(__VA_ARGS__)
+#define utilsSoftSrcMatchSetPanId(iid, ...) utilsSoftSrcMatchSetPanId(__VA_ARGS__)
+#define utilsSoftSrcMatchExtFindEntry(iid, ...) utilsSoftSrcMatchExtFindEntry(__VA_ARGS__)
+#define utilsSoftSrcMatchShortFindEntry(iid, ...) utilsSoftSrcMatchShortFindEntry(__VA_ARGS__)
+#define utilsSoftSrcMatchExtFindEntry(iid, ...) utilsSoftSrcMatchExtFindEntry(__VA_ARGS__)
+#define utilsSoftSrcMatchShortFindEntry(iid, ...) utilsSoftSrcMatchShortFindEntry(__VA_ARGS__)
 
 // Energy Scan
 typedef enum
@@ -2592,7 +2592,7 @@ static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
         sReceiveAckFrame.mInfo.mRxInfo.mLqi       = pPacketDetails->lqi;
         sReceiveAckFrame.mInfo.mRxInfo.mTimestamp = pPacketDetails->timeReceived.packetTime;
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
-        sReceiveAckFrame.mIid                     = iid;
+        sReceiveAckFrame.mIid = iid;
 #endif
     }
     else
@@ -2605,7 +2605,7 @@ static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
         // Set this flag only when the packet is really acknowledged with frame pending set.
         sReceiveFrame.mInfo.mRxInfo.mAckedWithFramePending = framePendingSetInOutgoingAck;
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
-        sReceiveFrame.mIid                                 = iid;
+        sReceiveFrame.mIid = iid;
 #endif
 
 #if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2

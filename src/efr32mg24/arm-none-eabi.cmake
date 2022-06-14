@@ -26,32 +26,26 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/efr32mg1x.cmake)
+set(CMAKE_SYSTEM_NAME              Generic)
+set(CMAKE_SYSTEM_PROCESSOR         ARM)
 
-add_library(silabs-efr32mg12-sdk)
+set(CMAKE_C_COMPILER               arm-none-eabi-gcc)
+set(CMAKE_CXX_COMPILER             arm-none-eabi-g++)
+set(CMAKE_ASM_COMPILER             arm-none-eabi-as)
+set(CMAKE_RANLIB                   arm-none-eabi-ranlib)
 
-target_compile_definitions(silabs-efr32mg12-sdk
-    PRIVATE
-        ${COMMON_FLAG}
-)
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE COMPILER_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-target_include_directories(silabs-efr32mg12-sdk
-    PUBLIC
-        ${SILABS_COMMON_INCLUDES}
-        ${SILABS_GSDK_DIR}/platform/Device/SiliconLabs/EFR32MG12P/Include
-        ${SILABS_EFR32MG1X_INCLUDES}
-)
+set(COMMON_C_FLAGS                 "-mcpu=cortex-m33 -mthumb -fmessage-length=0 -ffunction-sections -fdata-sections -mfpu=fpv5-sp-d16 -mfloat-abi=hard")
 
-target_sources(silabs-efr32mg12-sdk
-    PRIVATE
-        ${SILABS_GSDK_COMMON_SOURCES}
-        ${SILABS_EFR32MG12_SOURCES}
-)
+set(CMAKE_C_FLAGS_INIT             "${COMMON_C_FLAGS} -std=c99")
+set(CMAKE_CXX_FLAGS_INIT           "${COMMON_C_FLAGS} -fno-exceptions -fno-rtti")
+set(CMAKE_EXE_LINKER_FLAGS_INIT    "${COMMON_C_FLAGS} -specs=nano.specs -specs=nosys.specs")
 
-target_link_libraries(silabs-efr32mg12-sdk
-    PUBLIC
-        silabs-mbedtls
-    PRIVATE
-        ${silabs-librail}
-        ot-config
-)
+set(CMAKE_C_FLAGS_DEBUG            "-Og -g")
+set(CMAKE_CXX_FLAGS_DEBUG          "-Og -g")
+set(CMAKE_ASM_FLAGS_DEBUG          "-g")
+
+set(CMAKE_C_FLAGS_RELEASE          "-Os")
+set(CMAKE_CXX_FLAGS_RELEASE        "-Os")
+set(CMAKE_ASM_FLAGS_RELEASE        "")
