@@ -218,7 +218,7 @@ main()
     lowercase_args=$(echo "$@" | tr '[:upper:]' '[:lower:]')
     board=$([[ ${lowercase_args} =~ (brd[0-9]{4}[a-z]{1}) ]] && echo "${BASH_REMATCH[1]}")
 
-    # Determine board's platform and exit if unsupported
+    # Find component file for latest revision of board
     local board_slcc
     board_slcc=$(
         find "${sdk_dir}"/hardware/board/component -type f \( -name "${board}*" ! -name '*_support.slcc' \) \
@@ -226,10 +226,11 @@ main()
             | tail -n 1
     )
 
+    # Determine board's platform and exit if unsupported
     local platform
     platform=$(
         grep -Po 'board:device:.*' "${board_slcc}" \
-            | sed 's/board:device:\(efr32\)*\([[:alpha:]]\{2\}\)m*\([[:digit:]]\{1,2\}\).*/efr32\2\3/' \
+            | sed "s/board:device:${efr32_device_regex}/\1\2\3\4/" \
             | head -n 1
     )
     if [ -z "$platform" ]; then

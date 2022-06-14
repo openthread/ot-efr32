@@ -62,14 +62,16 @@ readonly OT_OPTIONS=(
 readonly BOARDS=(
     brd4151a
     brd4161a
+    brd4164a
     brd4166a
-    brd4170a
-    brd4304a
     brd4168a
+    brd4170a
     brd4180a
     brd4180b
+    brd4181a
     brd4186c
     brd4187c
+    brd4304a
 )
 
 # Sanity check to ensure each board has its platform before it.
