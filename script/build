@@ -219,7 +219,7 @@ main()
 
     # Find component file for latest revision of board
     local board_slcc
-    board_slcc=$(efr32_get_board_slcc ${board})
+    board_slcc=$(efr32_get_board_slcc "${board}")
 
     # Determine board's platform and exit if unsupported
     local platform
