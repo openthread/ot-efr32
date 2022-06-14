@@ -39,7 +39,6 @@ fi
 
 script_dir="$(dirname "$(realpath "$script_path")")"
 repo_dir="$(dirname "$script_dir")"
-sdk_dir=${repo_dir}/third_party/silabs/gecko_sdk/
 board="brdXXXXY"
 
 # shellcheck source=script/efr32-definitions
@@ -220,17 +219,13 @@ main()
 
     # Find component file for latest revision of board
     local board_slcc
-    board_slcc=$(
-        find "${sdk_dir}"/hardware/board/component -type f \( -name "${board}*" ! -name '*_support.slcc' \) \
-            | sort --version-sort \
-            | tail -n 1
-    )
+    board_slcc=$(efr32_get_board_slcc ${board})
 
     # Determine board's platform and exit if unsupported
     local platform
     platform=$(
         grep -Po 'board:device:.*' "${board_slcc}" \
-            | sed "s/board:device:${efr32_device_regex}/\1\2\3\4/" \
+            | sed "s/board:device:${efr32_device_regex}/efr32\2\4/" \
             | head -n 1
     )
     if [ -z "$platform" ]; then

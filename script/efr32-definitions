@@ -35,6 +35,7 @@ fi
 
 script_dir="$(dirname "$(realpath "$script_path")")"
 repo_dir="$(dirname "$script_dir")"
+sdk_dir="${repo_dir}/third_party/silabs/gecko_sdk/"
 
 efr32_device_regex=""
 efr32_device_regex+="\(efr32\)*"                                # Group 1 - efr32 (optional)
@@ -48,6 +49,28 @@ efr32_device_regex+="\([[:alpha:]]\{2,3\}\)*"                   # Group 8 - im, 
 efr32_device_regex+="\(f[[:digit:]]\{1,\}\)*"                   # Group 9 - 32, 40, 48, 68, 125
 efr32_device_regex+=".*"                                        # Rest of line
 readonly efr32_device_regex
+
+efr32_get_board_slcc()
+{
+    local readonly \
+        doc="Gets the latest revision .slcc file for a efr32 board"
+    #
+    # Arg $1 -- efr32 board
+    if [ $# -ne 1 ] || [ -z "$1" ] ; then
+        printf "${doc}\n\nUsage:\n\t%s <efr32_board> \n" ${FUNCNAME[0]} >&2
+        return 1
+    fi
+    local board=$1
+
+    # Find component file for latest revision of board
+    local board_slcc
+    board_slcc=$(
+        find "${sdk_dir}"/hardware/board/component -type f \( -name "${board}*" ! -name '*_support.slcc' \) \
+            | sort --version-sort \
+            | tail -n 1
+    )
+    echo "${board_slcc}"
+}
 
 efr32_get_platforms()
 {
@@ -85,13 +108,19 @@ efr32_check_platform()
 
 efr32_get_jlink_device()
 {
-    # Gets the J-Link device type for a efr32 board
+    local readonly \
+        doc="Gets the J-Link device type for a efr32 board"
     #
     # Arg $1 -- efr32 board
     if [ $# -ne 1 ] || [ -z "$1" ] ; then
-        printf "Gets the J-Link device type for a efr32 platform\n\nUsage:\n\t%s <efr32_board> \n" ${FUNCNAME[0]} >&2
+        printf "${doc}\n\nUsage:\n\t%s <efr32_board> \n" ${FUNCNAME[0]} >&2
         return 1
     fi
+    local board=$1
+
+    # Find component file for latest revision of board
+    local board_slcc
+    board_slcc=$(efr32_get_board_slcc ${board})
 
     local jlink_device
     jlink_device=$(
