@@ -29,7 +29,7 @@
 # ==============================================================================
 # sleepy-demo
 # ==============================================================================
-option(EFR32_APP_SLEEPY_DEMO "enable sleepy-demo app" ON)
+option(EFR32_APP_SLEEPY_DEMO "enable sleepy-demo app" OFF)
 
 if(EFR32_APP_SLEEPY_DEMO)
     add_subdirectory(sleepy-demo)
