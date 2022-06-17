@@ -124,7 +124,7 @@ efr32_get_jlink_device()
 
     local jlink_device
     jlink_device=$(
-        grep -Po 'board:device:.*' "${board_slcc}" \
+        grep -Eo 'board:device:.*' "${board_slcc}" \
             | sed "s/board:device:${efr32_device_regex}/\1\2\3\4\5xxx\7/" \
             | tr "[:lower:]" "[:upper:]" \
             | head -n 1
