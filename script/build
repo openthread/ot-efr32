@@ -224,7 +224,7 @@ main()
     # Determine board's platform and exit if unsupported
     local platform
     platform=$(
-        grep -Po 'board:device:.*' "${board_slcc}" \
+        grep -Eo 'board:device:.*' "${board_slcc}" \
             | sed "s/board:device:${efr32_device_regex}/efr32\2\4/" \
             | head -n 1
     )
