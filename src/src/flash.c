@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2022, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -100,7 +100,6 @@ void otPlatFlashRead(otInstance *aInstance, uint8_t aSwapIndex, uint32_t aOffset
 
 #else // Defaults to Silabs nvm3 system
 
-#include "nvm3.h"
 #include "nvm3_default.h"
 #include <string.h>
 #include <openthread/platform/settings.h>
@@ -349,7 +348,6 @@ static otError addSetting(uint16_t aKey, const uint8_t *aValue, uint16_t aValueL
             }
         }
     }
-
     return err;
 }
 

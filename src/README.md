@@ -75,45 +75,29 @@ Alternatively, the [J-Link][jlink-software-pack] software pack can be used to fl
 
 Before building example apps, make sure to initialize all submodules. Afterward, the build can be launched using `./script/build`.
 
-To see which platforms are supported, the bash script [`<path-to-ot-efr32>/script/efr32-definitions`](../script/efr32-definitions) has been provided. Once `source`d, the functions `efr32_get_platforms` and `efr32_get_boards` can be used to get lists of available platforms and boards for those platforms
-
 **Example**
-
-```bash
-$ cd <path-to-ot-efr32>
-$ source ./script/efr32-definitions
-$ efr32_get_platforms
-efr32mg1 efr32mg12 efr32mg13 efr32mg21
-$ platform="efr32mg12"
-$ efr32_get_boards $platform
-brd4161a
-brd4166a
-brd4170a
-brd4304a
-```
 
 The example below demonstrates how to build for `efr32mg12` on `brd4161a`, but the same command maybe used for other platforms and boards.
 
 ```bash
 $ cd <path-to-ot-efr32>
-$ git submodule update --init
-$ platform="efr32mg12"
+$ git submodule update --init --recursive .
 $ board="brd4161a"
-$ ./script/build $platform -DBOARD=$board
+$ ./script/build $board
 ...
 -- Configuring done
 -- Generating done
--- Build files have been written to: <path-to-ot-efr32>/build/<platform>
+-- Build files have been written to: <path-to-ot-efr32>/build/<board>
 + [[ -n ot-rcp ot-cli-ftd ot-cli-mtd ot-ncp-ftd ot-ncp-mtd sleepy-demo-ftd sleepy-demo-mtd ]]
 + ninja ot-rcp ot-cli-ftd ot-cli-mtd ot-ncp-ftd ot-ncp-mtd sleepy-demo-ftd sleepy-demo-mtd
 [572/572] Linking CXX executable bin/ot-ncp-ftd
 + cd <path-to-ot-efr32>
 ```
 
-After a successful build, the `elf` files are found in `<path-to-ot-efr32>/build/<platform>/bin`.
+After a successful build, the `elf` files are found in `<path-to-ot-efr32>/build/<board>/bin`.
 
 ```bash
-$ ls build/$platform/bin
+$ ls build/$board/bin
 ot-cli-ftd      ot-cli-mtd      ot-ncp-ftd      ot-ncp-mtd      ot-rcp      sleepy-demo-ftd      sleepy-demo-mtd
 ot-cli-ftd.s37  ot-cli-mtd.s37  ot-ncp-ftd.s37  ot-ncp-mtd.s37  ot-rcp.s37  sleepy-demo-ftd.s37  sleepy-demo-mtd.s37
 ```
@@ -159,15 +143,15 @@ Compiled binaries also may be flashed onto the specified EFR32 dev board using [
 
 [j-link-commander]: https://www.segger.com/products/debug-probes/j-link/tools/j-link-commander/
 
-**Example:** Flashing `ot-cli-ftd` to a `efr32mg12` device
+**Example:** Flashing `ot-cli-ftd` to a `brd4161a` device
 
 ```bash
 $ cd <path-to-ot-efr32>
 $ source ./script/efr32-definitions
-$ platform="efr32mg12"
-$ cd <path-to-ot-efr32>/build/$platform/bin
+$ board="brd4161a"
+$ cd <path-to-ot-efr32>/build/$board/bin
 $ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.hex
-$ <path-to-JLinkGDBServer>/JLinkExe -device $(efr32_get_jlink_device $platform) -speed 4000 -if SWD -autoconnect 1 -SelectEmuBySN <SerialNo>
+$ <path-to-JLinkGDBServer>/JLinkExe -device $(efr32_get_jlink_device $board) -speed 4000 -if SWD -autoconnect 1 -SelectEmuBySN <SerialNo>
 $ J-Link>loadfile ot-cli-ftd.hex
 $ J-Link>r
 $ J-Link>q
@@ -297,14 +281,14 @@ A debug session may be started with [J-LinkGDBServer][jlinkgdbserver].
 
 [jlinkgdbserver]: https://www.segger.com/jlink-gdb-server.html
 
-**Example:** Debugging `ot-cli-ftd` on a `efr32mg12` device
+**Example:** Debugging `ot-cli-ftd` on a `brd4161a` device
 
 ```bash
 $ source <path-to-ot-efr32>/script/efr32-definitions
-$ platform="efr32mg12"
+$ board="brd4161a"
 $ cd <path-to-JLinkGDBServer>
-$ sudo ./JLinkGDBServer -if swd -singlerun -device $(efr32_get_jlink_device $platform)
-$ cd <path-to-ot-efr32>/build/$platform/bin
+$ sudo ./JLinkGDBServer -if swd -singlerun -device $(efr32_get_jlink_device $board)
+$ cd <path-to-ot-efr32>/build/$board/bin
 $ arm-none-eabi-gdb ot-cli-ftd
 $ (gdb) target remote 127.0.0.1:2331
 $ (gdb) load
@@ -322,7 +306,7 @@ The above example demonstrates basic OpenThread capabilities. Enable more featur
 
 ```bash
 $ cd <path-to-ot-efr32>
-$ ./script/build efr32mg12 -DBOARD=brd4161a -DOT_COMMISSIONER=ON -DOT_JOINER=ON -DOT_DHCP6_CLIENT=ON -DOT_DHCP6_SERVER=ON
+$ ./script/build brd4161a -DOT_COMMISSIONER=ON -DOT_JOINER=ON -DOT_DHCP6_CLIENT=ON -DOT_DHCP6_SERVER=ON
 ```
 
 <a name="verification"/>
@@ -333,6 +317,6 @@ The following toolchain has been used for testing and verification:
 
 - gcc version 7.3.1
 
-The EFR32 example has been verified with following Flex SDK/RAIL Library version:
+The EFR32 example has been verified with following Silicon Labs Gecko SDK Library version:
 
-- Flex SDK v3.1.x
+- Silicon Labs Gecko SDK v4.1.x

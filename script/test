@@ -41,8 +41,6 @@ repo_dir="$(dirname "$script_dir")"
 # shellcheck source=script/efr32-definitions
 source "$script_dir/efr32-definitions"
 
-readonly OT_BUILDDIR="${OT_CMAKE_BUILD_DIR:-$repo_dir/build}"
-
 readonly OT_OPTIONS=(
     "-DOT_COMPILE_WARNING_AS_ERROR=ON"
     "-DOT_COMMISSIONER=ON"
@@ -60,18 +58,36 @@ readonly OT_OPTIONS=(
     "-DOT_MAC_FILTER=ON"
 )
 
+# List of boards to test
+readonly BOARDS=(
+    brd4151a
+    brd4161a
+    brd4164a
+    brd4166a
+    brd4168a
+    brd4170a
+    brd4180a
+    brd4180b
+    brd4181a
+    brd4186c
+    brd4187c
+    brd4304a
+)
+
+# Sanity check to ensure each board has its platform before it.
+if [[ ! "$((${#BOARDS[@]} % 2))" -eq "0" ]]; then
+    echo "BOARDS is not properly defined."
+    # exit 1
+fi
+
 main()
 {
     export CPPFLAGS="${CPPFLAGS:-} -DNDEBUG"
-
-    for platform in $(efr32_get_platforms); do
-        for board in $(efr32_get_boards "$platform"); do
-            echo "Building [$platform -- $board]..."
-            rm -rf "$OT_BUILDDIR"
-            "$script_dir"/build "$platform" "${OT_OPTIONS[@]}" -DBOARD="$board"
-        done
+    for ((idx = 0; idx < ${#BOARDS[@]}; idx = idx + 1)); do
+        local board="${BOARDS[idx]}"
+        echo "Building [${board}]..."
+        "$script_dir"/build "$board" "${OT_OPTIONS[@]}"
     done
-
 }
 
 main "$@"

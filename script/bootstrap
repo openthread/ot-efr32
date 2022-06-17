@@ -35,8 +35,7 @@ install_packages_apt()
 
     # apt-get update and install dependencies
     sudo apt-get update
-    sudo apt-get --no-install-recommends install -y coreutils
-
+    sudo apt-get --no-install-recommends install -y coreutils openjdk-11-jre python3-setuptools python3-pip git-lfs unzip
 }
 
 install_packages_opkg()
@@ -52,12 +51,18 @@ install_packages_rpm()
 install_packages_brew()
 {
     echo 'Installing script dependencies...'
-    brew install coreutils
+    brew install coreutils openjdk@11
 }
 
 install_packages_source()
 {
     echo 'source not supported currently' && false
+}
+
+install_packages_pip3()
+{
+    sudo pip3 install --system -U cmake==3.22.4
+    cmake --version | grep 3.22.4
 }
 
 install_packages()
@@ -73,6 +78,10 @@ install_packages()
         PM=brew
     fi
     install_packages_$PM
+
+    if command -v pip3; then
+        install_packages_pip3
+    fi
 }
 
 main()
@@ -81,6 +90,9 @@ main()
 
     echo "Bootstrapping openthread"
     "$(dirname "$0")"/../openthread/script/bootstrap
+
+    echo "Bootstrapping silabs"
+    "$(dirname "$0")"/bootstrap_silabs
 
     echo "Bootstrap completed successfully."
 }

@@ -73,3 +73,9 @@ __pycache__
 
 # Local History for Visual Studio Code
 .history/
+
+# slc-cli
+third_party/silabs/slc/slc_cli/
+third_party/silabs/slc/**/*.zip
+
+.cache

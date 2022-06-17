@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2022, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,10 @@
 #include "rail.h"
 #include "sl_sleeptimer.h"
 
-#define XTAL_ACCURACY 200
+// According to EFR datasheets, HFXO is ± 40 ppm and LFXO (at least for MG12) is
+// -8 to +40 ppm.  Assuming average as worst case.
+#define HFXO_ACCURACY 40
+#define LFXO_ACCURACY 24
 
 // millisecond timer (sleeptimer)
 static sl_sleeptimer_timer_handle_t sl_handle;
@@ -97,7 +100,16 @@ uint32_t otPlatAlarmMilliGetNow(void)
 
 uint32_t otPlatTimeGetXtalAccuracy(void)
 {
-    return XTAL_ACCURACY;
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    // For sleepies, we need to account for the low-frequency crystal
+    // accuracy when they go to sleep.  Accounting for that as well,
+    // for the worst case.
+    if (efr32AllowSleepCallback())
+    {
+        return HFXO_ACCURACY + LFXO_ACCURACY;
+    }
+#endif
+    return HFXO_ACCURACY;
 }
 
 void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
@@ -212,6 +224,27 @@ void efr32AlarmProcess(otInstance *aInstance)
 uint32_t otPlatAlarmMicroGetNow(void)
 {
     return RAIL_GetTime();
+}
+
+// Note: This function should be called at least once per wrap
+// period for the wrap-around logic to work below
+uint64_t otPlatTimeGet(void)
+{
+    static uint32_t timerWraps   = 0U;
+    static uint32_t prev32TimeUs = 0U;
+    uint32_t        now32TimeUs;
+    uint64_t        now64TimeUs;
+    CORE_DECLARE_IRQ_STATE;
+    CORE_ENTER_CRITICAL();
+    now32TimeUs = RAIL_GetTime();
+    if (now32TimeUs < prev32TimeUs)
+    {
+        timerWraps += 1U;
+    }
+    prev32TimeUs = now32TimeUs;
+    now64TimeUs  = ((uint64_t)timerWraps << 32) + now32TimeUs;
+    CORE_EXIT_CRITICAL();
+    return now64TimeUs;
 }
 
 // Note: If we ever use OpenThread in a multi-instance scenario, we need to

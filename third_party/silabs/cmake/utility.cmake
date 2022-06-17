@@ -32,9 +32,9 @@ string(TOUPPER "${EFR32_PLATFORM}" PLATFORM_UPPERCASE)
 string(TOLOWER "${BOARD}" BOARD_LOWERCASE)
 string(TOUPPER "${BOARD}" BOARD_UPPERCASE)
 
-set(SILABS_GSDK_DIR ${PROJECT_SOURCE_DIR}/third_party/silabs/sdk_support)
+set(SILABS_GSDK_DIR ${PROJECT_SOURCE_DIR}/third_party/silabs/gecko_sdk)
 
 # Check if GSDK exists
 if(NOT EXISTS "${SILABS_GSDK_DIR}")
-    message(FATAL_ERROR "Cannot find: ${SILABS_GSDK_DIR}\nCheck that Silicon Labs GSDK ${SILABS_GSDK_VERSION} was installed properly")
+    message(FATAL_ERROR "Cannot find: ${SILABS_GSDK_DIR}\nPlease make sure the submodule is initialized")
 endif()

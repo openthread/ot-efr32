@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021, The OpenThread Authors.
+ *  Copyright (c) 2022, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,6 @@
 
 #include "utils/soft_source_match_table.h"
 
-#include "antenna.h"
 #include "board_config.h"
 #include "em_core.h"
 #include "em_system.h"
@@ -62,10 +61,15 @@
 #include "rail.h"
 #include "rail_config.h"
 #include "rail_ieee802154.h"
+#include "sl_packet_utils.h"
 
 #ifdef SL_COMPONENT_CATALOG_PRESENT
 #include "sl_component_catalog.h"
 #endif // SL_COMPONENT_CATALOG_PRESENT
+
+#ifdef SL_CATALOG_RAIL_MULTIPLEXER_PRESENT
+#include "sl_rail_mux_rename.h"
+#endif
 
 #ifdef SL_CATALOG_RAIL_UTIL_ANT_DIV_PRESENT
 #include "sl_rail_util_ant_div.h"
@@ -88,6 +92,20 @@
 
 #define LOW_BYTE(n) ((uint8_t)((n)&0xFF))
 #define HIGH_BYTE(n) ((uint8_t)(LOW_BYTE((n) >> 8)))
+
+// Intentionally maintaining separate groups for series-1 and series-2 devices
+// This gives flexibility to add new elements to be read, like CCA Thresholds.
+#if defined(_SILICON_LABS_32B_SERIES_1)
+#define USERDATA_MFG_CUSTOM_EUI_64 (2)
+#elif defined(_SILICON_LABS_32B_SERIES_2)
+#define USERDATA_MFG_CUSTOM_EUI_64 (2)
+#else
+#error "UNSUPPORTED DEVICE"
+#endif
+
+#ifndef USERDATA_END
+#define USERDATA_END (USERDATA_BASE + FLASH_PAGE_SIZE)
+#endif
 
 #define EFR32_RECEIVE_SENSITIVITY -100   // dBm
 #define EFR32_RSSI_AVERAGING_TIME 16     // us
@@ -117,6 +135,41 @@
 #define QUARTER_DBM_IN_DBM 4
 #define US_IN_MS 1000
 
+/* FilterMask provided by RAIL is structured as follows:
+ * |  Bit:7  |  Bit:6  |  Bit:5  |    Bit:4    |  Bit:3  |  Bit:2  |  Bit:1  |    Bit:0     |
+ * |  Addr2  |  Addr1  |  Addr0  |  Bcast Addr | Pan Id2 | Pan Id1 | Pan Id0 | Bcast PanId  |
+ * | Matched | Matched | Matched |   Matched   | Matched | Matched | Matched |   Matched    |
+ */
+
+#define RADIO_BCAST_IID (0)
+#define RADIO_GET_FILTER_MASK(iid) (1 << (iid))
+
+#define RADIO_BCAST_PANID_FILTER_MASK RADIO_GET_FILTER_MASK(0)
+#define RADIO_INDEX0_PANID_FILTER_MASK RADIO_GET_FILTER_MASK(1)
+#define RADIO_INDEX1_PANID_FILTER_MASK RADIO_GET_FILTER_MASK(2)
+#define RADIO_INDEX2_PANID_FILTER_MASK RADIO_GET_FILTER_MASK(3)
+
+#define RADIO_BCAST_ADDR_FILTER_MASK (RADIO_BCAST_PANID_FILTER_MASK << 4)
+#define RADIO_INDEX0_ADDR_FILTER_MASK (RADIO_INDEX0_PANID_FILTER_MASK << 4)
+#define RADIO_INDEX1_ADDR_FILTER_MASK (RADIO_INDEX1_PANID_FILTER_MASK << 4)
+#define RADIO_INDEX2_ADDR_FILTER_MASK (RADIO_INDEX2_PANID_FILTER_MASK << 4)
+
+#define RADIO_BCAST_PANID (0xFFFF)
+#define INVALID_VALUE (0xFF)
+
+#if defined(_SILICON_LABS_32B_SERIES_1)
+#define DEVICE_CAPABILITY_MCU_EN (1)
+#else
+#define DEVICE_CAPABILITY_MCU_EN (DEVINFO->SWCAPA1 & _DEVINFO_SWCAPA1_RFMCUEN_MASK)
+#endif
+
+// ! NOTE: This is a workaround. Should be removed once multipan support is added to `soft_source_match_table.c`
+#define utilsSoftSrcMatchSetPanId(iid, ...) utilsSoftSrcMatchSetPanId(__VA_ARGS__)
+#define utilsSoftSrcMatchExtFindEntry(iid, ...) utilsSoftSrcMatchExtFindEntry(__VA_ARGS__)
+#define utilsSoftSrcMatchShortFindEntry(iid, ...) utilsSoftSrcMatchShortFindEntry(__VA_ARGS__)
+#define utilsSoftSrcMatchExtFindEntry(iid, ...) utilsSoftSrcMatchExtFindEntry(__VA_ARGS__)
+#define utilsSoftSrcMatchShortFindEntry(iid, ...) utilsSoftSrcMatchShortFindEntry(__VA_ARGS__)
+
 // Energy Scan
 typedef enum
 {
@@ -139,7 +192,7 @@ static bool sIsSrcMatchEnabled = false;
 
 // Receive
 static uint8_t      sReceivePsdu[IEEE802154_MAX_LENGTH];
-static uint8_t      sReceiveAckPsdu[IEEE802154_ACK_LENGTH];
+static uint8_t      sReceiveAckPsdu[IEEE802154_MAX_LENGTH];
 static otRadioFrame sReceiveFrame;
 static otRadioFrame sReceiveAckFrame;
 static otError      sReceiveError;
@@ -170,12 +223,18 @@ static efr32RadioCounters sRailDebugCounters;
 
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
 extern uint8_t otNcpPlatGetCurCommandIid(void);
+static uint8_t sRailFilterMask = RADIO_BCAST_PANID_FILTER_MASK;
 #else
 #define otNcpPlatGetCurCommandIid() 0
 #endif
 
 // RAIL
+
+#ifdef SL_CATALOG_RAIL_MULTIPLEXER_PRESENT
+RAIL_Handle_t gRailHandle;
+#else
 RAIL_Handle_t emPhyRailHandle;
+#endif // SL_CATALOG_RAIL_MULTIPLEXER_PRESENT
 
 static const RAIL_IEEE802154_Config_t sRailIeee802154Config = {
     NULL, // addresses
@@ -199,10 +258,14 @@ static const RAIL_IEEE802154_Config_t sRailIeee802154Config = {
         100,      // timings.idleToRx
         192 - 10, // timings.txToRx
         100,      // timings.idleToTx
-        192,      // timings.rxToTx
-        0,        // timings.rxSearchTimeout
-        0,        // timings.txToRxSearchTimeout
-        0,        // timings.txToTx
+#if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
+        256, // timings.rxToTx - accommodate enhanced ACKs
+#else
+        192, // timings.rxToTx
+#endif
+        0, // timings.rxSearchTimeout
+        0, // timings.txToRxSearchTimeout
+        0, // timings.txToTx
     },
     RAIL_IEEE802154_ACCEPT_STANDARD_FRAMES, // framesMask
     false,                                  // promiscuousMode
@@ -210,7 +273,7 @@ static const RAIL_IEEE802154_Config_t sRailIeee802154Config = {
     false,                                  // defaultFramePendingInOutgoingAcks
 };
 
-#if RADIO_CONFIG_915MHZ_2GFSK_SUPPORT
+#if RADIO_CONFIG_SUBGHZ_SUPPORT
 #define PHY_HEADER_SIZE 2
 #else
 #define PHY_HEADER_SIZE 1
@@ -239,9 +302,158 @@ static uint32_t sCoexCounters[SL_RAIL_UTIL_COEX_EVENT_COUNT] = {0};
 
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
 
-static otExtAddress sExtAddress;
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+#define RADIO_INTERFACE_COUNT 4
+#define RADIO_EXT_ADDR_COUNT (RADIO_INTERFACE_COUNT - 1)
+#else
+#define RADIO_INTERFACE_COUNT 1
+#define RADIO_EXT_ADDR_COUNT (RADIO_INTERFACE_COUNT)
+#endif
+
+static otExtAddress sExtAddress[RADIO_EXT_ADDR_COUNT];
+
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+#define UNINITIALIZED_POWER -128
+#define INITIAL_POWER 0
+static int8_t sTxPower[RADIO_INTERFACE_COUNT];
+static int8_t maxMultipanTxPower(void)
+{
+    int8_t powerDbm = UNINITIALIZED_POWER;
+    for (uint8_t i = 1; i < RADIO_INTERFACE_COUNT; i++)
+    {
+        if (sTxPower[i] > powerDbm)
+        {
+            powerDbm = sTxPower[i];
+        }
+    }
+    return (powerDbm == UNINITIALIZED_POWER) ? INITIAL_POWER : powerDbm;
+}
+#endif
+
+#if RADIO_CONFIG_ENABLE_CUSTOM_EUI_SUPPORT
+/*
+ * This API reads the UserData page on the given EFR device.
+ */
+static int readUserData(void *buffer, uint16_t index, int len, bool changeByteOrder)
+{
+    uint8_t *readLocation  = (uint8_t *)USERDATA_BASE + index;
+    uint8_t *writeLocation = (uint8_t *)buffer;
+
+    // Sanity check to verify if the ouput buffer is valid and the index and len are valid.
+    // If invalid, change the len to -1 and return.
+    otEXPECT_ACTION((writeLocation != NULL) && ((readLocation + len) <= (uint8_t *)USERDATA_END), len = -1);
+
+    // Copy the contents of flash into output buffer.
+
+    for (int idx = 0; idx < len; idx++)
+    {
+        if (changeByteOrder)
+        {
+            writeLocation[idx] = readLocation[(len - 1) - idx];
+        }
+        else
+        {
+            writeLocation[idx] = readLocation[idx];
+        }
+    }
+
+exit:
+    // Return len, len was changed to -1 to indicate failure.
+    return len;
+}
+#endif
+
+/*
+ * This API converts the FilterMask to appropriate IID. If there are any errors, it will fallback on bcast IID.
+ *
+ */
+static inline uint8_t getIidFromFilterMask(uint8_t mask)
+{
+    uint8_t iid = INVALID_VALUE;
+
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+    // We need only the Pan Id masks here, as we are not matching the addresses.
+    // Also mask all the unused indices.
+    mask &= sRailFilterMask;
+
+    // The only acceptable values for mask at this point are:
+    // 1 - BCAST PANID   - IID(0)
+    // 2 - INDEX 0       - IID(1)
+    // 4 - INDEX 1       - IID(2)
+    // 8 - INDEX 2       - IID(3)
+    //
+    // The packet should either be directed to one of the PANs or Bcast.
+    //(mask & (mask -1) is a simplistic way of testing if the mask is a power of 2.
+    otEXPECT_ACTION(((mask != 0) && (mask & (mask - 1)) == 0), iid = 0);
+
+    while (mask)
+    {
+        iid++;
+        mask >>= 1;
+    }
+
+exit:
+#else
+    (void)mask;
+    iid = RADIO_BCAST_IID;
+#endif
+    return iid;
+}
+
+/*
+ * This API validates the received FilterMask by checking if the destination address
+ * in the received packet corresponds to destination PanID.
+ */
+static bool isFilterMaskValid(uint8_t mask)
+{
+    bool valid = false;
+
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+
+    /* Packet will be considered as a valid packet in 3 cases:
+     * Case 1: If the packet was directed towards bcast address or bcase panid
+     *
+     * Case 2: If the packet was directed to right address corresponding to the panid
+     *         (If Address filter and pan filter in the received packet match).
+     *
+     * Case 3: We dont have either the destination addressing feild or destination PanId
+     *         in the received packet to determine if the dest address and dest pan match.
+     */
+    if (((mask & RADIO_BCAST_PANID_FILTER_MASK) || (mask & RADIO_BCAST_ADDR_FILTER_MASK)) || // Case 1
+        ((mask & 0x0F) == (mask >> 4)) ||                                                    // Case 2
+        (((mask & 0x0F) == 0) || ((mask >> 4) == 0)))                                        // Case 3
+    {
+        valid = true;
+    }
+#else
+    (void)mask;
+    valid    = true;
+#endif
+
+    return valid;
+}
+
+/*
+ * RAIL accepts 3 pan indices 0, 1 or 2. But valid IIDs are 1, 2 and 3 (0 is reserved for bcast).
+ * This API validates the passed IID and converts it into usable PanIndex.
+ */
+
+static inline uint8_t getPanIndexFromIid(uint8_t iid)
+{
+    uint8_t panIndex = 0;
+
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+    otEXPECT_ACTION(((iid < RADIO_INTERFACE_COUNT) && (iid != 0)), panIndex = INVALID_VALUE);
+    panIndex = iid - 1;
+exit:
+#else
+    panIndex = iid;
+#endif
+    return panIndex;
+}
 
 #if (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
+
 enum
 {
     MAC_KEY_PREV,
@@ -249,15 +461,23 @@ enum
     MAC_KEY_NEXT,
     MAC_KEY_COUNT
 };
-// Transmit Security
-static uint32_t                sMacFrameCounter;
-static uint8_t                 sKeyId;
-static struct otMacKeyMaterial sMacKeys[MAC_KEY_COUNT];
 
-static uint32_t sAckFrameCounter;
-static uint8_t  sAckKeyId;
+typedef struct securityMaterial
+{
+    uint8_t          ackKeyId;
+    uint8_t          keyId;
+    uint32_t         macFrameCounter;
+    uint32_t         ackFrameCounter;
+    otMacKeyMaterial keys[MAC_KEY_COUNT];
+} securityMaterial;
+
+// Transmit Security
+static securityMaterial sMacKeys[RADIO_INTERFACE_COUNT];
 
 #if OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
+
+#define CSL_TX_UNCERTAINTY 20 // Uncertainty of scheduling a CSL transmission, in ±10 us units.
+
 // CSL parameters
 static uint32_t sCslPeriod;
 static uint32_t sCslSampleTime;
@@ -300,14 +520,17 @@ static uint8_t generateAckIeData(uint8_t *aLinkMetricsIeData, uint8_t aLinkMetri
     return offset;
 }
 
-static otError radioProcessTransmitSecurity(otRadioFrame *aFrame)
+static otError radioProcessTransmitSecurity(otRadioFrame *aFrame, uint8_t iid)
 {
     otError error = OT_ERROR_NONE;
     uint8_t keyId;
     uint8_t keyToUse;
+    uint8_t panIndex = getPanIndexFromIid(iid);
 
     otEXPECT(otMacFrameIsSecurityEnabled(aFrame) && otMacFrameIsKeyIdMode1(aFrame)
              && !aFrame->mInfo.mTxInfo.mIsSecurityProcessed);
+
+    assert(panIndex != INVALID_VALUE);
 
     if (otMacFrameIsAck(aFrame))
     {
@@ -315,15 +538,15 @@ static otError radioProcessTransmitSecurity(otRadioFrame *aFrame)
 
         otEXPECT_ACTION(keyId != 0, error = OT_ERROR_FAILED);
 
-        if (keyId == sKeyId - 1)
+        if (keyId == sMacKeys[iid].keyId - 1)
         {
             keyToUse = MAC_KEY_PREV;
         }
-        else if (keyId == sKeyId)
+        else if (keyId == sMacKeys[iid].keyId)
         {
             keyToUse = MAC_KEY_CURRENT;
         }
-        else if (keyId == sKeyId + 1)
+        else if (keyId == sMacKeys[iid].keyId + 1)
         {
             keyToUse = MAC_KEY_NEXT;
         }
@@ -335,34 +558,77 @@ static otError radioProcessTransmitSecurity(otRadioFrame *aFrame)
     }
     else
     {
-        keyId    = sKeyId;
+        keyId    = sMacKeys[iid].keyId;
         keyToUse = MAC_KEY_CURRENT;
     }
 
-    aFrame->mInfo.mTxInfo.mAesKey = &sMacKeys[keyToUse];
+    aFrame->mInfo.mTxInfo.mAesKey = &sMacKeys[iid].keys[keyToUse];
 
-    if (!aFrame->mInfo.mTxInfo.mIsARetx)
+    if (!aFrame->mInfo.mTxInfo.mIsHeaderUpdated)
     {
         if (otMacFrameIsAck(aFrame))
         {
             // Store ack frame counter and ack key ID for receive frame
             // TODO: What's a better solution?  (With flags like
             // frame pending or enh-secure, we have used reserved bits)
-            sAckKeyId        = keyId;
-            sAckFrameCounter = sMacFrameCounter;
+            sMacKeys[iid].ackKeyId        = keyId;
+            sMacKeys[iid].ackFrameCounter = sMacKeys[iid].macFrameCounter;
         }
 
         otMacFrameSetKeyId(aFrame, keyId);
-        otMacFrameSetFrameCounter(aFrame, sMacFrameCounter++);
+        otMacFrameSetFrameCounter(aFrame, sMacKeys[iid].macFrameCounter++);
     }
 
-    otMacFrameProcessTransmitAesCcm(aFrame, &sExtAddress);
-    otEXPECT(aFrame->mInfo.mTxInfo.mIsSecurityProcessed);
+#if defined(_SILICON_LABS_32B_SERIES_2) && OPENTHREAD_RADIO
+    efr32PlatProcessTransmitAesCcm(aFrame, &sExtAddress[panIndex]);
+#else
+    otMacFrameProcessTransmitAesCcm(aFrame, &sExtAddress[panIndex]);
+#endif
 
 exit:
     return error;
 }
 #endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
+
+static uint8_t readInitialPacketData(RAIL_RxPacketInfo_t *packetInfo,
+                                     uint8_t              expected_data_bytes_max,
+                                     uint8_t              expected_data_bytes_min,
+                                     uint8_t *            buffer,
+                                     uint8_t              buffer_len)
+{
+    uint8_t packetBytesRead = 0;
+
+    // Check if we have enough buffer
+    assert((buffer_len >= expected_data_bytes_max) || (packetInfo != NULL));
+
+    // Read the packet info
+    RAIL_GetRxIncomingPacketInfo(gRailHandle, packetInfo);
+
+    // We are trying to get the packet info of a packet before it is completely received.
+    // We do this to evaluate the FP bit in response and add IEs to ACK if needed.
+    // Check to see if we have received atleast minimum number of bytes requested.
+    otEXPECT_ACTION(packetInfo->packetBytes >= expected_data_bytes_min, packetBytesRead = 0);
+
+    // Only extract what we care about
+    if (packetInfo->packetBytes > expected_data_bytes_max)
+    {
+        packetInfo->packetBytes = expected_data_bytes_max;
+        // Check if the initial portion of the packet received so far exceeds the max value requested.
+        if (packetInfo->firstPortionBytes >= expected_data_bytes_max)
+        {
+            // If we have received more, make sure to copy only the required bytes into the buffer.
+            packetInfo->firstPortionBytes = expected_data_bytes_max;
+            packetInfo->lastPortionData   = NULL;
+        }
+    }
+
+    // Copy number of bytes as indicated in `packetInfo->firstPortionBytes` into the buffer.
+    RAIL_CopyRxPacket(buffer, packetInfo);
+    packetBytesRead = packetInfo->packetBytes;
+
+exit:
+    return packetBytesRead;
+}
 
 //------------------------------------------------------------------------------
 // Forward Declarations
@@ -394,7 +660,8 @@ static bool validatePacketDetails(RAIL_RxPacketHandle_t   packetHandle,
 static bool validatePacketTimestamp(RAIL_RxPacketDetails_t *pPacketDetails, uint16_t packetLength);
 static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
                                  bool                    securedOutgoingEnhancedAck,
-                                 bool                    framePendingSetInOutgoingAck);
+                                 bool                    framePendingSetInOutgoingAck,
+                                 uint8_t                 iid);
 
 static otError skipRxPacketLengthBytes(RAIL_RxPacketInfo_t *pPacketInfo);
 
@@ -412,7 +679,13 @@ static bool phyStackEventIsEnabled(void)
 #endif // SL_CATALOG_RAIL_UTIL_ANT_DIV_PRESENT
 
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    result |= ((sl_rail_util_coex_is_enabled() || SL_RAIL_UTIL_COEX_RUNTIME_PHY_SELECT) && sRadioCoexEnabled);
+    if (sRadioCoexEnabled)
+    {
+        result |= sl_rail_util_coex_is_enabled();
+#ifdef SL_RAIL_UTIL_COEX_RUNTIME_PHY_SELECT
+        result |= SL_RAIL_UTIL_COEX_RUNTIME_PHY_SELECT;
+#endif
+    }
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
 
     return result;
@@ -434,7 +707,13 @@ static void          updateEvents(RAIL_Events_t mask, RAIL_Events_t values)
 static sl_rail_util_ieee802154_stack_event_t handlePhyStackEvent(sl_rail_util_ieee802154_stack_event_t stackEvent,
                                                                  uint32_t                              supplement)
 {
-    return (phyStackEventIsEnabled() ? sl_rail_util_ieee802154_on_event(stackEvent, supplement) : 0);
+    return (phyStackEventIsEnabled()
+#ifdef SL_CATALOG_RAIL_MULTIPLEXER_PRESENT
+                ? sl_rail_mux_ieee802154_on_event(gRailHandle, stackEvent, supplement)
+#else
+                ? sl_rail_util_ieee802154_on_event(stackEvent, supplement)
+#endif
+                : 0);
 }
 #else
 static void updateEvents(RAIL_Events_t mask, RAIL_Events_t values)
@@ -513,13 +792,46 @@ exit:
     return error;
 }
 
+#if (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
+static otError radioScheduleRx(uint8_t aChannel, uint32_t aStart, uint32_t aDuration)
+{
+    otError       error = OT_ERROR_NONE;
+    RAIL_Status_t status;
+
+    RAIL_SchedulerInfo_t bgRxSchedulerInfo = {
+        .priority = RADIO_SCHEDULER_BACKGROUND_RX_PRIORITY,
+        // sliptime/transaction time is not used for bg rx
+    };
+
+    // Configure scheduled receive as requested
+    // Q: Verify these parameters and configuration
+    //
+    RAIL_ScheduleRxConfig_t rxCfg = {.start                   = aStart,
+                                     .startMode               = RAIL_TIME_ABSOLUTE,
+                                     .end                     = aDuration,
+                                     .endMode                 = RAIL_TIME_DELAY,
+                                     .rxTransitionEndSchedule = 0, // This lets us idle after a scheduled-rx
+                                     .hardWindowEnd = 0}; // This lets us receive a packet near a window-end-event
+
+    status = RAIL_ScheduleRx(gRailHandle, aChannel, &rxCfg, &bgRxSchedulerInfo);
+    otEXPECT_ACTION(status == RAIL_STATUS_NO_ERROR, error = OT_ERROR_FAILED);
+
+    (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_RX_LISTEN, 0U);
+exit:
+    return error;
+}
+#endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
+
 //------------------------------------------------------------------------------
 // Radio Initialization
-
 static RAIL_Handle_t efr32RailInit(efr32CommonConfig *aCommonConfig)
 {
     RAIL_Status_t status;
     RAIL_Handle_t handle;
+
+#if !OPENTHREAD_RADIO
+    assert(DEVICE_CAPABILITY_MCU_EN);
+#endif
 
     handle = RAIL_Init(&aCommonConfig->mRailConfig, NULL);
     assert(handle != NULL);
@@ -545,11 +857,18 @@ static RAIL_Handle_t efr32RailInit(efr32CommonConfig *aCommonConfig)
 
     status = RAIL_IEEE802154_EnableDataFramePending(handle, true);
     assert(status == RAIL_STATUS_NO_ERROR);
+
+    // Copies of MAC keys for encrypting at the radio layer
+    memset(sMacKeys, 0, sizeof(sMacKeys));
 #endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 
     uint16_t actualLength =
         RAIL_SetTxFifo(handle, aCommonConfig->mRailTxFifo.fifo, 0, sizeof(aCommonConfig->mRailTxFifo.fifo));
     assert(actualLength == sizeof(aCommonConfig->mRailTxFifo.fifo));
+
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+    memset(sTxPower, UNINITIALIZED_POWER, sizeof(sTxPower));
+#endif
 
     return handle;
 }
@@ -575,7 +894,7 @@ static void efr32RailConfigLoad(efr32BandConfig *aBandConfig)
     else
     {
 #ifdef SL_CATALOG_RAIL_UTIL_IEEE802154_PHY_SELECT_PRESENT
-        status = sl_rail_util_plugin_config_2p4ghz_radio(gRailHandle);
+        status = sl_rail_util_ieee802154_config_radio(gRailHandle);
 #else
         status = RAIL_IEEE802154_Config2p4GHzRadio(gRailHandle);
 #endif // SL_CATALOG_RAIL_UTIL_IEEE802154_PHY_SELECT_PRESENT
@@ -632,12 +951,12 @@ static void efr32ConfigInit(void (*aEventCallback)(RAIL_Handle_t railHandle, RAI
     sBandConfig.mChannelMin    = OT_RADIO_2P4GHZ_OQPSK_CHANNEL_MIN;
     sBandConfig.mChannelMax    = OT_RADIO_2P4GHZ_OQPSK_CHANNEL_MAX;
 
-#elif RADIO_CONFIG_915MHZ_2GFSK_SUPPORT
+#elif RADIO_CONFIG_SUBGHZ_SUPPORT
     sBandConfig.mChannelConfig          = channelConfigs[0];
     sBandConfig.mChannelMin             = OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MIN;
     sBandConfig.mChannelMax             = OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MAX;
 
-#elif RADIO_CONFIG_915MHZ_OQPSK_SUPPORT
+#elif RADIO_CONFIG_915MHZ_OQPSK_SUPPORT // Not supported
     sBandConfig.mChannelConfig = channelConfigs[0];
     sBandConfig.mChannelMin    = OT_RADIO_915MHZ_OQPSK_CHANNEL_MIN;
     sBandConfig.mChannelMax    = OT_RADIO_915MHZ_OQPSK_CHANNEL_MAX;
@@ -650,22 +969,14 @@ static void efr32ConfigInit(void (*aEventCallback)(RAIL_Handle_t railHandle, RAI
     gRailHandle = efr32RailInit(&sCommonConfig);
     assert(gRailHandle != NULL);
 
-    /* clang-format off */
     updateEvents(RAIL_EVENTS_ALL,
-                 (0
-                  | RAIL_EVENT_RX_ACK_TIMEOUT
-                  | RAIL_EVENT_RX_PACKET_RECEIVED
-                  | RAIL_EVENTS_TXACK_COMPLETION
-                  | RAIL_EVENTS_TX_COMPLETION
-                  | RAIL_EVENT_RSSI_AVERAGE_DONE
-                  | RAIL_EVENT_IEEE802154_DATA_REQUEST_COMMAND
+                 (0 | RAIL_EVENT_RX_ACK_TIMEOUT | RAIL_EVENT_RX_PACKET_RECEIVED | RAIL_EVENT_SCHEDULED_RX_STARTED
+                  | RAIL_EVENT_RX_SCHEDULED_RX_END | RAIL_EVENTS_TXACK_COMPLETION | RAIL_EVENTS_TX_COMPLETION
+                  | RAIL_EVENT_RSSI_AVERAGE_DONE | RAIL_EVENT_IEEE802154_DATA_REQUEST_COMMAND
 #if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT || RADIO_CONFIG_DMP_SUPPORT
-                  | RAIL_EVENT_CONFIG_SCHEDULED
-                  | RAIL_EVENT_CONFIG_UNSCHEDULED
-                  | RAIL_EVENT_SCHEDULER_STATUS
+                  | RAIL_EVENT_CONFIG_SCHEDULED | RAIL_EVENT_CONFIG_UNSCHEDULED | RAIL_EVENT_SCHEDULER_STATUS
 #endif
                   | RAIL_EVENT_CAL_NEEDED));
-    /* clang-format on */
 
     efr32RailConfigLoad(&(sBandConfig));
 }
@@ -708,6 +1019,7 @@ void efr32RadioInit(void)
     assert(RAIL_ConfigRxOptions(gRailHandle, RAIL_RX_OPTION_TRACK_ABORTED_FRAMES, RAIL_RX_OPTION_TRACK_ABORTED_FRAMES)
            == RAIL_STATUS_NO_ERROR);
     efr32PhyStackInit();
+    efr32RadioSetCcaMode(SL_OPENTHREAD_RADIO_CCA_MODE);
 
     sEnergyScanStatus = ENERGY_SCAN_STATUS_IDLE;
     sTransmitError    = OT_ERROR_NONE;
@@ -776,19 +1088,36 @@ exit:
 //------------------------------------------------------------------------------
 // Stack support
 
+uint64_t otPlatRadioGetNow(otInstance *aInstance)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    return otPlatTimeGet();
+}
+
 void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeeeEui64)
 {
     OT_UNUSED_VARIABLE(aInstance);
 
-    uint64_t eui64;
-    uint8_t *eui64Ptr = NULL;
+#if RADIO_CONFIG_ENABLE_CUSTOM_EUI_SUPPORT
+    // Invalid EUI
+    uint8_t nullEui[] = {0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU};
 
-    eui64    = SYSTEM_GetUnique();
-    eui64Ptr = (uint8_t *)&eui64;
-
-    for (uint8_t i = 0; i < OT_EXT_ADDRESS_SIZE; i++)
+    // Read the Custom EUI and compare it to nullEui
+    if ((readUserData(aIeeeEui64, USERDATA_MFG_CUSTOM_EUI_64, OT_EXT_ADDRESS_SIZE, true) == -1)
+        || (memcmp(aIeeeEui64, nullEui, OT_EXT_ADDRESS_SIZE) == 0))
+#endif
     {
-        aIeeeEui64[i] = eui64Ptr[(OT_EXT_ADDRESS_SIZE - 1) - i];
+        uint64_t eui64;
+        uint8_t *eui64Ptr = NULL;
+
+        eui64    = SYSTEM_GetUnique();
+        eui64Ptr = (uint8_t *)&eui64;
+
+        for (uint8_t i = 0; i < OT_EXT_ADDRESS_SIZE; i++)
+        {
+            aIeeeEui64[i] = eui64Ptr[(OT_EXT_ADDRESS_SIZE - 1) - i];
+        }
     }
 }
 
@@ -797,26 +1126,38 @@ void otPlatRadioSetPanId(otInstance *aInstance, uint16_t aPanId)
     OT_UNUSED_VARIABLE(aInstance);
 
     RAIL_Status_t status;
-    uint8_t       panIndex = otNcpPlatGetCurCommandIid();
+    uint8_t       iid      = otNcpPlatGetCurCommandIid();
+    uint8_t       panIndex = getPanIndexFromIid(iid);
 
-    otLogInfoPlat("PANID=%X index=%u", aPanId, panIndex);
-
-    utilsSoftSrcMatchSetPanId(aPanId);
+    assert(panIndex != INVALID_VALUE);
+    otLogInfoPlat("PANID=%X index=%u IID=%d", aPanId, panIndex, iid);
+    utilsSoftSrcMatchSetPanId(iid, aPanId);
 
     status = RAIL_IEEE802154_SetPanId(gRailHandle, aPanId, panIndex);
     assert(status == RAIL_STATUS_NO_ERROR);
+
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+    // We already have IID 0 enabled in filtermask to track BCAST Packets, so
+    // track only unique PanIds.
+    if (aPanId != RADIO_BCAST_PANID)
+    {
+        sRailFilterMask |= RADIO_GET_FILTER_MASK(iid);
+    }
+#endif
 }
 
 void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aAddress)
 {
+    RAIL_Status_t status;
+    uint8_t       panIndex = getPanIndexFromIid(otNcpPlatGetCurCommandIid());
+
     OT_UNUSED_VARIABLE(aInstance);
+    assert(panIndex != INVALID_VALUE);
+
     for (size_t i = 0; i < sizeof(*aAddress); i++)
     {
-        sExtAddress.m8[i] = aAddress->m8[sizeof(*aAddress) - 1 - i];
+        sExtAddress[panIndex].m8[i] = aAddress->m8[sizeof(*aAddress) - 1 - i];
     }
-
-    RAIL_Status_t status;
-    uint8_t       panIndex = otNcpPlatGetCurCommandIid();
 
     otLogInfoPlat("ExtAddr=%X%X%X%X%X%X%X%X index=%u", aAddress->m8[7], aAddress->m8[6], aAddress->m8[5],
                   aAddress->m8[4], aAddress->m8[3], aAddress->m8[2], aAddress->m8[1], aAddress->m8[0], panIndex);
@@ -830,12 +1171,20 @@ void otPlatRadioSetShortAddress(otInstance *aInstance, uint16_t aAddress)
     OT_UNUSED_VARIABLE(aInstance);
 
     RAIL_Status_t status;
-    uint8_t       panIndex = otNcpPlatGetCurCommandIid();
+    uint8_t       panIndex = getPanIndexFromIid(otNcpPlatGetCurCommandIid());
 
+    assert(panIndex != INVALID_VALUE);
     otLogInfoPlat("ShortAddr=%X index=%u", aAddress, panIndex);
 
     status = RAIL_IEEE802154_SetShortAddress(gRailHandle, aAddress, panIndex);
     assert(status == RAIL_STATUS_NO_ERROR);
+}
+
+otRadioState otPlatRadioGetState(otInstance *aInstance)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    return sState;
 }
 
 bool otPlatRadioIsEnabled(otInstance *aInstance)
@@ -851,6 +1200,14 @@ otError otPlatRadioEnable(otInstance *aInstance)
 
     otLogInfoPlat("State=OT_RADIO_STATE_SLEEP", NULL);
     sState = OT_RADIO_STATE_SLEEP;
+
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+    uint8_t iid = otNcpPlatGetCurCommandIid();
+    if (sTxPower[iid] == UNINITIALIZED_POWER)
+    {
+        sTxPower[iid] = INITIAL_POWER;
+    }
+#endif
 
 exit:
     return OT_ERROR_NONE;
@@ -910,6 +1267,37 @@ exit:
     return error;
 }
 
+#if (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
+otError otPlatRadioReceiveAt(otInstance *aInstance, uint8_t aChannel, uint32_t aStart, uint32_t aDuration)
+{
+    otError          error = OT_ERROR_NONE;
+    RAIL_Status_t    status;
+    efr32BandConfig *config;
+
+    OT_UNUSED_VARIABLE(aInstance);
+    otEXPECT_ACTION(sState != OT_RADIO_STATE_DISABLED, error = OT_ERROR_INVALID_STATE);
+
+    config = efr32RadioGetBandConfig(aChannel);
+    otEXPECT_ACTION(config != NULL, error = OT_ERROR_INVALID_ARGS);
+
+    if (sCurrentBandConfig != config)
+    {
+        RAIL_Idle(gRailHandle, RAIL_IDLE, true);
+        efr32RailConfigLoad(config);
+        sCurrentBandConfig = config;
+    }
+
+    status = radioScheduleRx(aChannel, aStart, aDuration);
+    otEXPECT_ACTION(status == RAIL_STATUS_NO_ERROR, error = OT_ERROR_FAILED);
+
+    sReceiveFrame.mChannel    = aChannel;
+    sReceiveAckFrame.mChannel = aChannel;
+
+exit:
+    return error;
+}
+#endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
+
 otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aFrame)
 {
     otError          error = OT_ERROR_NONE;
@@ -933,15 +1321,21 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aFrame)
     sTransmitBusy  = true;
     sTxFrame       = aFrame;
 
+#if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
+    uint8_t iid = 0;
+#endif
+
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+    iid = aFrame->mIid;
+#endif
+
     setInternalFlag(FLAG_CURRENT_TX_USE_CSMA, aFrame->mInfo.mTxInfo.mCsmaCaEnabled);
 
 #if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
     updateIeInfoTxFrame();
-#if OPENTHREAD_CONFIG_MAC_SOFTWARE_TX_SECURITY_ENABLE
     // Note - we need to call this outside of txCurrentPacket as for Series 2,
     // this results in calling the SE interface from a critical section which is not permitted.
-    otEXPECT_ACTION(radioProcessTransmitSecurity(sTxFrame) == OT_ERROR_NONE, error = OT_ERROR_INVALID_STATE);
-#endif
+    otEXPECT_ACTION(radioProcessTransmitSecurity(sTxFrame, iid) == OT_ERROR_NONE, error = OT_ERROR_INVALID_STATE);
 #endif // OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
 
     CORE_DECLARE_IRQ_STATE;
@@ -983,7 +1377,7 @@ void updateIeInfoTxFrame(void)
 
 #if OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
     // Update IE data in the 802.15.4 header with the newest CSL period / phase
-    if (sCslPeriod > 0 && !sTxFrame->mInfo.mTxInfo.mIsARetx)
+    if (sCslPeriod > 0 && !sTxFrame->mInfo.mTxInfo.mIsHeaderUpdated)
     {
         otMacFrameSetCslIe(sTxFrame, (uint16_t)sCslPeriod, getCslPhase());
     }
@@ -1090,27 +1484,38 @@ void txCurrentPacket(void)
         csmaConfig.csmaTries    = sTxFrame->mInfo.mTxInfo.mMaxCsmaBackoffs;
         csmaConfig.ccaThreshold = sCcaThresholdDbm;
 
-#if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
-        // delayed tx, such as for CSL
-        if (sTxFrame->mInfo.mTxInfo.mTxDelay != 0)
-        {
-            uint32_t remainingUs =
-                (sTxFrame->mInfo.mTxInfo.mTxDelayBaseTime + sTxFrame->mInfo.mTxInfo.mTxDelay - RAIL_GetTime());
-            if (remainingUs <= 0)
-            {
-                otSysEventSignalPending();
-            }
-            else
-            {
-                RAIL_ScheduleTxConfig_t scheduleTxOptions = {.when       = remainingUs,
-                                                             .mode       = RAIL_TIME_DELAY,
-                                                             .txDuringRx = RAIL_SCHEDULED_TX_DURING_RX_POSTPONE_TX};
-                status = RAIL_StartScheduledCcaCsmaTx(gRailHandle, sTxFrame->mChannel, txOptions, &scheduleTxOptions,
-                                                      &csmaConfig, &txSchedulerInfo);
-            }
-        }
-        else
-#endif
+        // Note: We don't support scheduled-tx, but here's placeholder code
+        // if we ever implement it.
+        /*
+        #if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
+                // Delayed tx in radio, such as for CSL
+                if (sTxFrame->mInfo.mTxInfo.mTxDelay != 0)
+                {
+                    int32_t remainingUs = (sTxFrame->mInfo.mTxInfo.mTxDelayBaseTime
+                                           + sTxFrame->mInfo.mTxInfo.mTxDelay
+                                           - RAIL_GetTime());
+                    if (remainingUs <= 0)
+                    {
+                        otSysEventSignalPending();
+                    }
+                    else
+                    {
+                        RAIL_ScheduleTxConfig_t scheduleTxOptions = {
+                            .when = remainingUs,
+                            .mode = RAIL_TIME_DELAY,
+                            .txDuringRx = RAIL_SCHEDULED_TX_DURING_RX_POSTPONE_TX
+                        };
+                        status = RAIL_StartScheduledCcaCsmaTx(gRailHandle,
+                                                              sTxFrame->mChannel,
+                                                              txOptions,
+                                                              &scheduleTxOptions,
+                                                              &csmaConfig,
+                                                              &txSchedulerInfo);
+                    }
+                }
+                else
+        #endif
+        */
         {
             status = RAIL_StartCcaCsmaTx(gRailHandle, sTxFrame->mChannel, txOptions, &csmaConfig, &txSchedulerInfo);
         }
@@ -1181,20 +1586,18 @@ otRadioCaps otPlatRadioGetCaps(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
 
-    /* clang-format off */
-    otRadioCaps capabilities = (OT_RADIO_CAPS_ACK_TIMEOUT
-                                | OT_RADIO_CAPS_CSMA_BACKOFF
-                                | OT_RADIO_CAPS_ENERGY_SCAN
+    otRadioCaps capabilities = (OT_RADIO_CAPS_ACK_TIMEOUT | OT_RADIO_CAPS_CSMA_BACKOFF | OT_RADIO_CAPS_ENERGY_SCAN
                                 | OT_RADIO_CAPS_SLEEP_TO_TX);
-    /* clang-format on */
 
-#if OPENTHREAD_CONFIG_MAC_SOFTWARE_TX_SECURITY_ENABLE
+#if (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
     capabilities |= OT_RADIO_CAPS_TRANSMIT_SEC;
 #endif
 
-#if OPENTHREAD_CONFIG_MAC_SOFTWARE_TX_TIMING_ENABLE
-    capabilities |= OT_RADIO_CAPS_TRANSMIT_TIMING;
-#endif
+    // Currently not supporting delayed tx in radio because of single tx / callback design
+    // capabilities |= OT_RADIO_CAPS_TRANSMIT_TIMING;
+
+    // Supporting otPlatRadioReceiveAt function in radio
+    capabilities |= OT_RADIO_CAPS_RECEIVE_TIMING;
 
     return capabilities;
 }
@@ -1247,12 +1650,47 @@ otError otPlatRadioSetTransmitPower(otInstance *aInstance, int8_t aPower)
 
     RAIL_Status_t status;
 
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+    sTxPower[otNcpPlatGetCurCommandIid()] = aPower;
+    aPower                                = maxMultipanTxPower();
+#endif
+
     // RAIL_SetTxPowerDbm() takes power in units of deci-dBm (0.1dBm)
     // Divide by 10 because aPower is supposed be in units dBm
     status = RAIL_SetTxPowerDbm(gRailHandle, ((RAIL_TxPower_t)aPower) * 10);
     assert(status == RAIL_STATUS_NO_ERROR);
 
     return OT_ERROR_NONE;
+}
+
+// Required for RCP error recovery
+// See src/lib/spinel/radio_spinel_impl.hpp::RestoreProperties()
+otError otPlatRadioSetChannelMaxTransmitPower(otInstance *aInstance, uint8_t aChannel, int8_t aMaxPower)
+{
+    uint16_t currentChannel;
+    otError  error = OT_ERROR_NONE;
+
+#if RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT
+    otEXPECT_ACTION(aChannel >= OT_RADIO_2P4GHZ_OQPSK_CHANNEL_MIN && aChannel <= OT_RADIO_2P4GHZ_OQPSK_CHANNEL_MAX,
+                    error = OT_ERROR_INVALID_ARGS);
+#elif RADIO_CONFIG_SUBGHZ_SUPPORT
+    otEXPECT_ACTION(aChannel >= OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MIN
+                        && aChannel <= OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_MAX,
+                    error = OT_ERROR_INVALID_ARGS);
+#elif RADIO_CONFIG_915MHZ_OQPSK_SUPPORT // Not supported
+    otEXPECT_ACTION(aChannel >= OT_RADIO_915MHZ_OQPSK_CHANNEL_MIN && aChannel <= OT_RADIO_915MHZ_OQPSK_CHANNEL_MAX,
+                    error = OT_ERROR_INVALID_ARGS);
+#endif
+
+    RAIL_GetChannel(gRailHandle, &currentChannel);
+
+    if (aChannel == currentChannel)
+    {
+        otPlatRadioSetTransmitPower(aInstance, aMaxPower);
+    }
+
+exit:
+    return error;
 }
 
 otError otPlatRadioGetCcaEnergyDetectThreshold(otInstance *aInstance, int8_t *aThreshold)
@@ -1303,6 +1741,8 @@ void otPlatRadioSetMacKey(otInstance *            aInstance,
                           const otMacKeyMaterial *aNextKey,
                           otRadioKeyType          aKeyType)
 {
+    uint8_t iid = otNcpPlatGetCurCommandIid();
+
     OT_UNUSED_VARIABLE(aInstance);
     OT_UNUSED_VARIABLE(aKeyIdMode);
     OT_UNUSED_VARIABLE(aKeyType);
@@ -1312,22 +1752,24 @@ void otPlatRadioSetMacKey(otInstance *            aInstance,
     CORE_DECLARE_IRQ_STATE;
     CORE_ENTER_ATOMIC();
 
-    sKeyId = aKeyId;
-    memcpy(&sMacKeys[MAC_KEY_PREV], aPrevKey, sizeof(sMacKeys[MAC_KEY_PREV]));
-    memcpy(&sMacKeys[MAC_KEY_CURRENT], aCurrKey, sizeof(sMacKeys[MAC_KEY_PREV]));
-    memcpy(&sMacKeys[MAC_KEY_NEXT], aNextKey, sizeof(sMacKeys[MAC_KEY_PREV]));
+    sMacKeys[iid].keyId = aKeyId;
+    memcpy(&sMacKeys[iid].keys[MAC_KEY_PREV], aPrevKey, sizeof(otMacKeyMaterial));
+    memcpy(&sMacKeys[iid].keys[MAC_KEY_CURRENT], aCurrKey, sizeof(otMacKeyMaterial));
+    memcpy(&sMacKeys[iid].keys[MAC_KEY_NEXT], aNextKey, sizeof(otMacKeyMaterial));
 
     CORE_EXIT_ATOMIC();
 }
 
 void otPlatRadioSetMacFrameCounter(otInstance *aInstance, uint32_t aMacFrameCounter)
 {
+    uint8_t iid = otNcpPlatGetCurCommandIid();
+
     OT_UNUSED_VARIABLE(aInstance);
 
     CORE_DECLARE_IRQ_STATE;
     CORE_ENTER_ATOMIC();
 
-    sMacFrameCounter = aMacFrameCounter;
+    sMacKeys[iid].macFrameCounter = aMacFrameCounter;
 
     CORE_EXIT_ATOMIC();
 }
@@ -1356,6 +1798,21 @@ void otPlatRadioUpdateCslSampleTime(otInstance *aInstance, uint32_t aCslSampleTi
 
     sCslSampleTime = aCslSampleTime;
 }
+
+uint8_t otPlatRadioGetCslAccuracy(otInstance *aInstance)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    return otPlatTimeGetXtalAccuracy();
+}
+
+uint8_t otPlatRadioGetCslUncertainty(otInstance *aInstance)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    return CSL_TX_UNCERTAINTY;
+}
+
 #endif // OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
 
 //------------------------------------------------------------------------------
@@ -1415,69 +1872,16 @@ exit:
 //------------------------------------------------------------------------------
 // Radio implementation: Enhanced ACKs, CSL
 
-static uint8_t getKeySourceLength(uint8_t keyIdMode)
+// Return false if we should generate an immediate ACK
+// Return true otherwise
+static bool writeIeee802154EnhancedAck(RAIL_Handle_t        aRailHandle,
+                                       RAIL_RxPacketInfo_t *packetInfoForEnhAck,
+                                       uint8_t *            initialPktReadBytes,
+                                       uint8_t *            receivedPsdu)
 {
-    uint8_t len = 0;
+    // RAIL will generate an Immediate ACK for us.
+    // For an Enhanced ACK, we need to generate the whole packet ourselves.
 
-    switch (keyIdMode)
-    {
-    case IEEE802154_KEYID_MODE_0:
-        len = IEEE802154_KEYID_MODE_0_SIZE;
-        break;
-
-    case IEEE802154_KEYID_MODE_1:
-        len = IEEE802154_KEYID_MODE_1_SIZE;
-        break;
-
-    case IEEE802154_KEYID_MODE_2:
-        len = IEEE802154_KEYID_MODE_2_SIZE;
-        break;
-
-    case IEEE802154_KEYID_MODE_3:
-        len = IEEE802154_KEYID_MODE_3_SIZE;
-        break;
-    }
-
-    return len;
-}
-
-static bool writeIeee802154EnhancedAck(RAIL_Handle_t aRailHandle)
-{
-    // This table is derived from 802.15.4-2015 Section 7.2.1.5 PAN ID
-    // Compression field and Table 7-2 for both 2003/2006 and 2015
-    // frame versions.  It is indexed by 6 bits of the MacFCF:
-    //   SrcAdrMode FrameVer<msbit> DstAdrMode PanIdCompression
-    // and each address' length is encoded in a nibble:
-    //    15:12  11:8     7:4     3:0
-    //   SrcAdr  SrcPan  DstAdr  DstPan
-    // Illegal combinations are indicated by 0xFFFFU.
-
-#define ADDRSIZE_DST_PAN_SHIFT 0
-#define ADDRSIZE_DST_PAN_MASK (0x0FU << ADDRSIZE_DST_PAN_SHIFT)
-#define ADDRSIZE_DST_ADR_SHIFT 4
-#define ADDRSIZE_DST_ADR_MASK (0x0FU << ADDRSIZE_DST_ADR_SHIFT)
-#define ADDRSIZE_SRC_PAN_SHIFT 8
-#define ADDRSIZE_SRC_PAN_MASK (0x0FU << ADDRSIZE_SRC_PAN_SHIFT)
-#define ADDRSIZE_SRC_ADR_SHIFT 12
-#define ADDRSIZE_SRC_ADR_MASK (0x0FU << ADDRSIZE_SRC_ADR_SHIFT)
-
-    /* clang-format off */
-    static const uint16_t ieee802154Table7p2[64] =
-    {
-        0x0000U, 0x0000U, 0xFFFFU, 0xFFFFU, 0x0022U, 0x0022U, 0x0082U, 0x0082U,
-        0x0000U, 0x0002U, 0xFFFFU, 0xFFFFU, 0x0022U, 0x0020U, 0x0082U, 0x0080U,
-        0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU,
-        0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU,
-        0x2200U, 0x2200U, 0xFFFFU, 0xFFFFU, 0x2222U, 0x2022U, 0x2282U, 0x2082U,
-        0x2200U, 0x2000U, 0xFFFFU, 0xFFFFU, 0x2222U, 0x2022U, 0x2282U, 0x2082U,
-        0x8200U, 0x8200U, 0xFFFFU, 0xFFFFU, 0x8222U, 0x8022U, 0x8282U, 0x8082U,
-        0x8200U, 0x8000U, 0xFFFFU, 0xFFFFU, 0x8222U, 0x8022U, 0x8082U, 0x8080U,
-    };
-    /* clang-format on */
-
-    // For an Enhanced ACK, we need to generate that ourselves;
-    // RAIL will generate an Immediate ACK for us, though we can
-    // tell it to go out with its FramePending bit set.
     // An 802.15.4 packet from RAIL should look like:
     // 1/2 |   1/2  | 0/1  |  0/2   | 0/2/8  |  0/2   | 0/2/8  |   14
     // PHR | MacFCF | Seq# | DstPan | DstAdr | SrcPan | SrcAdr | SecHdr
@@ -1486,352 +1890,60 @@ static bool writeIeee802154EnhancedAck(RAIL_Handle_t aRailHandle)
     // is triggered after receiving through the SrcAdr field of Version 0/1 packets,
     // and after receiving through the SecHdr for Version 2 packets.
 
+    otRadioFrame receivedFrame, enhAckFrame;
+    uint8_t      enhAckPsdu[IEEE802154_MAX_LENGTH];
+
 #define EARLY_FRAME_PENDING_EXPECTED_BYTES (2U + 2U + 1U + 2U + 8U + 2U + 8U + 14U)
 #define FINAL_PACKET_LENGTH_WITH_IE (EARLY_FRAME_PENDING_EXPECTED_BYTES + OT_ACK_IE_MAX_SIZE)
 
-    RAIL_RxPacketInfo_t packetInfoForEnhAck;
-    uint8_t             pkt[FINAL_PACKET_LENGTH_WITH_IE];
+    otEXPECT((packetInfoForEnhAck != NULL) && (initialPktReadBytes != NULL) && (receivedPsdu != NULL));
 
-    uint8_t pktOffset = PHY_HEADER_SIZE;
-    RAIL_GetRxIncomingPacketInfo(gRailHandle, &packetInfoForEnhAck);
+    *initialPktReadBytes = readInitialPacketData(packetInfoForEnhAck, EARLY_FRAME_PENDING_EXPECTED_BYTES,
+                                                 (PHY_HEADER_SIZE + 2), receivedPsdu, FINAL_PACKET_LENGTH_WITH_IE);
 
-    if (packetInfoForEnhAck.packetBytes < (pktOffset + 2U))
+    uint8_t iid = getIidFromFilterMask(packetInfoForEnhAck->filterMask);
+
+    if (*initialPktReadBytes == 0U)
+    {
+        return true; // Nothing to read, which means generating an immediate ACK is also pointless
+    }
+
+    receivedFrame.mPsdu   = receivedPsdu + PHY_HEADER_SIZE;
+    receivedFrame.mLength = *initialPktReadBytes - PHY_HEADER_SIZE;
+    enhAckFrame.mPsdu     = enhAckPsdu + PHY_HEADER_SIZE;
+
+    if (!otMacFrameIsVersion2015(&receivedFrame))
     {
         return false;
     }
 
-    // Only extract what we care about
-    if (packetInfoForEnhAck.packetBytes > EARLY_FRAME_PENDING_EXPECTED_BYTES)
+    otMacAddress aSrcAddress;
+    uint8_t      linkMetricsDataLen = 0;
+    uint8_t *    dataPtr            = NULL;
+    bool         setFramePending    = false;
+
+    otMacFrameGetSrcAddr(&receivedFrame, &aSrcAddress);
+
+    if (sIsSrcMatchEnabled && (aSrcAddress.mType != OT_MAC_ADDRESS_TYPE_NONE))
     {
-        packetInfoForEnhAck.packetBytes = EARLY_FRAME_PENDING_EXPECTED_BYTES;
-        if (packetInfoForEnhAck.firstPortionBytes >= EARLY_FRAME_PENDING_EXPECTED_BYTES)
+        if (aSrcAddress.mType == OT_MAC_ADDRESS_TYPE_EXTENDED)
         {
-            packetInfoForEnhAck.firstPortionBytes = EARLY_FRAME_PENDING_EXPECTED_BYTES;
-            packetInfoForEnhAck.lastPortionData   = NULL;
-        }
-    }
-
-    RAIL_CopyRxPacket(pkt, &packetInfoForEnhAck);
-    uint16_t macFcf = pkt[pktOffset++];
-
-    if ((macFcf & IEEE802154_FRAME_TYPE_MASK) == IEEE802154_FRAME_TYPE_MULTIPURPOSE)
-    {
-        // Multipurpose frames have an arcane FCF structure
-        if ((macFcf & IEEE802154_MP_FRAME_FLAG_LONG_FCF) != 0U)
-        {
-            macFcf |= (pkt[pktOffset++] << 8);
-        }
-
-        // Map Multipurpose FCF to a 'normal' Version FCF as best we can.
-        /* clang-format off */
-        macFcf = (IEEE802154_FRAME_TYPE_MULTIPURPOSE
-                  | ((macFcf & (IEEE802154_MP_FRAME_FLAG_SECURITY_ENABLED
-                      | IEEE802154_MP_FRAME_FLAG_IE_LIST_PRESENT)) >> 6)
-                  | ((macFcf & IEEE802154_MP_FRAME_FLAG_FRAME_PENDING) >> 7)
-                  | ((macFcf & IEEE802154_MP_FRAME_FLAG_ACK_REQUIRED) >> 9)
-                  | ((macFcf & (IEEE802154_MP_FRAME_FLAG_PANID_PRESENT
-                      | IEEE802154_MP_FRAME_FLAG_SEQ_SUPPRESSION)) >> 2)
-                  | ((macFcf & IEEE802154_MP_FRAME_DESTINATION_MODE_MASK) << 6)
-                  | IEEE802154_MP_FRAME_VERSION_2015
-                  | ((macFcf & IEEE802154_MP_FRAME_SOURCE_MODE_MASK) << 8)
-                 );
-        /* clang-format on */
-
-        // MultiPurpose's PANID_PRESENT is not equivalent to 2012/5's
-        // PANID_COMPRESSION so we map it best we can by flipping it
-        // in the following address-combination situations:
-        uint16_t addrCombo = (macFcf & (IEEE802154_FRAME_SOURCE_MODE_MASK | IEEE802154_FRAME_DESTINATION_MODE_MASK));
-        if ((addrCombo == (IEEE802154_FRAME_SOURCE_MODE_NONE | IEEE802154_FRAME_DESTINATION_MODE_NONE))
-            || (addrCombo == (IEEE802154_FRAME_SOURCE_MODE_SHORT | IEEE802154_FRAME_DESTINATION_MODE_SHORT))
-            || (addrCombo == (IEEE802154_FRAME_SOURCE_MODE_SHORT | IEEE802154_FRAME_DESTINATION_MODE_LONG))
-            || (addrCombo == (IEEE802154_FRAME_SOURCE_MODE_LONG | IEEE802154_FRAME_DESTINATION_MODE_SHORT)))
-        {
-            // 802.15.4-2015 PANID_COMPRESSION = MP PANID_PRESENT
+            setFramePending = (utilsSoftSrcMatchExtFindEntry(iid, &aSrcAddress.mAddress.mExtAddress) >= 0);
         }
         else
         {
-            // 802.15.4-2015 PANID_COMPRESSION = !MP PANID_PRESENT
-            macFcf ^= IEEE802154_FRAME_FLAG_PANID_COMPRESSION; // Flip it
-        }
-    }
-    else
-    {
-        macFcf |= (pkt[pktOffset++] << 8);
-    }
-
-    bool enhAck = ((macFcf & IEEE802154_FRAME_VERSION_MASK) == IEEE802154_FRAME_VERSION_2015);
-    if (!enhAck)
-    {
-        return false;
-    }
-
-    // Compress MAC FCF to index into 64-entry address-length table:
-    // SrcAdrMode FrameVer<msbit> DstAdrMode PanIdCompression
-    //
-    // Note: Use IEEE802154_FRAME_VERSION_2012 rather than _MASK so the
-    // low-order bit of the version field isn't used in deriving the index.
-    uint16_t index = (((macFcf & (IEEE802154_FRAME_SOURCE_MODE_MASK | IEEE802154_FRAME_VERSION_2012)) >> 10)
-                      | ((macFcf & IEEE802154_FRAME_DESTINATION_MODE_MASK) >> 9)
-                      | ((macFcf & IEEE802154_FRAME_FLAG_PANID_COMPRESSION) >> 6));
-
-    uint16_t addrSizes = ieee802154Table7p2[index];
-    // Illegal combinations mean illegal packets which we ignore
-    if (addrSizes == 0xFFFFU)
-    {
-        return false;
-    }
-
-    uint8_t seqNo =
-        ((enhAck && ((macFcf & IEEE802154_FRAME_FLAG_SEQ_SUPPRESSION) != 0U)) ? 0U : pkt[pktOffset++]); // Seq#
-
-    // Start writing the enhanced ACK -- we need to construct it since RAIL cannot.
-
-    // First extract addresses from incoming packet since we may
-    // need to reflect them in a different order in the outgoing ACK.
-    // Use byte[0] to hold each one's length.
-    uint8_t dstPan[3] = {0}; // Initialized only to eliminate false gcc warning
-    dstPan[0]         = ((addrSizes & ADDRSIZE_DST_PAN_MASK) >> ADDRSIZE_DST_PAN_SHIFT);
-    if ((dstPan[0] + pktOffset) > packetInfoForEnhAck.packetBytes)
-    {
-        return false;
-    }
-
-    if (dstPan[0] > 0U)
-    {
-        dstPan[1] = pkt[pktOffset++];
-        dstPan[2] = pkt[pktOffset++];
-    }
-
-    uint8_t dstAdr[9];
-    dstAdr[0] = ((addrSizes & ADDRSIZE_DST_ADR_MASK) >> ADDRSIZE_DST_ADR_SHIFT);
-    if ((dstAdr[0] + pktOffset) > packetInfoForEnhAck.packetBytes)
-    {
-        return false;
-    }
-
-    for (uint8_t i = 1U; i <= dstAdr[0]; i++)
-    {
-        dstAdr[i] = pkt[pktOffset++];
-    }
-
-    uint8_t srcPan[3];
-    srcPan[0] = ((addrSizes & ADDRSIZE_SRC_PAN_MASK) >> ADDRSIZE_SRC_PAN_SHIFT);
-    if ((srcPan[0] + pktOffset) > packetInfoForEnhAck.packetBytes)
-    {
-        return false;
-    }
-
-    if (srcPan[0] > 0U)
-    {
-        srcPan[1] = pkt[pktOffset++];
-        srcPan[2] = pkt[pktOffset++];
-    }
-
-    uint8_t srcAdr[9];
-    srcAdr[0] = ((addrSizes & ADDRSIZE_SRC_ADR_MASK) >> ADDRSIZE_SRC_ADR_SHIFT);
-    if ((srcAdr[0] + pktOffset) > packetInfoForEnhAck.packetBytes)
-    {
-        return false;
-    }
-
-    for (uint8_t i = 1U; i <= srcAdr[0]; i++)
-    {
-        srcAdr[i] = pkt[pktOffset++];
-    }
-
-    // Once done with address fields, pick the security control (if present)
-    uint8_t securityHeader[1 + 4 + 8 + 1]; // max len: control + fc + key source + key ID
-    uint8_t securityHeaderLength = 0;
-
-    if (macFcf & IEEE802154_FRAME_FLAG_SECURITY_ENABLED)
-    {
-        uint8_t securityControl = pkt[pktOffset];
-        // Then the key ID
-        uint8_t keySourceLength = getKeySourceLength(securityControl & IEEE802154_KEYID_MODE_MASK);
-        securityHeaderLength += (sizeof(uint8_t)     /* security control */
-                                 + sizeof(uint32_t)  /* frame counter */
-                                 + keySourceLength   /* key source length */
-                                 + sizeof(uint8_t)); /* key ID */
-        memcpy(securityHeader, pkt + pktOffset, securityHeaderLength);
-        pktOffset += securityHeaderLength;
-    }
-
-    // Reuse packet[] buffer for outgoing Enhanced ACK.
-    // Phr1 Phr2 FcfL FcfH [Seq#] [DstPan] [DstAdr] [SrcPan] [SrcAdr]
-    // Will fill in PHR later.
-    // MAC Fcf:
-    // - Frame Type = ACK
-    // - Security Enabled, as appropriate
-    // - Frame Pending = 0 or as appropriate
-    // - ACK Request = 0
-    // - PanId compression = incoming packet's
-    // - Seq# suppression = incoming packet's
-    // - IE Present = 0 in this implementation
-    // - DstAdrMode = SrcAdrMode of incoming packet's
-    // - Frame Version = 2 (154E)
-    // - SrcAdrMode = DstAdrMode of incoming packet's (for convenience)
-
-    /* clang-format off */
-    uint16_t ackFcf = (IEEE802154_FRAME_TYPE_ACK
-                        | (macFcf & IEEE802154_FRAME_FLAG_PANID_COMPRESSION)
-                        | (macFcf & IEEE802154_FRAME_FLAG_SEQ_SUPPRESSION)
-                        | (macFcf & IEEE802154_FRAME_FLAG_SECURITY_ENABLED)
-                        | IEEE802154_FRAME_VERSION_2015
-                        | ((macFcf & IEEE802154_FRAME_SOURCE_MODE_MASK) >> 4)
-                        | ((macFcf & IEEE802154_FRAME_DESTINATION_MODE_MASK) << 4)
-                        );
-    /* clang-format on */
-
-    // Do frame-pending check now
-    if (sIsSrcMatchEnabled)
-    {
-        bool setFramePending = false;
-        if (srcAdr[0] > 0U)
-        {
-            if (srcAdr[0] == 8U)
-            {
-                setFramePending = (utilsSoftSrcMatchExtFindEntry((otExtAddress *)&srcAdr[1]) >= 0);
-            }
-            else
-            {
-                uint16_t srcAdrShort = srcAdr[1] | (srcAdr[2] << 8);
-                setFramePending      = (utilsSoftSrcMatchShortFindEntry(srcAdrShort) >= 0);
-            }
-        }
-        if (setFramePending)
-        {
-            ackFcf |= IEEE802154_FRAME_FLAG_FRAME_PENDING;
+            setFramePending = (utilsSoftSrcMatchShortFindEntry(iid, aSrcAddress.mAddress.mShortAddress) >= 0);
         }
     }
 
-    pktOffset        = PHY_HEADER_SIZE;
-    pkt[pktOffset++] = (uint8_t)ackFcf;
-    pkt[pktOffset++] = (uint8_t)(ackFcf >> 8);
-
-    if ((macFcf & IEEE802154_FRAME_FLAG_SEQ_SUPPRESSION) == 0U)
-    {
-        pkt[pktOffset++] = seqNo;
-    }
-
-    // Determine outgoing ACK's address field sizes
-    index = (((ackFcf & (IEEE802154_FRAME_SOURCE_MODE_MASK | IEEE802154_FRAME_VERSION_2012)) >> 10)
-             | ((ackFcf & IEEE802154_FRAME_DESTINATION_MODE_MASK) >> 9)
-             | ((ackFcf & IEEE802154_FRAME_FLAG_PANID_COMPRESSION) >> 6));
-
-    addrSizes = ieee802154Table7p2[index];
-    if (addrSizes == 0xFFFFU)
-    {
-        // Uh-oh! Enh-ACK would be malformed?!  Something funky happened!
-        // Possibly a latency-induced issue.
-        return false;
-    }
-
-    // DstPan = SrcPan of incoming if avail otherwise DstPan of incoming
-    if ((addrSizes & ADDRSIZE_DST_PAN_MASK) != 0U)
-    {
-        if (srcPan[0] > 0U)
-        {
-            pkt[pktOffset++] = srcPan[1];
-            pkt[pktOffset++] = srcPan[2];
-        }
-        else if (dstPan[0] > 0U)
-        {
-            pkt[pktOffset++] = dstPan[1];
-            pkt[pktOffset++] = dstPan[2];
-        }
-        else
-        {
-            // Uh-oh! Outgoing packet needs a DstPanId but incoming had neither!
-            // Possibly a latency-induced issue.
-            return false;
-        }
-    }
-
-    // DstAdr = SrcAdr of incoming packet -- their sizes should match
-    if ((addrSizes & ADDRSIZE_DST_ADR_MASK) != 0U)
-    {
-        for (uint8_t i = 1U; i <= srcAdr[0]; i++)
-        {
-            pkt[pktOffset++] = srcAdr[i];
-        }
-    }
-
-    // SrcPan = DstPan of incoming if avail otherwise SrcPan of incoming
-    if ((addrSizes & ADDRSIZE_SRC_PAN_MASK) != 0U)
-    {
-        if (dstPan[0] > 0U)
-        {
-            pkt[pktOffset++] = dstPan[1];
-            pkt[pktOffset++] = dstPan[2];
-        }
-        else if (srcPan[0] > 0U)
-        {
-            pkt[pktOffset++] = srcPan[1];
-            pkt[pktOffset++] = srcPan[2];
-        }
-        else
-        {
-            // Uh-oh! Outgoing packet needs a SrcPanId but incoming had neither!
-            // Possibly a latency-induced issue.
-            return false;
-        }
-    }
-
-    // SrcAdr = DstAdr of incoming packet -- their sizes should match
-    if ((addrSizes & ADDRSIZE_SRC_ADR_MASK) != 0U)
-    {
-        for (uint8_t i = 1U; i <= dstAdr[0]; i++)
-        {
-            pkt[pktOffset++] = dstAdr[i];
-        }
-    }
-
-    // Note: We just copy over the receive frame's security header just to allocate data
-    // Actual processing of security happens during transmit, in txCurrentPacket,
-    // which should call radioProcessTransmitSecurity
-
-    if (ackFcf & IEEE802154_FRAME_FLAG_SECURITY_ENABLED)
-    {
-        memcpy(pkt + pktOffset, securityHeader, securityHeaderLength);
-        pktOffset += securityHeaderLength;
-    }
-
-    // Before we're done, store some important info in reserved bits in the
-    // MAC header (cleared later)
-    // Check whether frame pending is set.
-    // Check whether enhanced ACK is secured.
-    // To do this, we retrieve the last rx packet, and also use that to generate our IE header.
-    RAIL_RxPacketInfo_t    rxPacketInfo;
-    RAIL_RxPacketDetails_t packetDetails;
-    uint16_t               length;
-    RAIL_RxPacketHandle_t  packetHandle =
-        RAIL_GetRxPacketInfo(gRailHandle, RAIL_RX_PACKET_HANDLE_OLDEST_COMPLETE, &rxPacketInfo);
-    otEXPECT(packetHandle != RAIL_RX_PACKET_HANDLE_INVALID);
-    otEXPECT(validatePacketDetails(packetHandle, &packetDetails, &rxPacketInfo, &length));
-    otEXPECT((skipRxPacketLengthBytes(&rxPacketInfo)) == OT_ERROR_NONE);
-
+    // Generate our IE header.
     // Write IE data for enhanced ACK (link metrics + allocate bytes for CSL)
-    uint8_t  linkMetricsDataLen = 0;
-    uint8_t *dataPtr            = NULL;
 
 #if OPENTHREAD_CONFIG_MLE_LINK_METRICS_SUBJECT_ENABLE
-    uint8_t      linkMetricsData[OT_ENH_PROBING_IE_DATA_MAX_SIZE];
-    otMacAddress macAddress;
+    uint8_t linkMetricsData[OT_ENH_PROBING_IE_DATA_MAX_SIZE];
 
-    otEXPECT(srcAdr[0] > 0U);
-    if (srcAdr[0] == 8U)
-    {
-        memcpy(macAddress.mAddress.mExtAddress.m8, &srcAdr[1], OT_EXT_ADDRESS_SIZE);
-        macAddress.mType = OT_MAC_ADDRESS_TYPE_EXTENDED;
-    }
-    else
-    {
-        macAddress.mAddress.mShortAddress = (srcAdr[1] | (srcAdr[2] << 8));
-        macAddress.mType                  = OT_MAC_ADDRESS_TYPE_SHORT;
-    }
-
-    linkMetricsDataLen =
-        otLinkMetricsEnhAckGenData(&macAddress, packetDetails.lqi, packetDetails.rssi, linkMetricsData);
+    linkMetricsDataLen = otLinkMetricsEnhAckGenData(&aSrcAddress, sReceiveFrame.mInfo.mRxInfo.mLqi,
+                                                    sReceiveFrame.mInfo.mRxInfo.mRssi, linkMetricsData);
 
     if (linkMetricsDataLen > 0)
     {
@@ -1841,43 +1953,61 @@ static bool writeIeee802154EnhancedAck(RAIL_Handle_t aRailHandle)
 
     sAckIeDataLength = generateAckIeData(dataPtr, linkMetricsDataLen);
 
-    // Note: CSL data is set on transmit, in txCurrentPacket
-    // (it is set both for ACKs and other tx frames, so it's not specific here)
+    otEXPECT(otMacFrameGenerateEnhAck(&receivedFrame, setFramePending, sAckIeData, sAckIeDataLength, &enhAckFrame)
+             == OT_ERROR_NONE);
 
-    if ((ackFcf & IEEE802154_FRAME_FLAG_SECURITY_ENABLED) || (ackFcf & IEEE802154_FRAME_FLAG_FRAME_PENDING))
+#if OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
+    if (sCslPeriod > 0)
     {
-        uint8_t *macFcfPointer = ((rxPacketInfo.firstPortionBytes == 0) ? (uint8_t *)rxPacketInfo.lastPortionData
-                                                                        : (uint8_t *)rxPacketInfo.firstPortionData);
+        // Update IE data in the 802.15.4 header with the newest CSL period / phase
+        otMacFrameSetCslIe(&enhAckFrame, (uint16_t)sCslPeriod, getCslPhase());
+    }
+#endif
 
-        if (ackFcf & IEEE802154_FRAME_FLAG_SECURITY_ENABLED)
-        {
-            *macFcfPointer |= IEEE802154_SECURED_OUTGOING_ENHANCED_ACK;
-        }
-
-        if (ackFcf & IEEE802154_FRAME_FLAG_FRAME_PENDING)
-        {
-            *macFcfPointer |= IEEE802154_FRAME_PENDING_SET_IN_OUTGOING_ACK;
-        }
+    if (otMacFrameIsSecurityEnabled(&enhAckFrame))
+    {
+        otEXPECT(radioProcessTransmitSecurity(&enhAckFrame, iid) == OT_ERROR_NONE);
     }
 
-    // Now add the IE data
-    memcpy(pkt + pktOffset, sAckIeData, sAckIeDataLength);
-    pktOffset += sAckIeDataLength;
+    // Before we're done, store some important info in reserved bits in the
+    // MAC header (cleared later)
+    // Check whether frame pending is set.
+    // Check whether enhanced ACK is secured.
+    otEXPECT((skipRxPacketLengthBytes(packetInfoForEnhAck)) == OT_ERROR_NONE);
+    uint8_t *macFcfPointer =
+        ((packetInfoForEnhAck->firstPortionBytes == 0) ? (uint8_t *)packetInfoForEnhAck->lastPortionData
+                                                       : (uint8_t *)packetInfoForEnhAck->firstPortionData);
+
+    if (otMacFrameIsSecurityEnabled(&enhAckFrame))
+    {
+        *macFcfPointer |= IEEE802154_SECURED_OUTGOING_ENHANCED_ACK;
+    }
+
+    if (setFramePending)
+    {
+        *macFcfPointer |= IEEE802154_FRAME_PENDING_SET_IN_OUTGOING_ACK;
+    }
 
     // Fill in PHR now that we know Enh-ACK's length
     if (PHY_HEADER_SIZE == 2U) // Not true till SubGhz implementation is in place
     {
-        pkt[0] = (0x08U /*FCS=2byte*/ | 0x10U /*Whiten=enabled*/);
-        pkt[1] = (uint8_t)(__RBIT(pktOffset - 2U /*PHY_HEADER_SIZE*/ + 2U /*FCS*/) >> 24);
+        enhAckPsdu[0] = (0x08U /*FCS=2byte*/ | 0x10U /*Whiten=enabled*/);
+        enhAckPsdu[1] = (uint8_t)(__RBIT(enhAckFrame.mLength) >> 24);
     }
     else
     {
-        pkt[0] = (pktOffset - 1U /*PHY_HEADER_SIZE*/ + 2U /*FCS*/);
+        enhAckPsdu[0] = enhAckFrame.mLength;
     }
 
-    return (RAIL_IEEE802154_WriteEnhAck(aRailHandle, pkt, pktOffset) == RAIL_STATUS_NO_ERROR);
+    RAIL_Status_t enhAckStatus = RAIL_IEEE802154_WriteEnhAck(aRailHandle, enhAckPsdu, enhAckFrame.mLength);
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+    otEXPECT_ACTION(enhAckStatus == RAIL_STATUS_NO_ERROR, sRailDebugCounters.mRailEventsEnhAckTxFailed++);
+#else
+    otEXPECT(enhAckStatus == RAIL_STATUS_NO_ERROR);
+#endif
+
 exit:
-    return false;
+    return true;
 }
 #endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 
@@ -1886,20 +2016,36 @@ exit:
 
 static void dataRequestCommandCallback(RAIL_Handle_t aRailHandle)
 {
+#define MAX_EXPECTED_BYTES (2U + 2U + 1U) // PHR + FCF + DSN
+
+    uint8_t             receivedPsdu[IEEE802154_MAX_LENGTH];
+    uint8_t             pktOffset = PHY_HEADER_SIZE;
+    uint8_t             initialPktReadBytes;
+    RAIL_RxPacketInfo_t packetInfo;
+
     // This callback occurs after the address fields of an incoming
     // ACK-requesting CMD or DATA frame have been received and we
     // can do a frame pending check.  We must also figure out what
     // kind of ACK is being requested -- Immediate or Enhanced.
 
 #if (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
-    if (writeIeee802154EnhancedAck(aRailHandle))
+    if (writeIeee802154EnhancedAck(aRailHandle, &packetInfo, &initialPktReadBytes, receivedPsdu))
     {
+        // We also return true above if there were failures in
+        // generating an enhanced ACK.
         return;
     }
+#else
+    initialPktReadBytes =
+        readInitialPacketData(&packetInfo, MAX_EXPECTED_BYTES, pktOffset + 2, receivedPsdu, MAX_EXPECTED_BYTES);
 #endif
 
+    // Calculate frame pending for immediate-ACK
     // If not, RAIL will send an immediate ACK, but we need to do FP lookup.
     RAIL_Status_t status = RAIL_STATUS_NO_ERROR;
+
+    // Check if we read the FCF, if not, set macFcf to 0
+    uint16_t macFcf = (initialPktReadBytes <= pktOffset) ? 0U : receivedPsdu[pktOffset];
 
     bool framePendingSet = false;
 
@@ -1910,17 +2056,19 @@ static void dataRequestCommandCallback(RAIL_Handle_t aRailHandle)
         status = RAIL_IEEE802154_GetAddress(aRailHandle, &sourceAddress);
         otEXPECT(status == RAIL_STATUS_NO_ERROR);
 
+        uint8_t iid = getIidFromFilterMask(packetInfo.filterMask);
+        OT_UNUSED_VARIABLE(iid);
         if ((sourceAddress.length == RAIL_IEEE802154_LongAddress
-             && utilsSoftSrcMatchExtFindEntry((otExtAddress *)sourceAddress.longAddress) >= 0)
+             && utilsSoftSrcMatchExtFindEntry(iid, (otExtAddress *)sourceAddress.longAddress) >= 0)
             || (sourceAddress.length == RAIL_IEEE802154_ShortAddress
-                && utilsSoftSrcMatchShortFindEntry(sourceAddress.shortAddress) >= 0))
+                && utilsSoftSrcMatchShortFindEntry(iid, sourceAddress.shortAddress) >= 0))
         {
             status = RAIL_IEEE802154_SetFramePending(aRailHandle);
             otEXPECT(status == RAIL_STATUS_NO_ERROR);
             framePendingSet = true;
         }
     }
-    else
+    else if ((macFcf & IEEE802154_FRAME_TYPE_MASK) != IEEE802154_FRAME_TYPE_DATA)
     {
         status = RAIL_IEEE802154_SetFramePending(aRailHandle);
         otEXPECT(status == RAIL_STATUS_NO_ERROR);
@@ -1931,8 +2079,6 @@ static void dataRequestCommandCallback(RAIL_Handle_t aRailHandle)
     {
         // Store whether frame pending was set in the outgoing ACK in a reserved
         // bit of the MAC header (cleared later)
-        RAIL_RxPacketInfo_t packetInfo;
-        RAIL_GetRxIncomingPacketInfo(gRailHandle, &packetInfo);
 
         otEXPECT((skipRxPacketLengthBytes(&packetInfo)) == OT_ERROR_NONE);
         uint8_t *macFcfPointer = ((packetInfo.firstPortionBytes == 0) ? (uint8_t *)packetInfo.lastPortionData
@@ -1958,6 +2104,7 @@ static void packetReceivedCallback(RAIL_RxPacketHandle_t packetHandle)
     uint16_t               length;
     bool                   framePendingInAck = false;
     bool                   rxCorrupted       = false;
+    uint8_t                iid               = 0;
 
     packetHandle = RAIL_GetRxPacketInfo(gRailHandle, packetHandle, &packetInfo);
     otEXPECT_ACTION(
@@ -1971,12 +2118,17 @@ static void packetReceivedCallback(RAIL_RxPacketHandle_t packetHandle)
     uint8_t macFcf =
         ((packetInfo.firstPortionBytes == 0) ? packetInfo.lastPortionData[0] : packetInfo.firstPortionData[0]);
 
+    iid = getIidFromFilterMask(packetInfo.filterMask);
+
     if (packetDetails.isAck)
     {
         otEXPECT_ACTION(
-            (length == IEEE802154_ACK_LENGTH && (macFcf & IEEE802154_FRAME_TYPE_MASK) == IEEE802154_FRAME_TYPE_ACK),
+            (length >= IEEE802154_MIN_LENGTH && (macFcf & IEEE802154_FRAME_TYPE_MASK) == IEEE802154_FRAME_TYPE_ACK),
             rxCorrupted = true);
 
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+        sRailDebugCounters.mRailEventAcksReceived++;
+#endif
         // read packet
         RAIL_CopyRxPacket(sReceiveAckFrame.mPsdu, &packetInfo);
         sReceiveAckFrame.mLength = length;
@@ -1991,7 +2143,7 @@ static void packetReceivedCallback(RAIL_RxPacketHandle_t packetHandle)
             && (sReceiveAckFrame.mPsdu[IEEE802154_DSN_OFFSET] == sTransmitFrame.mPsdu[IEEE802154_DSN_OFFSET]))
         {
             otEXPECT_ACTION(validatePacketTimestamp(&packetDetails, length), rxCorrupted = true);
-            updateRxFrameDetails(&packetDetails, false, false);
+            updateRxFrameDetails(&packetDetails, false, false, iid);
 
             // Processing the ACK frame in ISR context avoids the Tx state to be messed up,
             // in case the Rx FIFO queue gets wiped out in a DMP situation.
@@ -2016,7 +2168,7 @@ static void packetReceivedCallback(RAIL_RxPacketHandle_t packetHandle)
     }
     else
     {
-        otEXPECT_ACTION(sPromiscuous || (length != IEEE802154_ACK_LENGTH), rxCorrupted = true);
+        otEXPECT_ACTION(sPromiscuous || (length >= IEEE802154_MIN_DATA_LENGTH), rxCorrupted = true);
 
         if (macFcf & IEEE802154_FRAME_FLAG_ACK_REQUIRED)
         {
@@ -2138,13 +2290,10 @@ static void schedulerEventCallback(RAIL_Handle_t aRailHandle)
     RAIL_SchedulerStatus_t status = RAIL_GetSchedulerStatus(aRailHandle);
     assert(status != RAIL_SCHEDULER_STATUS_INTERNAL_ERROR);
 
-    /* clang-format off */
-    if (status == RAIL_SCHEDULER_STATUS_CCA_CSMA_TX_FAIL
-        || status == RAIL_SCHEDULER_STATUS_SINGLE_TX_FAIL
+    if (status == RAIL_SCHEDULER_STATUS_CCA_CSMA_TX_FAIL || status == RAIL_SCHEDULER_STATUS_SINGLE_TX_FAIL
         || status == RAIL_SCHEDULER_STATUS_SCHEDULED_TX_FAIL
         || (status == RAIL_SCHEDULER_STATUS_SCHEDULE_FAIL && sTransmitBusy)
         || (status == RAIL_SCHEDULER_STATUS_EVENT_INTERRUPTED && sTransmitBusy))
-    /* clang-format on */
     {
         if (getInternalFlag(FLAG_ONGOING_TX_ACK))
         {
@@ -2201,6 +2350,13 @@ static void RAILCb_Generic(RAIL_Handle_t aRailHandle, RAIL_Events_t aEvents)
         (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_RX_STARTED, (uint32_t)isReceivingFrame());
     }
 #endif // SL_CATALOG_RAIL_UTIL_IEEE802154_STACK_EVENT_PRESENT
+
+#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
+    if (aEvents & RAIL_EVENT_SIGNAL_DETECTED)
+    {
+        (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_SIGNAL_DETECTED, 0U);
+    }
+#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
 
     if ((aEvents & RAIL_EVENT_IEEE802154_DATA_REQUEST_COMMAND)
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
@@ -2259,6 +2415,16 @@ static void RAILCb_Generic(RAIL_Handle_t aRailHandle, RAIL_Events_t aEvents)
 #endif // SL_CATALOG_RAIL_UTIL_IEEE802154_STACK_EVENT_PRESENT
     }
 
+    if (aEvents & RAIL_EVENT_SCHEDULED_RX_STARTED)
+    {
+        sState = OT_RADIO_STATE_RECEIVE;
+    }
+
+    if (aEvents & RAIL_EVENT_RX_SCHEDULED_RX_END)
+    {
+        radioSetIdle();
+    }
+
     if (aEvents & RAIL_EVENT_RX_PACKET_RECEIVED)
     {
         packetReceivedCallback(RAIL_HoldRxPacket(aRailHandle));
@@ -2273,11 +2439,7 @@ static void RAILCb_Generic(RAIL_Handle_t aRailHandle, RAIL_Events_t aEvents)
         (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_RX_CORRUPTED, (uint32_t)isReceivingFrame());
     }
     // The following 3 events cause us to not receive a packet
-    /* clang-format off */
-    if (aEvents & (RAIL_EVENT_RX_PACKET_ABORTED
-                  | RAIL_EVENT_RX_ADDRESS_FILTERED
-                  | RAIL_EVENT_RX_FIFO_OVERFLOW))
-    /* clang-format on */
+    if (aEvents & (RAIL_EVENT_RX_PACKET_ABORTED | RAIL_EVENT_RX_ADDRESS_FILTERED | RAIL_EVENT_RX_FIFO_OVERFLOW))
     {
         (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_RX_FILTERED, (uint32_t)isReceivingFrame());
     }
@@ -2338,6 +2500,8 @@ static void RAILCb_Generic(RAIL_Handle_t aRailHandle, RAIL_Events_t aEvents)
         // TODO: Non-RTOS DMP case fails
 #if (!defined(SL_CATALOG_BLUETOOTH_PRESENT) || defined(SL_CATALOG_KERNEL_PRESENT))
         assert(status == RAIL_STATUS_NO_ERROR);
+#else
+        OT_UNUSED_VARIABLE(status);
 #endif
 
 #if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
@@ -2373,6 +2537,8 @@ static bool validatePacketDetails(RAIL_RxPacketHandle_t   packetHandle,
 
     otEXPECT_ACTION((RAIL_GetRxPacketDetailsAlt(gRailHandle, packetHandle, pPacketDetails) == RAIL_STATUS_NO_ERROR),
                     pktValid = false);
+
+    otEXPECT_ACTION(isFilterMaskValid(pPacketInfo->filterMask), pktValid = false);
 
     // RAIL's packetBytes includes the (1 or 2 byte) PHY header but not the 2-byte CRC.
     // We want *packetLength to match the PHY header length so we add 2 for CRC
@@ -2415,7 +2581,8 @@ exit:
 
 static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
                                  bool                    securedOutgoingEnhancedAck,
-                                 bool                    framePendingSetInOutgoingAck)
+                                 bool                    framePendingSetInOutgoingAck,
+                                 uint8_t                 iid)
 {
     assert(pPacketDetails != NULL);
 
@@ -2424,6 +2591,9 @@ static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
         sReceiveAckFrame.mInfo.mRxInfo.mRssi      = pPacketDetails->rssi;
         sReceiveAckFrame.mInfo.mRxInfo.mLqi       = pPacketDetails->lqi;
         sReceiveAckFrame.mInfo.mRxInfo.mTimestamp = pPacketDetails->timeReceived.packetTime;
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+        sReceiveAckFrame.mIid = iid;
+#endif
     }
     else
     {
@@ -2434,10 +2604,14 @@ static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
         sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck = securedOutgoingEnhancedAck;
         // Set this flag only when the packet is really acknowledged with frame pending set.
         sReceiveFrame.mInfo.mRxInfo.mAckedWithFramePending = framePendingSetInOutgoingAck;
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+        sReceiveFrame.mIid = iid;
+#endif
+
 #if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
         // Use stored values for these
-        sReceiveFrame.mInfo.mRxInfo.mAckKeyId        = sAckKeyId;
-        sReceiveFrame.mInfo.mRxInfo.mAckFrameCounter = sAckFrameCounter;
+        sReceiveFrame.mInfo.mRxInfo.mAckKeyId        = sMacKeys[iid].ackKeyId;
+        sReceiveFrame.mInfo.mRxInfo.mAckFrameCounter = sMacKeys[iid].ackFrameCounter;
 #endif
     }
 }
@@ -2473,8 +2647,8 @@ static void processNextRxPacket(otInstance *aInstance)
     RAIL_RxPacketDetails_t packetDetails;
     RAIL_Status_t          status;
     uint16_t               length;
-    uint16_t               receiveChannel;
     bool                   rxProcessDone = false;
+    uint8_t                iid           = 0;
 
     CORE_DECLARE_IRQ_STATE;
     CORE_ENTER_ATOMIC();
@@ -2484,21 +2658,22 @@ static void processNextRxPacket(otInstance *aInstance)
         (packetHandle != RAIL_RX_PACKET_HANDLE_INVALID && packetInfo.packetStatus == RAIL_RX_PACKET_READY_SUCCESS),
         packetHandle = RAIL_RX_PACKET_HANDLE_INVALID);
 
+    iid = getIidFromFilterMask(packetInfo.filterMask);
+
     otEXPECT(validatePacketDetails(packetHandle, &packetDetails, &packetInfo, &length));
 
     otEXPECT((skipRxPacketLengthBytes(&packetInfo)) == OT_ERROR_NONE);
 
     // As received ACK frames are already processed in packetReceivedCallback,
     // we only need to read and process the non-ACK frames here.
-    otEXPECT(sPromiscuous || (!packetDetails.isAck && (length != IEEE802154_ACK_LENGTH)));
+    otEXPECT(sPromiscuous || (!packetDetails.isAck && (length >= IEEE802154_MIN_DATA_LENGTH)));
 
     // read packet
     RAIL_CopyRxPacket(sReceiveFrame.mPsdu, &packetInfo);
     sReceiveFrame.mLength = length;
 
     uint8_t *macFcfPointer = sReceiveFrame.mPsdu;
-    RAIL_GetChannel(gRailHandle, &receiveChannel);
-    sReceiveFrame.mChannel = receiveChannel;
+    sReceiveFrame.mChannel = packetDetails.channel;
 
     // Check the reserved bits in the MAC header, then clear them.
 
@@ -2517,7 +2692,7 @@ static void processNextRxPacket(otInstance *aInstance)
     }
 
     otEXPECT(validatePacketTimestamp(&packetDetails, length));
-    updateRxFrameDetails(&packetDetails, securedOutgoingEnhancedAck, framePendingSetInOutgoingAck);
+    updateRxFrameDetails(&packetDetails, securedOutgoingEnhancedAck, framePendingSetInOutgoingAck, iid);
     rxProcessDone = true;
 
 exit:
@@ -2607,6 +2782,11 @@ void efr32RadioProcess(otInstance *aInstance)
 //------------------------------------------------------------------------------
 // Antenna Diversity, Wifi coexistence and Runtime PHY select support
 
+RAIL_Status_t efr32RadioSetCcaMode(uint8_t aMode)
+{
+    return RAIL_IEEE802154_ConfigCcaMode(gRailHandle, aMode);
+}
+
 RAIL_IEEE802154_PtiRadioConfig_t efr32GetPtiRadioConfig(void)
 {
     return (RAIL_IEEE802154_GetPtiRadioConfig(gRailHandle));
@@ -2646,7 +2826,7 @@ void sl_ot_update_active_radio_config(void)
 
     otRadioState currentState = sState;
     otEXPECT(setRadioState(OT_RADIO_STATE_SLEEP) == OT_ERROR_NONE);
-    sl_rail_util_plugin_config_2p4ghz_radio(gRailHandle);
+    sl_rail_util_ieee802154_config_radio(gRailHandle);
     otEXPECT(setRadioState(currentState) == OT_ERROR_NONE);
 
 exit:
@@ -2669,19 +2849,11 @@ void efr32AntennaConfigInit(void)
 
 static void changeDynamicEvents(void)
 {
-    /* clang-format off */
-    const RAIL_Events_t eventMask = RAIL_EVENTS_NONE
-                                    | RAIL_EVENT_RX_SYNC1_DETECT
-                                    | RAIL_EVENT_RX_SYNC2_DETECT
-                                    | RAIL_EVENT_RX_FRAME_ERROR
-                                    | RAIL_EVENT_RX_FIFO_OVERFLOW
-                                    | RAIL_EVENT_RX_ADDRESS_FILTERED
-                                    | RAIL_EVENT_RX_PACKET_ABORTED
-                                    | RAIL_EVENT_RX_FILTER_PASSED
-                                    | RAIL_EVENT_TX_CHANNEL_CLEAR
-                                    | RAIL_EVENT_TX_CCA_RETRY
-                                    | RAIL_EVENT_TX_START_CCA;
-    /* clang-format on */
+    const RAIL_Events_t eventMask = RAIL_EVENTS_NONE | RAIL_EVENT_RX_SYNC1_DETECT | RAIL_EVENT_RX_SYNC2_DETECT
+                                    | RAIL_EVENT_RX_FRAME_ERROR | RAIL_EVENT_RX_FIFO_OVERFLOW
+                                    | RAIL_EVENT_RX_ADDRESS_FILTERED | RAIL_EVENT_RX_PACKET_ABORTED
+                                    | RAIL_EVENT_RX_FILTER_PASSED | RAIL_EVENT_TX_CHANNEL_CLEAR
+                                    | RAIL_EVENT_TX_CCA_RETRY | RAIL_EVENT_TX_START_CCA | RAIL_EVENT_SIGNAL_DETECTED;
     RAIL_Events_t eventValues = RAIL_EVENTS_NONE;
 
     if (phyStackEventIsEnabled())
@@ -2859,27 +3031,3 @@ void efr32RadioClearCoexCounters(void)
 
 #endif // SL_OPENTHREAD_COEX_COUNTER_ENABLE
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-
-RAIL_AntennaConfig_t halAntennaConfig;
-
-void initAntenna(void)
-{
-#if (HAL_ANTDIV_ENABLE && defined(BSP_ANTDIV_SEL_PORT) && defined(BSP_ANTDIV_SEL_PIN) && defined(BSP_ANTDIV_SEL_LOC))
-    halAntennaConfig.ant0PinEn = true;
-    halAntennaConfig.ant0Port  = (uint8_t)BSP_ANTDIV_SEL_PORT;
-    halAntennaConfig.ant0Pin   = BSP_ANTDIV_SEL_PIN;
-    halAntennaConfig.ant0Loc   = BSP_ANTDIV_SEL_LOC;
-#endif
-#ifdef _SILICON_LABS_32B_SERIES_2
-    halAntennaConfig.defaultPath = BSP_ANTDIV_SEL_LOC;
-#endif
-#if (HAL_ANTDIV_ENABLE && defined(BSP_ANTDIV_NSEL_PORT) && defined(BSP_ANTDIV_NSEL_PIN) && defined(BSP_ANTDIV_NSEL_LOC))
-    halAntennaConfig.ant1PinEn = true;
-    halAntennaConfig.ant1Port  = (uint8_t)BSP_ANTDIV_NSEL_PORT;
-    halAntennaConfig.ant1Pin   = BSP_ANTDIV_NSEL_PIN;
-    halAntennaConfig.ant1Loc   = BSP_ANTDIV_NSEL_LOC;
-#endif
-#if (HAL_ANTDIV_ENABLE || defined(_SILICON_LABS_32B_SERIES_2))
-    (void)RAIL_ConfigAntenna(RAIL_EFR32_HANDLE, &halAntennaConfig);
-#endif
-}
