@@ -51,7 +51,7 @@ source "$script_dir/slc_cli"
 OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET:-}
 
 readonly OT_OPTIONS=(
-    "-DCMAKE_BUILD_TYPE=MinSizeRel"
+    "-DCMAKE_BUILD_TYPE=Release"
     "-DOT_DIAGNOSTIC=ON"
     "-DOT_EXTERNAL_HEAP=ON"
     "-DOT_SLAAC=ON"
