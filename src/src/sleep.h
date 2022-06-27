@@ -36,6 +36,8 @@
 #ifndef SLEEP_H_
 #define SLEEP_H_
 
+#include <stdbool.h>
+
 void sl_ot_sleep_init(void);
 bool sl_ot_is_ok_to_sleep(void);
 
