@@ -810,7 +810,7 @@ static otError radioScheduleRx(uint8_t aChannel, uint32_t aStart, uint32_t aDura
                                      .startMode               = RAIL_TIME_ABSOLUTE,
                                      .end                     = aDuration,
                                      .endMode                 = RAIL_TIME_DELAY,
-                                     .rxTransitionEndSchedule = 0, // This lets us idle after a scheduled-rx
+                                     .rxTransitionEndSchedule = 1, // This lets us idle after a scheduled-rx
                                      .hardWindowEnd = 0}; // This lets us receive a packet near a window-end-event
 
     status = RAIL_ScheduleRx(gRailHandle, aChannel, &rxCfg, &bgRxSchedulerInfo);
