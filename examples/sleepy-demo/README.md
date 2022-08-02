@@ -23,7 +23,7 @@ build/brd4161a/bin/sleepy-demo-ftd  build/brd4161a/bin/sleepy-demo-ftd.s37  buil
 
 In Silicon Labs Simplicity Studio flash one device with the `sleepy-demo-mtd.s37` image and the other device with the `sleepy-demo-ftd.s37` image.
 
-For instructions on flashing firmware, see [Flashing binaries](../../README.md#flash)
+For instructions on flashing firmware, see [Flashing binaries](../../src/README.md#flashing-binaries)
 
 ## 2. Starting nodes
 
