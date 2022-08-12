@@ -822,6 +822,29 @@ exit:
 }
 #endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 
+static void configureTxPower(RAIL_TxPowerConfig_t *aTxPowerConfig)
+{
+    RAIL_Status_t       status;
+    RAIL_TxPowerLevel_t tx_power_lvl;
+    RAIL_TxPower_t      tx_power_dbm = OPENTHREAD_CONFIG_DEFAULT_TRANSMIT_POWER * 10;
+
+    tx_power_lvl = RAIL_GetTxPower(gRailHandle);
+
+    // Always need to call RAIL_SetTxPowerDbm after RAIL_ConfigTxPower
+    // First need to get existing power setting and reassert value after config
+
+    if (tx_power_lvl != RAIL_TX_POWER_LEVEL_INVALID)
+    {
+        tx_power_dbm = RAIL_GetTxPowerDbm(gRailHandle);
+    }
+
+    status = RAIL_ConfigTxPower(gRailHandle, aTxPowerConfig);
+    assert(status == RAIL_STATUS_NO_ERROR);
+
+    status = RAIL_SetTxPowerDbm(gRailHandle, tx_power_dbm);
+    assert(status == RAIL_STATUS_NO_ERROR);
+}
+
 //------------------------------------------------------------------------------
 // Radio Initialization
 static RAIL_Handle_t efr32RailInit(efr32CommonConfig *aCommonConfig)
@@ -911,8 +934,7 @@ static void efr32RailConfigLoad(efr32BandConfig *aBandConfig)
 #endif // OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
 #endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 
-    status = RAIL_ConfigTxPower(gRailHandle, &txPowerConfig);
-    assert(status == RAIL_STATUS_NO_ERROR);
+    configureTxPower(&txPowerConfig);
 }
 
 static void efr32RadioSetTxPower(int8_t aPowerDbm)
