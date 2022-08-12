@@ -876,7 +876,8 @@ static RAIL_Handle_t efr32RailInit(efr32CommonConfig *aCommonConfig)
 static void efr32RailConfigLoad(efr32BandConfig *aBandConfig)
 {
     RAIL_Status_t        status;
-    RAIL_TxPowerConfig_t txPowerConfig = {SL_RAIL_UTIL_PA_SELECTION_2P4GHZ, SL_RAIL_UTIL_PA_VOLTAGE_MV, 10};
+    RAIL_TxPowerConfig_t txPowerConfig = {SL_RAIL_UTIL_PA_SELECTION_2P4GHZ, SL_RAIL_UTIL_PA_VOLTAGE_MV,
+                                          SL_RAIL_UTIL_PA_RAMP_TIME_US};
 
     if (aBandConfig->mChannelConfig != NULL)
     {
