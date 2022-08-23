@@ -36,6 +36,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
+# Toolchain file
+message(STATUS "Toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
+
 # ==============================================================================
 # OpenThread
 # ==============================================================================
@@ -102,6 +105,3 @@ string(COMPARE EQUAL "${PLATFORM_LOWERCASE}" "efr32mg12" _cmp)
 if (_cmp)
     target_sources(${OT_PLATFORM_LIB} PUBLIC ${EFR32MG12_915MHZ_PHY_SOURCES})
 endif()
-
-
-add_subdirectory(third_party)

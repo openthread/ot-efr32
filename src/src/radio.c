@@ -90,8 +90,13 @@
 //------------------------------------------------------------------------------
 // Enums, macros and static variables
 
+#ifndef LOW_BYTE
 #define LOW_BYTE(n) ((uint8_t)((n)&0xFF))
+#endif // LOW_BTE
+
+#ifndef HIGH_BYTE
 #define HIGH_BYTE(n) ((uint8_t)(LOW_BYTE((n) >> 8)))
+#endif // HIGH_BYTE
 
 // Intentionally maintaining separate groups for series-1 and series-2 devices
 // This gives flexibility to add new elements to be read, like CCA Thresholds.
@@ -1927,15 +1932,35 @@ static bool writeIeee802154EnhancedAck(RAIL_Handle_t        aRailHandle,
 
     if (sIsSrcMatchEnabled && (aSrcAddress.mType != OT_MAC_ADDRESS_TYPE_NONE))
     {
-        if (aSrcAddress.mType == OT_MAC_ADDRESS_TYPE_EXTENDED)
+#if _SILICON_LABS_32B_SERIES_1_CONFIG == 1 && OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+        if (iid == 0) // on MG1 the RAIL filter mask doesn't work so search all tables
         {
-            setFramePending = (utilsSoftSrcMatchExtFindEntry(iid, &aSrcAddress.mAddress.mExtAddress) >= 0);
+            for (uint8_t i = 1; i <= RADIO_CONFIG_SRC_MATCH_PANID_NUM; i++)
+            {
+                setFramePending = (aSrcAddress.mType == OT_MAC_ADDRESS_TYPE_EXTENDED
+                                       ? (utilsSoftSrcMatchExtFindEntry(i, &aSrcAddress.mAddress.mExtAddress) >= 0)
+                                       : (utilsSoftSrcMatchShortFindEntry(i, aSrcAddress.mAddress.mShortAddress) >= 0));
+                if (setFramePending)
+                {
+                    break;
+                }
+            }
         }
         else
+#endif
         {
-            setFramePending = (utilsSoftSrcMatchShortFindEntry(iid, aSrcAddress.mAddress.mShortAddress) >= 0);
+            setFramePending = (aSrcAddress.mType == OT_MAC_ADDRESS_TYPE_EXTENDED
+                                   ? (utilsSoftSrcMatchExtFindEntry(iid, &aSrcAddress.mAddress.mExtAddress) >= 0)
+                                   : (utilsSoftSrcMatchShortFindEntry(iid, aSrcAddress.mAddress.mShortAddress) >= 0));
         }
     }
+
+#if _SILICON_LABS_32B_SERIES_1_CONFIG == 1 && OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+    otPanId destPanId;
+
+    destPanId = efr32GetDstPanId(&receivedFrame);
+    iid       = utilsSoftSrcMatchFindIidFromPanId(destPanId);
+#endif
 
     // Generate our IE header.
     // Write IE data for enhanced ACK (link metrics + allocate bytes for CSL)
@@ -2059,10 +2084,29 @@ static void dataRequestCommandCallback(RAIL_Handle_t aRailHandle)
 
         uint8_t iid = getIidFromFilterMask(packetInfo.filterMask);
         OT_UNUSED_VARIABLE(iid);
-        if ((sourceAddress.length == RAIL_IEEE802154_LongAddress
-             && utilsSoftSrcMatchExtFindEntry(iid, (otExtAddress *)sourceAddress.longAddress) >= 0)
-            || (sourceAddress.length == RAIL_IEEE802154_ShortAddress
-                && utilsSoftSrcMatchShortFindEntry(iid, sourceAddress.shortAddress) >= 0))
+#if _SILICON_LABS_32B_SERIES_1_CONFIG == 1 && OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+        if (iid == 0) // on MG1 the RAIL filter mask doesn't work so search all tables
+        {
+            for (uint8_t i = 1; i <= RADIO_CONFIG_SRC_MATCH_PANID_NUM; i++)
+            {
+                framePendingSet =
+                    (sourceAddress.length == RAIL_IEEE802154_LongAddress
+                         ? (utilsSoftSrcMatchExtFindEntry(i, (otExtAddress *)sourceAddress.longAddress) >= 0)
+                         : (utilsSoftSrcMatchShortFindEntry(i, sourceAddress.shortAddress) >= 0));
+                if (framePendingSet)
+                {
+                    status = RAIL_IEEE802154_SetFramePending(aRailHandle);
+                    otEXPECT(status == RAIL_STATUS_NO_ERROR);
+                    break;
+                }
+            }
+        }
+        else
+#endif
+            if ((sourceAddress.length == RAIL_IEEE802154_LongAddress
+                 && utilsSoftSrcMatchExtFindEntry(iid, (otExtAddress *)sourceAddress.longAddress) >= 0)
+                || (sourceAddress.length == RAIL_IEEE802154_ShortAddress
+                    && utilsSoftSrcMatchShortFindEntry(iid, sourceAddress.shortAddress) >= 0))
         {
             status = RAIL_IEEE802154_SetFramePending(aRailHandle);
             otEXPECT(status == RAIL_STATUS_NO_ERROR);
@@ -3004,7 +3048,7 @@ static void emRadioHoldOffInternalIsr(uint8_t active)
 }
 
 // External API used by Coex Component
-void emRadioHoldOffIsr(bool active)
+SL_WEAK void emRadioHoldOffIsr(bool active)
 {
     emRadioHoldOffInternalIsr((uint8_t)active | (rhoActive & ~RHO_EXT_ACTIVE));
 }

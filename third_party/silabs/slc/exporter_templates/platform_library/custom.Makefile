@@ -183,7 +183,6 @@ target_link_libraries({{PROJECT_NAME}}
 
         # The --whole-archive flags are necessary to resolve all symbols from the GSDK
         -Wl,--whole-archive ${ {{-PROJECT_NAME}}-sdk_location} -Wl,--no-whole-archive
-        jlinkrtt
         ot-config
 )
 

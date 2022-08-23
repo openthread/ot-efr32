@@ -39,12 +39,13 @@
 #include <sys/time.h>
 
 #include "platform-efr32.h"
+#include "rail_ieee802154.h"
 #include <openthread/cli.h>
 #include <openthread/config.h>
+#include <openthread/logging.h>
 #include <openthread/platform/alarm-milli.h>
 #include <openthread/platform/diag.h>
 #include <openthread/platform/radio.h>
-#include "common/code_utils.hpp"
 
 #if OPENTHREAD_CONFIG_DIAG_ENABLE
 
@@ -84,6 +85,71 @@ void otPlatDiagRadioReceived(otInstance *aInstance, otRadioFrame *aFrame, otErro
 void otPlatDiagAlarmCallback(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
+}
+
+otError otPlatDiagTxStreamRandom(void)
+{
+    RAIL_Status_t status;
+    uint16_t      streamChannel;
+
+    RAIL_GetChannel(gRailHandle, &streamChannel);
+
+    otLogInfoPlat("Diag Stream PN9 Process", NULL);
+
+    status = RAIL_StartTxStream(gRailHandle, streamChannel, RAIL_STREAM_PN9_STREAM);
+    assert(status == RAIL_STATUS_NO_ERROR);
+
+    return status;
+}
+
+otError otPlatDiagTxStreamTone(void)
+{
+    RAIL_Status_t status;
+    uint16_t      streamChannel;
+
+    RAIL_GetChannel(gRailHandle, &streamChannel);
+
+    otLogInfoPlat("Diag Stream CARRIER-WAVE Process", NULL);
+
+    status = RAIL_StartTxStream(gRailHandle, streamChannel, RAIL_STREAM_CARRIER_WAVE);
+    assert(status == RAIL_STATUS_NO_ERROR);
+
+    return status;
+}
+
+otError otPlatDiagTxStreamStop(void)
+{
+    RAIL_Status_t status;
+
+    otLogInfoPlat("Diag Stream STOP Process", NULL);
+
+    status = RAIL_StopTxStream(gRailHandle);
+    assert(status == RAIL_STATUS_NO_ERROR);
+
+    return status;
+}
+
+otError otPlatDiagTxStreamAddrMatch(uint8_t enable)
+{
+    RAIL_Status_t status;
+
+    otLogInfoPlat("Diag Stream Disable addressMatch", NULL);
+
+    status = RAIL_IEEE802154_SetPromiscuousMode(gRailHandle, !enable);
+    assert(status == RAIL_STATUS_NO_ERROR);
+
+    return status;
+}
+
+otError otPlatDiagTxStreamAutoAck(uint8_t autoAckEnabled)
+{
+    RAIL_Status_t status = RAIL_STATUS_NO_ERROR;
+
+    otLogInfoPlat("Diag Stream Disable autoAck", NULL);
+
+    RAIL_PauseRxAutoAck(gRailHandle, !autoAckEnabled);
+
+    return status;
 }
 
 #endif // #if OPENTHREAD_CONFIG_DIAG_ENABLE
