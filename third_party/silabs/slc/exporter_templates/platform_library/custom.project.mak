@@ -74,7 +74,7 @@ target_sources({{PROJECT_NAME}}-sdk PRIVATE
     {%- set source = prepare_path(source) -%}
 
     {#- Ignore crypto sources, PAL sources, and openthread sources #}
-    {%- if ('util/third_party/crypto/mbedtls' not in source)
+    {%- if ('util/third_party/crypto' not in source)
             and ('${PROJECT_SOURCE_DIR}/src/src' not in source)
             and ('${PROJECT_SOURCE_DIR}/openthread' not in source) %}
         {%- if source.endswith('.c') or source.endswith('.cpp') or source.endswith('.h') or source.endswith('.hpp') %}
@@ -88,7 +88,7 @@ target_sources({{PROJECT_NAME}}-sdk PRIVATE
     {%- set source = prepare_path(source) -%}
 
     {#- Ignore crypto sources, PAL sources, and openthread sources #}
-    {%- if ('util/third_party/crypto/mbedtls' not in source)
+    {%- if ('util/third_party/crypto' not in source)
             and ('${PROJECT_SOURCE_DIR}/src/src' not in source)
             and ('${PROJECT_SOURCE_DIR}/openthread' not in source) %}
         {%- if source.endswith('.s') or source.endswith('.S') %}

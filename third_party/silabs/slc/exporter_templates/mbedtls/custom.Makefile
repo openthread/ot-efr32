@@ -52,7 +52,7 @@ set_target_properties({{PROJECT_NAME}}-mbedtls
 # ==============================================================================
 # Includes
 # ==============================================================================
-set(SILABS_MBEDTLS_DIR "${SILABS_GSDK_DIR}/util/third_party/crypto/mbedtls")
+set(SILABS_MBEDTLS_DIR "${SILABS_GSDK_DIR}/util/third_party/crypto")
 
 {%- if C_CXX_INCLUDES %}
 target_include_directories({{PROJECT_NAME}}-mbedtls
@@ -73,7 +73,7 @@ set(SILABS_MBEDTLS_SOURCES
     {%- set source = prepare_path(source) -%}
 
     {#- Filter-out non-mbedtls sources #}
-    {%- if 'SILABS_MBEDTLS_DIR' in source %}
+    {%- if 'util/third_party/crypto' in source %}
     {{source}}
     {%- endif %}
 {%- endfor %}

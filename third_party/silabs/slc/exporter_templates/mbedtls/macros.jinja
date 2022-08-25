@@ -10,8 +10,6 @@
     {#- Redirect PAL sources to the ot-efr32 PAL #}
     {%- set path = path | replace('${SILABS_GSDK_DIR}/protocol/openthread/platform-abstraction/efr32', '${PROJECT_SOURCE_DIR}/src/src') -%}
 
-    {#- Shorten source paths with SILABS_MBEDTLS_DIR #}
-    {%- set path = path | replace('{SILABS_GSDK_DIR}/util/third_party/crypto/mbedtls', '{SILABS_MBEDTLS_DIR}') -%}
 {{path}}
 {%- endmacro %}
 
