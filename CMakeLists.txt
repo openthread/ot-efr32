@@ -53,15 +53,25 @@ if(OT_PACKAGE_VERSION STREQUAL "")
 endif()
 message(STATUS "Package Version: ${OT_PACKAGE_VERSION}")
 
-set(OT_PLATFORM_LIB "openthread-efr32-soc")
-set(OT_PLATFORM_LIB_RCP openthread-efr32-rcp)
+# ==============================================================================
+# Set platform libs and allow overriding
+# ==============================================================================
+if(NOT OT_PLATFORM_LIB)
+    set(OT_PLATFORM_LIB "openthread-efr32-soc")
+endif()
+
+if(NOT OT_PLATFORM_LIB_RCP)
+    set(OT_PLATFORM_LIB_RCP "openthread-efr32-rcp")
+endif()
 
 set(OT_PLATFORM "external" CACHE STRING "disable example platforms" FORCE)
 
 # ==============================================================================
 # mbedtls
 # ==============================================================================
-set(OT_EXTERNAL_MBEDTLS "openthread-efr32-soc-mbedtls" CACHE STRING "use silabs mbedtls" FORCE)
+if(NOT DEFINED OT_EXTERNAL_MBEDTLS)
+    set(OT_EXTERNAL_MBEDTLS "openthread-efr32-soc-mbedtls" CACHE STRING "external mbedtls library" FORCE)
+endif()
 set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls management" FORCE)
 set(OT_MBEDTLS ${OT_EXTERNAL_MBEDTLS})
 
@@ -80,6 +90,8 @@ target_compile_options(ot-config INTERFACE
 # Generated platform projects
 # ==============================================================================
 set(slc_generated_projects
+    ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc-with-buttons-power-manager
+    ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc-with-buttons
     ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc/platform
     ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc/mbedtls
     ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp/platform

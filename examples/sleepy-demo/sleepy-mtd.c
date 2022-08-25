@@ -1,5 +1,8 @@
-/*
- *  Copyright (c) 2020, The OpenThread Authors.
+/*******************************************************************************
+ * @file
+ * @brief MTD application logic.
+ *******************************************************************************
+ *  Copyright (c) 2022, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -24,33 +27,31 @@
  *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
- */
+ ******************************************************************************/
+// Define module name for Power Manager debuging feature.
+#define CURRENT_MODULE_NAME "OPENTHREAD_SAMPLE_APP"
 
 #include <assert.h>
 #include <string.h>
 
-#include "bsp.h"
-#include "em_cmu.h"
-#include "em_emu.h"
-#include "gpiointerrupt.h"
-#include "hal-config.h"
-#include "hal_common.h"
-#include "openthread-system.h"
-#include "platform-efr32.h"
 #include <common/code_utils.hpp>
 #include <common/logging.hpp>
-#include <openthread-core-config.h>
 #include <openthread/cli.h>
-#include <openthread/config.h>
 #include <openthread/dataset_ftd.h>
-#include <openthread/diag.h>
 #include <openthread/instance.h>
-#include <openthread/link.h>
 #include <openthread/message.h>
-#include <openthread/tasklet.h>
 #include <openthread/thread.h>
 #include <openthread/udp.h>
 #include <openthread/platform/logging.h>
+
+#include "sl_button.h"
+#include "sl_simple_button.h"
+#include "sl_simple_button_instances.h"
+
+#include "sl_component_catalog.h"
+#ifdef SL_CATALOG_POWER_MANAGER_PRESENT
+#include "sl_power_manager.h"
+#endif
 
 // Constants
 #define MULTICAST_ADDR "ff03::1"
@@ -60,39 +61,16 @@
 #define MTD_MESSAGE "mtd button"
 #define FTD_MESSAGE "ftd button"
 
-// Types
-typedef struct ButtonArray
-{
-    GPIO_Port_TypeDef port;
-    unsigned int      pin;
-} ButtonArray_t;
-
-// Prototypes
-bool sleepCb(void);
-void setNetworkConfiguration(otInstance *aInstance);
-void handleNetifStateChanged(uint32_t aFlags, void *aContext);
-void gpioInit(void (*gpioCallback)(uint8_t pin));
-void buttonCallback(uint8_t pin);
-void initUdp(void);
-void applicationTick(void);
-void mtdReceiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo);
-
-/**
- * This function initializes the CLI app.
- *
- * @param[in]  aInstance  The OpenThread instance structure.
- *
- */
-extern void otAppCliInit(otInstance *aInstance);
+// Forward declarations
+otInstance *otGetInstance(void);
+void        mtdReceiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo);
+extern void otSysEventSignalPending(void);
 
 // Variables
-static otInstance *        instance;
-static otUdpSocket         sMtdSocket;
-static const ButtonArray_t sButtonArray[BSP_BUTTON_COUNT] = BSP_BUTTON_INIT;
-static bool                sButtonPressed                 = false;
-static bool                sRxOnIdleButtonPressed         = false;
-static bool                sAllowDeepSleep                = false;
-static bool                sTaskletsPendingSem            = true;
+static otUdpSocket sMtdSocket;
+static bool        sButtonPressed         = false;
+static bool        sRxOnIdleButtonPressed = false;
+static bool        sAllowSleep            = false;
 
 void sleepyInit(void)
 {
@@ -100,12 +78,12 @@ void sleepyInit(void)
     otCliOutputFormat("sleepy-demo-mtd started\r\n");
 
     otLinkModeConfig config;
-    SuccessOrExit(error = otLinkSetPollPeriod(instance, SLEEPY_POLL_PERIOD_MS));
+    SuccessOrExit(error = otLinkSetPollPeriod(otGetInstance(), SLEEPY_POLL_PERIOD_MS));
 
     config.mRxOnWhenIdle = true;
     config.mDeviceType   = 0;
     config.mNetworkData  = 0;
-    SuccessOrExit(error = otThreadSetLinkMode(instance, config));
+    SuccessOrExit(error = otThreadSetLinkMode(otGetInstance(), config));
 
 exit:
     if (error != OT_ERROR_NONE)
@@ -115,64 +93,18 @@ exit:
     return;
 }
 
-int main(int argc, char *argv[])
+/*
+ * Callback from sl_ot_is_ok_to_sleep to check if it is ok to go to sleep.
+ */
+bool efr32AllowSleepCallback(void)
 {
-    otLinkModeConfig config;
-
-    otSysInit(argc, argv);
-    gpioInit(buttonCallback);
-
-    instance = otInstanceInitSingle();
-    assert(instance);
-
-    otAppCliInit(instance);
-
-    sleepyInit();
-    setNetworkConfiguration(instance);
-    otSetStateChangedCallback(instance, handleNetifStateChanged, instance);
-
-    initUdp();
-    otIp6SetEnabled(instance, true);
-    otThreadSetEnabled(instance, true);
-    efr32SetSleepCallback(sleepCb);
-
-    while (!otSysPseudoResetWasRequested())
-    {
-        otTaskletsProcess(instance);
-        otSysProcessDrivers(instance);
-
-        applicationTick();
-
-        // Put the EFR32 into deep sleep if callback sleepCb permits.
-        efr32Sleep();
-    }
-
-    otInstanceFinalize(instance);
-    return 0;
+    return sAllowSleep;
 }
 
 /*
- * Callback from efr32Sleep to indicate if it is ok to go into sleep mode.
- * This runs with interrupts disabled.
- */
-bool sleepCb(void)
-{
-    bool allow;
-    allow               = (sAllowDeepSleep && !sTaskletsPendingSem);
-    sTaskletsPendingSem = false;
-    return allow;
-}
-
-void otTaskletsSignalPending(otInstance *aInstance)
-{
-    (void)aInstance;
-    sTaskletsPendingSem = true;
-}
-
-/**
  * Override default network settings, such as panid, so the devices can join a network
  */
-void setNetworkConfiguration(otInstance *aInstance)
+void setNetworkConfiguration(void)
 {
     static char          aNetworkName[] = "SleepyEFR32";
     otError              error;
@@ -214,69 +146,12 @@ void setNetworkConfiguration(otInstance *aInstance)
     aDataset.mComponents.mIsNetworkNamePresent = true;
 
     /* Set the Active Operational Dataset to this dataset */
-    error = otDatasetSetActive(aInstance, &aDataset);
+    error = otDatasetSetActive(otGetInstance(), &aDataset);
     if (error != OT_ERROR_NONE)
     {
         otCliOutputFormat("otDatasetSetActive failed with: %d, %s\r\n", error, otThreadErrorToString(error));
         return;
     }
-}
-
-void handleNetifStateChanged(uint32_t aFlags, void *aContext)
-{
-    otLinkModeConfig config;
-
-    if ((aFlags & OT_CHANGED_THREAD_ROLE) != 0)
-    {
-        otDeviceRole changedRole = otThreadGetDeviceRole(aContext);
-
-        switch (changedRole)
-        {
-        case OT_DEVICE_ROLE_LEADER:
-        case OT_DEVICE_ROLE_ROUTER:
-            break;
-
-        case OT_DEVICE_ROLE_CHILD:
-            sAllowDeepSleep = false;
-            break;
-
-        case OT_DEVICE_ROLE_DETACHED:
-        case OT_DEVICE_ROLE_DISABLED:
-            break;
-        }
-    }
-}
-
-/*
- * Provide, if required an "otPlatLog()" function
- */
-#if OPENTHREAD_CONFIG_LOG_OUTPUT == OPENTHREAD_CONFIG_LOG_OUTPUT_APP
-void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
-{
-    OT_UNUSED_VARIABLE(aLogLevel);
-    OT_UNUSED_VARIABLE(aLogRegion);
-    OT_UNUSED_VARIABLE(aFormat);
-
-    va_list ap;
-    va_start(ap, aFormat);
-    otCliPlatLogv(aLogLevel, aLogRegion, aFormat, ap);
-    va_end(ap);
-}
-#endif
-
-void gpioInit(void (*callback)(uint8_t pin))
-{
-    // set up button GPIOs to input with pullups
-    for (int i = 0; i < BSP_BUTTON_COUNT; i++)
-    {
-        GPIO_PinModeSet(sButtonArray[i].port, sButtonArray[i].pin, gpioModeInputPull, 1);
-    }
-    // set up interrupt based callback function on falling edge
-    GPIOINT_Init();
-    GPIOINT_CallbackRegister(sButtonArray[0].pin, callback);
-    GPIOINT_CallbackRegister(sButtonArray[1].pin, callback);
-    GPIO_IntConfig(sButtonArray[0].port, sButtonArray[0].pin, false, true, true);
-    GPIO_IntConfig(sButtonArray[1].port, sButtonArray[1].pin, false, true, true);
 }
 
 void initUdp(void)
@@ -289,7 +164,7 @@ void initUdp(void)
     bindAddr.mPort = RECV_PORT;
 
     // Open the socket
-    error = otUdpOpen(instance, &sMtdSocket, mtdReceiveCallback, NULL);
+    error = otUdpOpen(otGetInstance(), &sMtdSocket, mtdReceiveCallback, NULL);
     if (error != OT_ERROR_NONE)
     {
         otCliOutputFormat("MTD failed to open udp socket with: %d, %s\r\n", error, otThreadErrorToString(error));
@@ -297,26 +172,34 @@ void initUdp(void)
     }
 
     // Bind to the socket. Close the socket if bind fails.
-    error = otUdpBind(instance, &sMtdSocket, &bindAddr, OT_NETIF_THREAD);
+    error = otUdpBind(otGetInstance(), &sMtdSocket, &bindAddr, OT_NETIF_THREAD);
     if (error != OT_ERROR_NONE)
     {
         otCliOutputFormat("MTD failed to bind udp socket with: %d, %s\r\n", error, otThreadErrorToString(error));
-        IgnoreReturnValue(otUdpClose(instance, &sMtdSocket));
+        IgnoreReturnValue(otUdpClose(otGetInstance(), &sMtdSocket));
         return;
     }
 }
 
-void buttonCallback(uint8_t pin)
+void sl_button_on_change(const sl_button_t *handle)
 {
-    if ((pin & 0x01) == 0x01)
+    if (sl_button_get_state(handle) == SL_SIMPLE_BUTTON_PRESSED)
     {
-        sButtonPressed = true;
-    }
-    else if ((pin & 0x01) == 0x00)
-    {
-        sRxOnIdleButtonPressed = true;
+        if (&sl_button_btn0 == handle)
+        {
+            sRxOnIdleButtonPressed = true;
+        }
+        else if (&sl_button_btn1 == handle)
+        {
+            sButtonPressed = true;
+        }
+        otSysEventSignalPending();
     }
 }
+
+#ifdef SL_CATALOG_KERNEL_PRESENT
+#define applicationTick sl_ot_rtos_application_tick
+#endif
 
 void applicationTick(void)
 {
@@ -329,11 +212,11 @@ void applicationTick(void)
     if (sRxOnIdleButtonPressed)
     {
         sRxOnIdleButtonPressed = false;
-        sAllowDeepSleep        = !sAllowDeepSleep;
-        config.mRxOnWhenIdle   = !sAllowDeepSleep;
+        sAllowSleep            = !sAllowSleep;
+        config.mRxOnWhenIdle   = !sAllowSleep;
         config.mDeviceType     = 0;
         config.mNetworkData    = 0;
-        SuccessOrExit(otThreadSetLinkMode(instance, config));
+        SuccessOrExit(otThreadSetLinkMode(otGetInstance(), config));
 
 #if (defined(SL_CATALOG_KERNEL_PRESENT) && defined(SL_CATALOG_POWER_MANAGER_PRESENT))
         if (sAllowSleep)
@@ -353,7 +236,7 @@ void applicationTick(void)
         sButtonPressed = false;
 
         // Get a message buffer
-        VerifyOrExit((message = otUdpNewMessage(instance, NULL)) != NULL);
+        VerifyOrExit((message = otUdpNewMessage(otGetInstance(), NULL)) != NULL);
 
         // Setup messageInfo
         memset(&messageInfo, 0, sizeof(messageInfo));
@@ -364,7 +247,7 @@ void applicationTick(void)
         SuccessOrExit(otMessageAppend(message, payload, (uint16_t)strlen(payload)));
 
         // Send the button press message
-        SuccessOrExit(otUdpSend(instance, &sMtdSocket, message, &messageInfo));
+        SuccessOrExit(otUdpSend(otGetInstance(), &sMtdSocket, message, &messageInfo));
 
         // Set message pointer to NULL so it doesn't get free'd by this function.
         // otUdpSend() executing successfully means OpenThread has taken ownership

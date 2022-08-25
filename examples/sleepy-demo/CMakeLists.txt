@@ -27,9 +27,9 @@
 #
 
 if(OT_FTD)
-    add_subdirectory(sleepy-demo-ftd)
+    include(sleepy-demo-ftd.cmake)
 endif()
 
 if(OT_MTD)
-    add_subdirectory(sleepy-demo-mtd)
+    include(sleepy-demo-mtd.cmake)
 endif()
