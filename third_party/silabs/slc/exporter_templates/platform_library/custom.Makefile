@@ -42,6 +42,7 @@
 
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
 include({{PROJECT_NAME}}-sdk.cmake)
+add_subdirectory(mbedtls)
 
 # ==============================================================================
 # Platform library
@@ -83,10 +84,7 @@ target_include_directories({{PROJECT_NAME}}-config INTERFACE
     config
 )
 
-{% if PROJECT_NAME.startswith("openthread-efr32-soc") -%}
-target_link_libraries(openthread-ftd PUBLIC {{PROJECT_NAME}}-config)
-target_link_libraries(openthread-mtd PUBLIC {{PROJECT_NAME}}-config)
-{%- elif PROJECT_NAME.startswith("openthread-efr32-rcp") -%}
+{%- if PROJECT_NAME.startswith("openthread-efr32-rcp") -%}
 target_link_libraries(openthread-radio PUBLIC {{PROJECT_NAME}}-config)
 {%- endif %}
 
@@ -125,13 +123,44 @@ set_property(SOURCE {{source}} PROPERTY LANGUAGE C)
 # ==============================================================================
 # Compile definitions
 # ==============================================================================
-target_compile_definitions(ot-config INTERFACE
+
+target_compile_definitions({{PROJECT_NAME}}-config INTERFACE
 {%- for define in C_CXX_DEFINES %}
-    {%- if not ( define.startswith("MBEDTLS_PSA_CRYPTO_CLIENT") or ("OPENTHREAD_RADIO" == define) or ("OPENTHREAD_FTD" == define) or ("OPENTHREAD_MTD" == define) or ("OPENTHREAD_COPROCESSOR" == define) ) %}
+    {%- if not (define.startswith("MBEDTLS_")
+                or define.startswith("OPENTHREAD_")
+                ) %}
     {{define}}={{C_CXX_DEFINES[define]}}
     {%- endif %}
 {%- endfor %}
 )
+
+{% if dict_contains_key_starting_with(C_CXX_DEFINES, "OPENTHREAD_") -%}
+target_compile_definitions(ot-config INTERFACE
+{%- for define in C_CXX_DEFINES %}
+    {%- if define.startswith("OPENTHREAD_") %}
+    {{define}}={{C_CXX_DEFINES[define]}}
+    {%- endif %}
+{%- endfor %}
+)
+
+{% endif -%}
+
+{% if dict_contains_key_starting_with(C_CXX_DEFINES, "MBEDTLS_")
+        or dict_contains_key_starting_with(C_CXX_DEFINES, "PSA_")
+        -%}
+add_library({{PROJECT_NAME}}-mbedtls-config INTERFACE)
+target_compile_definitions({{PROJECT_NAME}}-mbedtls-config INTERFACE
+{%- for define in C_CXX_DEFINES %}
+    {%- if define.startswith("MBEDTLS_") or
+           define.startswith("PSA_")
+     %}
+    {{define}}={{C_CXX_DEFINES[define]}}
+    {%- endif %}
+{%- endfor %}
+)
+target_link_libraries({{PROJECT_NAME}}-mbedtls PRIVATE {{PROJECT_NAME}}-mbedtls-config)
+
+{% endif -%}
 
 {% if dict_contains_key_starting_with(C_CXX_DEFINES, "MBEDTLS_PSA_CRYPTO_CLIENT") -%}
 target_compile_definitions({{PROJECT_NAME}}-config INTERFACE
