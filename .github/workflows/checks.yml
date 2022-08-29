@@ -1,6 +1,5 @@
-#!/bin/bash
 #
-#  Copyright (c) 2021, The OpenThread Authors.
+#  Copyright (c) 2022, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -27,74 +26,46 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-set -euxo pipefail
+name: Checks
 
-install_packages_apt()
-{
-    echo 'Installing script dependencies...'
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
+    branches:
+      - 'main'
 
-    # apt-get update and install dependencies
-    sudo apt-get update
-    sudo apt-get --no-install-recommends install -y coreutils openjdk-11-jre python3-setuptools python3-pip git-lfs unzip
-}
+jobs:
 
-install_packages_opkg()
-{
-    echo 'opkg not supported currently' && false
-}
+  cancel-previous-runs:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: rokroskar/workflow-run-cleanup-action@master
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      if: "github.ref != 'refs/heads/main'"
 
-install_packages_rpm()
-{
-    echo 'rpm not supported currently' && false
-}
+  pretty:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Bootstrap
+      run: |
+        sudo rm /etc/apt/sources.list.d/* && sudo apt-get update
+        sudo apt-get --no-install-recommends install -y clang-format-9 shellcheck
+        python3 -m pip install yapf==0.29.0
+        sudo snap install shfmt
+    - name: Check
+      run: |
+        script/make-pretty check
 
-install_packages_brew()
-{
-    echo 'Installing script dependencies...'
-    brew install coreutils openjdk@11
-}
-
-install_packages_source()
-{
-    echo 'source not supported currently' && false
-}
-
-install_packages_pip3()
-{
-    pip3 install -U cmake==3.22.4
-    cmake --version | grep 3.22.4
-}
-
-install_packages()
-{
-    PM=source
-    if command -v apt-get; then
-        PM=apt
-    elif command -v rpm; then
-        PM=rpm
-    elif command -v opkg; then
-        PM=opkg
-    elif command -v brew; then
-        PM=brew
-    fi
-    install_packages_$PM
-
-    if command -v pip3; then
-        install_packages_pip3
-    fi
-}
-
-main()
-{
-    install_packages
-
-    echo "Bootstrapping openthread"
-    "$(dirname "$0")"/../openthread/script/bootstrap
-
-    echo "Bootstrapping silabs"
-    "$(dirname "$0")"/bootstrap_silabs
-
-    echo "Bootstrap completed successfully."
-}
-
-main
+  markdown-link-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-verbose-mode: 'yes'
