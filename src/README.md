@@ -12,6 +12,8 @@
   - [Flashing Binaries](#flashing-binaries)
     - [Simplicity Commander](#simplicity-commander)
       - [Download Links](#download-links)
+      - [Commander GUI](#commander-gui)
+      - [Commander CLI](#commander-cli)
     - [J-Link Commander](#j-link-commander)
   - [Run the example with EFR32 boards](#run-the-example-with-efr32-boards)
   - [Debugging with J-Link GDB Server](#debugging-with-j-link-gdb-server)
@@ -112,7 +114,7 @@ Compiled binaries may be flashed onto the EFR32 using various tools from the [J-
 
 ### Simplicity Commander
 
-Simplicity Commander provides a graphical interface for J-Link Commander. It's included as part of [Simplicity Studio][simplicity-studio] and is also available as a standalone application
+Simplicity Commander provides command line and graphical interfaces for J-Link Commander. It's included as part of [Simplicity Studio][simplicity-studio] and is also available as a standalone application
 
 #### Download Links
 
@@ -120,9 +122,16 @@ Simplicity Commander provides a graphical interface for J-Link Commander. It's i
 - [Mac](https://www.silabs.com/documents/public/software/SimplicityCommander-Mac.zip)
 - [Windows](https://www.silabs.com/documents/public/software/SimplicityCommander-Windows.zip)
 
+For Windows and Linux, the Simplicity Commander executable can be found in the location that the package is extracted.  
+On MacOS, the executable can be found at the following directory:
+
 ```bash
-$ <path-to-simplicity-studio>/developer/adapter_packs/commander/commander
+$ /Applications/Commander.app/Contents/MacOS
 ```
+
+#### Commander GUI
+
+Launch the Simplicity Commander executable `commander` at the path stated above to open the Commander GUI, and perform the following steps to flash build artifacts to a target device:
 
 1. In the J-Link Device drop-down list select the serial number of the device to flash.
 2. Click the Adapter Connect button.
@@ -130,6 +139,29 @@ $ <path-to-simplicity-studio>/developer/adapter_packs/commander/commander
 4. Click on the Flash icon on the left side of the window to switch to the flash page.
 5. In the Flash MCU pane, enter the path of the `ot-cli-ftd.s37` file or choose the file with the Browse... button.
 6. Click the Flash button located under the Browse... button.
+
+#### Commander CLI
+
+The Simplicity Commander CLI provides another method of flashing binaries to a device without opening a GUI.  
+When using Simplicity Commander in CLI mode, it is highly recommended to add the directory of the executable to your environment's `PATH` variable. This can be done with the following command:
+
+```bash
+$ export PATH=$PATH:<path-to-executable-directory>
+```
+
+Once the executable is visible from `PATH`, build artifacts can be flashed to the target device with the `flash` command.
+
+**Example:** Flashing `ot-cli-ftd` to a device using its jlink serial number:
+
+```bash
+$ commander flash --serialno=<jlink-serial-number> <path-to-build-directory>/ot-cli-ftd.s37
+```
+
+**Example:** Flashing `ot-cli-ftd` to a device using its IP address:
+
+```bash
+$ commander flash --ip=<target-device-ip-address> <path-to-build-directory>/ot-cli-ftd.s37
+```
 
 For more information see [UG162: Simplicity Commander Reference][ug162]
 
