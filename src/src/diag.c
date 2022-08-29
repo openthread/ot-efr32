@@ -34,6 +34,7 @@
 
 #include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/time.h>
