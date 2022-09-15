@@ -46,7 +46,14 @@ include({{PROJECT_NAME}}-mbedtls.cmake)
 # ==============================================================================
 # Platform library
 # ==============================================================================
-add_library({{PROJECT_NAME}}
+
+# Create the platform as an OBJECT library target
+#
+# **NOTE**: Defining the library target as STATIC will cause linking issues
+#           where the WEAK implementation of a function is taken when both
+#           weakly and strongly defined implementations of the same function
+#           exist.
+add_library({{PROJECT_NAME}} OBJECT
     $<TARGET_OBJECTS:openthread-platform-utils>
 )
 
