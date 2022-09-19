@@ -62,6 +62,7 @@ endif()
 
 if(NOT OT_PLATFORM_LIB_RCP)
     set(OT_PLATFORM_LIB_RCP "openthread-efr32-rcp")
+    set(OT_MBEDTLS_RCP "openthread-efr32-rcp-mbedtls")
 endif()
 
 set(OT_PLATFORM "external" CACHE STRING "disable example platforms" FORCE)

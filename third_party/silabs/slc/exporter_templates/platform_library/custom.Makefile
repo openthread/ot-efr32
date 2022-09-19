@@ -60,13 +60,6 @@ add_library({{PROJECT_NAME}} OBJECT
 # Interface lib for sharing efr32 config to relevant targets
 add_library({{PROJECT_NAME}}-config INTERFACE)
 
-{% if PROJECT_NAME.startswith("openthread-efr32-rcp") -%}
-# Define RCP specific libraries
-set(OT_PLATFORM_LIB_RCP openthread-efr32-rcp)
-set(OT_MBEDTLS_RCP silabs-mbedtls-rcp)
-
-{% endif -%}
-
 set_target_properties({{PROJECT_NAME}}
     PROPERTIES
         C_STANDARD 99
