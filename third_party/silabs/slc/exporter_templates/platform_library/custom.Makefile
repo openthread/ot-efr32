@@ -90,11 +90,6 @@ target_include_directories({{PROJECT_NAME}}-config INTERFACE
     config
 )
 
-{% if PROJECT_NAME.startswith("openthread-efr32-rcp") -%}
-target_link_libraries(openthread-radio PUBLIC {{PROJECT_NAME}}-config)
-
-{% endif -%}
-
 target_include_directories({{PROJECT_NAME}} PRIVATE
     ${OT_PUBLIC_INCLUDES}
 )
@@ -157,7 +152,6 @@ target_compile_definitions(ot-config INTERFACE
 {% if dict_contains_key_starting_with(C_CXX_DEFINES, "MBEDTLS_")
         or dict_contains_key_starting_with(C_CXX_DEFINES, "PSA_")
         -%}
-add_library({{PROJECT_NAME}}-mbedtls-config INTERFACE)
 target_compile_definitions({{PROJECT_NAME}}-mbedtls-config INTERFACE
 {%- for define in C_CXX_DEFINES %}
     {%- if define.startswith("MBEDTLS_") or
@@ -167,6 +161,9 @@ target_compile_definitions({{PROJECT_NAME}}-mbedtls-config INTERFACE
     {%- endif %}
 {%- endfor %}
 )
+
+{% endif -%}
+
 target_include_directories({{PROJECT_NAME}}-mbedtls-config INTERFACE
     autogen
     config
@@ -175,6 +172,20 @@ target_include_directories({{PROJECT_NAME}}-mbedtls-config INTERFACE
 target_link_libraries({{PROJECT_NAME}}-mbedtls PRIVATE {{PROJECT_NAME}}-mbedtls-config)
 target_link_libraries({{PROJECT_NAME}} PRIVATE {{PROJECT_NAME}}-mbedtls-config)
 
+{% if PROJECT_NAME.startswith("openthread-efr32-rcp") -%}
+target_link_libraries(ot-config-radio INTERFACE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries(ot-config-radio INTERFACE {{PROJECT_NAME}}-config)
+{% elif PROJECT_NAME.startswith("openthread-efr32-mtd") -%}
+target_link_libraries(ot-config-ftd INTERFACE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries(ot-config-ftd INTERFACE {{PROJECT_NAME}}-config)
+{% elif PROJECT_NAME.startswith("openthread-efr32-ftd") -%}
+target_link_libraries(ot-config-mtd INTERFACE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries(ot-config-mtd INTERFACE {{PROJECT_NAME}}-config)
+{% elif PROJECT_NAME.startswith("openthread-efr32-soc") -%}
+target_link_libraries(ot-config-ftd INTERFACE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries(ot-config-mtd INTERFACE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries(ot-config-ftd INTERFACE {{PROJECT_NAME}}-config)
+target_link_libraries(ot-config-mtd INTERFACE {{PROJECT_NAME}}-config)
 {% endif -%}
 
 {% if dict_contains_key_starting_with(C_CXX_DEFINES, "MBEDTLS_PSA_CRYPTO_CLIENT") -%}

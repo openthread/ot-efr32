@@ -43,6 +43,9 @@ include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
 # ==============================================================================
 add_library({{PROJECT_NAME}}-mbedtls)
 
+# Interface lib for sharing mbedtls config to relevant targets
+add_library({{PROJECT_NAME}}-mbedtls-config INTERFACE)
+
 set_target_properties({{PROJECT_NAME}}-mbedtls
     PROPERTIES
         C_STANDARD 99
