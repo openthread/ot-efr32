@@ -51,7 +51,7 @@ install_packages_rpm()
 install_packages_brew()
 {
     echo 'Installing script dependencies...'
-    brew install coreutils openjdk@11
+    brew install coreutils openjdk@11 wget
 }
 
 install_packages_source()
