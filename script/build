@@ -162,7 +162,7 @@ main()
 {
     local usage="usage: $0 [-h] [--skip-silabs-apps] <efr32 platform> -DBOARD=<brdXXXXy> [-D<OT_XXXX=ON> -D<OT_YYYY=OFF>]"
 
-    local skip_silabs_apps=true
+    local skip_silabs_apps=false
     skip_generation=false
     # Parse flags
     optspec=":h-:"
