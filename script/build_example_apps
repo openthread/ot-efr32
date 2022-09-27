@@ -80,7 +80,7 @@ generate()
 
     if [[ ${cmake_library} == "openthread-efr32-soc-with-buttons" ]]; then
         # ==============================================================================================================
-        # Generate openthread-efr32-soc-with-buttons and openthread-efr32-soc-with-buttons-sdk libs
+        # Generate openthread-efr32-soc-with-buttons and openthread-efr32-soc-with-buttons-mbedtls libs
         # ==============================================================================================================
         current_project_export_dir="${slc_generated_projects_dir}/soc-with-buttons"
         project_name="openthread-efr32-soc-with-buttons"
@@ -98,31 +98,11 @@ generate()
 
         # TODO: Remove this when slc supports generic jinja template generation
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-sdk.cmake"
+        mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
 
-        # ==============================================================================================================
-        # Generate openthread-efr32-soc-with-buttons-mbedtls lib
-        # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/soc-with-buttons/mbedtls"
-
-        run_slc -v 1 generate \
-            --sdk="${sdk_dir}" \
-            --clear-cache \
-            --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc-with-buttons.slcp" \
-            --project-name="${project_name}" \
-            --output-type=makefile \
-            --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/mbedtls \
-            --export-destination="${current_project_export_dir}" \
-            --with "${board}"
-
-        # TODO: Remove this when slc supports generic jinja template generation
-        mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        rm "${current_project_export_dir}/${project_name}.project.mak"
-        rm -rf "${current_project_export_dir}"/{autogen,config}
     elif [[ ${cmake_library} == "openthread-efr32-soc-with-buttons-power-manager" ]]; then
         # ==============================================================================================================
-        # Generate openthread-efr32-soc-with-buttons-power-manager and openthread-efr32-soc-with-buttons-power-manager-sdk libs
+        # Generate openthread-efr32-soc-with-buttons-power-manager and openthread-efr32-soc-with-buttons-power-manager-mbedtls libs
         # ==============================================================================================================
         current_project_export_dir="${slc_generated_projects_dir}/soc-with-buttons-power-manager"
         project_name="openthread-efr32-soc-with-buttons-power-manager"
@@ -140,28 +120,8 @@ generate()
 
         # TODO: Remove this when slc supports generic jinja template generation
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-sdk.cmake"
+        mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
 
-        # ==============================================================================================================
-        # Generate openthread-efr32-soc-with-buttons-power-manager-mbedtls lib
-        # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/soc-with-buttons-power-manager/mbedtls"
-
-        run_slc -v 1 generate \
-            --sdk="${sdk_dir}" \
-            --clear-cache \
-            --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc-with-buttons.slcp" \
-            --project-name="${project_name}" \
-            --output-type=makefile \
-            --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/mbedtls \
-            --export-destination="${current_project_export_dir}" \
-            --with "${board}"
-
-        # TODO: Remove this when slc supports generic jinja template generation
-        mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        rm "${current_project_export_dir}/${project_name}.project.mak"
-        rm -rf "${current_project_export_dir}"/{autogen,config}
     fi
 }
 
@@ -185,7 +145,7 @@ build_example_app()
     shift 2
 
     # Generate the platform lib and related libs
-    generate ${ot_platform_lib}
+    generate "${ot_platform_lib}"
 
     builddir="${OT_CMAKE_BUILD_DIR}/examples/${example_app_ninja_target}"
 
@@ -274,7 +234,7 @@ main()
         -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
 
     ls -alh "${OT_CMAKE_BUILD_DIR}"/examples/sleepy-demo-ftd/bin/* \
-            "${OT_CMAKE_BUILD_DIR}"/examples/sleepy-demo-mtd/bin/*
+        "${OT_CMAKE_BUILD_DIR}"/examples/sleepy-demo-mtd/bin/*
 }
 
 main "$@"

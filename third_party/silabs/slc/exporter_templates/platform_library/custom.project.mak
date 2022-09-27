@@ -33,19 +33,17 @@
         'macros.jinja'
     import
         prepare_path,
-        compile_flags,
-        print_linker_flags,
         print_all_jinja_vars
     with context -%}
 
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
 
 # ==============================================================================
-# Library of platform dependencies from GSDK and generated config files
+# mbedtls library
 # ==============================================================================
-add_library({{PROJECT_NAME}}-sdk)
+add_library({{PROJECT_NAME}}-mbedtls)
 
-set_target_properties({{PROJECT_NAME}}-sdk
+set_target_properties({{PROJECT_NAME}}-mbedtls
     PROPERTIES
         C_STANDARD 99
         CXX_STANDARD 11
@@ -54,84 +52,57 @@ set_target_properties({{PROJECT_NAME}}-sdk
 # ==============================================================================
 # Includes
 # ==============================================================================
-target_include_directories({{PROJECT_NAME}}-sdk PUBLIC
+set(SILABS_MBEDTLS_DIR "${SILABS_GSDK_DIR}/util/third_party/crypto")
+
+{%- if C_CXX_INCLUDES %}
+target_include_directories({{PROJECT_NAME}}-mbedtls
+    PUBLIC
 {%- for include in C_CXX_INCLUDES %}
-    {%- if ('sample-apps' not in include) %}
-    {{ prepare_path(include) | replace('-I', '') | replace('\"', '') }}
-    {%- endif %}
+{%- if ('util/third_party/crypto' in include) or ('platform' in include) %}
+        {{ prepare_path(include) | replace('-I', '') | replace('\"', '') }}
+{%- endif %}
 {%- endfor %}
 )
-
-target_include_directories({{PROJECT_NAME}}-sdk PRIVATE
-    ${OT_PUBLIC_INCLUDES}
-)
+{%- endif %}
 
 # ==============================================================================
 # Sources
 # ==============================================================================
-target_sources({{PROJECT_NAME}}-sdk PRIVATE
+set(SILABS_MBEDTLS_SOURCES
 {%- for source in (ALL_SOURCES | sort) %}
     {%- set source = prepare_path(source) -%}
 
-    {#- Ignore crypto sources, PAL sources, and openthread sources #}
-    {%- if ('util/third_party/crypto' not in source)
-            and ('${PROJECT_SOURCE_DIR}/src/src' not in source)
-            and ('${PROJECT_SOURCE_DIR}/openthread' not in source) %}
-        {%- if source.endswith('.c') or source.endswith('.cpp') or source.endswith('.h') or source.endswith('.hpp') %}
+    {#- Filter-out non-mbedtls sources #}
+    {%- if 'util/third_party/crypto' in source %}
     {{source}}
-        {%- endif %}
     {%- endif %}
 {%- endfor %}
 )
 
-{%- for source in (ALL_SOURCES | sort) %}
-    {%- set source = prepare_path(source) -%}
+target_sources({{PROJECT_NAME}}-mbedtls PRIVATE ${SILABS_MBEDTLS_SOURCES})
 
-    {#- Ignore crypto sources, PAL sources, and openthread sources #}
-    {%- if ('util/third_party/crypto' not in source)
-            and ('${PROJECT_SOURCE_DIR}/src/src' not in source)
-            and ('${PROJECT_SOURCE_DIR}/openthread' not in source) %}
-        {%- if source.endswith('.s') or source.endswith('.S') %}
-
-target_sources({{PROJECT_NAME}}-sdk PRIVATE {{source}})
-set_property(SOURCE {{source}} PROPERTY LANGUAGE C)
-        {%- endif %}
-    {%- endif %}
-{%- endfor %}
-
-{% if EXT_CFLAGS+EXT_CXX_FLAGS -%}
 # ==============================================================================
-#  Compile Options
+# Compile definitions
 # ==============================================================================
-target_compile_options({{PROJECT_NAME}}-sdk PRIVATE
-    -Wno-unused-parameter
-    -Wno-missing-field-initializers
-    {{ compile_flags() }}
-)
-{%- endif %} {#- compile_options #}
+target_compile_definitions({{PROJECT_NAME}}-mbedtls PRIVATE ${OT_PLATFORM_DEFINES})
 
 # ==============================================================================
 # Linking
 # ==============================================================================
-target_link_libraries({{PROJECT_NAME}}-sdk
-    PUBLIC
-        {{PROJECT_NAME}}-mbedtls
-    PRIVATE
-{%- for source in SYS_LIBS+USER_LIBS %}
-        {{prepare_path(source)}}
+{%- set linker_flags = EXT_LD_FLAGS + EXT_DEBUG_LD_FLAGS %}
+{%- if linker_flags %}
+target_link_options({{PROJECT_NAME}}-mbedtls PRIVATE
+{%- for flag in linker_flags %}
+    {{ prepare_path(flag) }}
 {%- endfor %}
-        {{PROJECT_NAME}}-config
-        ot-config
 )
+{%- endif %}
 
-{% set linker_flags = EXT_LD_FLAGS + EXT_DEBUG_LD_FLAGS + EXT_RELEASE_LD_FLAGS %}
-{%- if linker_flags -%}
-# ==============================================================================
-#  Linker Flags
-# ==============================================================================
-target_link_options({{PROJECT_NAME}}-sdk PRIVATE {{ print_linker_flags() }}
+target_link_libraries({{PROJECT_NAME}}-mbedtls
+    PRIVATE
+        ot-config
+        {{PROJECT_NAME}}-config
 )
-{%- endif %} {# linker_flags #}
 
 {#- ========================================================================= #}
 {#- Debug                                                                     #}

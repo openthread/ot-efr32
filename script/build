@@ -47,6 +47,9 @@ source "$script_dir/efr32-definitions"
 # shellcheck source=script/slc_cli
 source "$script_dir/slc_cli"
 
+# shellcheck source=script/util
+source "$script_dir/util"
+
 # ==============================================================================
 OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET:-}
 
@@ -63,27 +66,28 @@ die()
     exit 1
 }
 
-build()
+generate()
 {
-    builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}"
+    if [ "${skip_generation}" = true ]; then
+        return
+    fi
 
-    mkdir -p "${builddir}"
-    cd "${builddir}"
+    local slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
 
-    if [ "${skip_generation}" = false ]; then
-        local slc_generated_projects_dir="${builddir}"/slc
+    run_slc -v 1 signature trust --sdk "${sdk_dir}"
 
-        run_slc -v 1 signature trust --sdk "${sdk_dir}"
-
+    if contains ".*-(ftd|mtd)" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         # ==============================================================================================================
-        # Generate openthread-efr32-soc and openthread-efr32-soc-sdk libs
+        # Generate openthread-efr32-soc and openthread-efr32-soc-mbedtls libs
         # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/soc/platform"
+        current_project_export_dir="${slc_generated_projects_dir}/soc"
+        project_name="openthread-efr32-soc"
 
         run_slc -v 1 generate \
             --sdk="${sdk_dir}" \
             --clear-cache \
             --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc.slcp" \
+            --project-name="${project_name}" \
             --output-type=makefile \
             --no-copy \
             --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
@@ -91,38 +95,21 @@ build()
             --with "${board}"
 
         # TODO: Remove this when slc supports generic jinja template generation
-        mv "${current_project_export_dir}/openthread-efr32-soc.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        mv "${current_project_export_dir}/openthread-efr32-soc.project.mak" "${current_project_export_dir}/openthread-efr32-soc-sdk.cmake"
-
+        mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
+        mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
+    fi
+    if contains "ot-rcp" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         # ==============================================================================================================
-        # Generate openthread-efr32-soc-mbedtls lib
+        # Generate openthread-efr32-rcp and openthread-efr32-rcp-mbedtls libs
         # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/soc/mbedtls"
-
-        run_slc -v 1 generate \
-            --sdk="${sdk_dir}" \
-            --clear-cache \
-            --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc.slcp" \
-            --output-type=makefile \
-            --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/mbedtls \
-            --export-destination="${current_project_export_dir}" \
-            --with "${board}"
-
-        # TODO: Remove this when slc supports generic jinja template generation
-        mv "${current_project_export_dir}/openthread-efr32-soc.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        rm "${current_project_export_dir}/openthread-efr32-soc.project.mak"
-        rm -rf "${current_project_export_dir}"/{autogen,config}
-
-        # ==============================================================================================================
-        # Generate openthread-efr32-rcp and openthread-efr32-rcp-sdk libs
-        # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/rcp/platform"
+        current_project_export_dir="${slc_generated_projects_dir}/rcp"
+        project_name="openthread-efr32-rcp"
 
         run_slc -v 1 generate \
             --sdk="${sdk_dir}" \
             --clear-cache \
             --project-file="${repo_dir}/src/platform_projects/openthread-efr32-rcp.slcp" \
+            --project-name="${project_name}" \
             --output-type=makefile \
             --no-copy \
             --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
@@ -130,39 +117,10 @@ build()
             --with "${board}"
 
         # TODO: Remove this when slc supports generic jinja template generation
-        mv "${current_project_export_dir}/openthread-efr32-rcp.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        mv "${current_project_export_dir}/openthread-efr32-rcp.project.mak" "${current_project_export_dir}/openthread-efr32-rcp-sdk.cmake"
+        mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
+        mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
 
-        # ==============================================================================================================
-        # Generate openthread-efr32-rcp-mbedtls lib
-        # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/rcp/mbedtls"
-
-        run_slc -v 1 generate \
-            --sdk="${sdk_dir}" \
-            --clear-cache \
-            --project-file="${repo_dir}/src/platform_projects/openthread-efr32-rcp.slcp" \
-            --output-type=makefile \
-            --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/mbedtls \
-            --export-destination="${current_project_export_dir}" \
-            --with "${board}"
-
-        # TODO: Remove this when slc supports generic jinja template generation
-        mv "${current_project_export_dir}/openthread-efr32-rcp.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        rm "${current_project_export_dir}/openthread-efr32-rcp.project.mak"
-        rm -rf "${current_project_export_dir}"/{autogen,config}
     fi
-
-    cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON "$@" "${repo_dir}"
-
-    if [[ -n ${OT_CMAKE_NINJA_TARGET[*]} ]]; then
-        ninja "${OT_CMAKE_NINJA_TARGET[@]}"
-    else
-        ninja
-    fi
-
-    cd "${repo_dir}"
 }
 
 create_srec()
@@ -176,6 +134,28 @@ create_srec()
     fi
 
     find "$1" -type f "${executable_flag[@]}" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
+}
+
+build()
+{
+    # Generate the platform lib and related libs
+    generate
+
+    builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}"
+
+    mkdir -p "${builddir}"
+    cd "${builddir}"
+
+    cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON "$@" "${repo_dir}"
+
+    if [[ -n ${OT_CMAKE_NINJA_TARGET[*]} ]]; then
+        ninja "${OT_CMAKE_NINJA_TARGET[@]}"
+    else
+        ninja
+    fi
+
+    create_srec "${builddir}"
+    cd "${repo_dir}"
 }
 
 main()
@@ -248,7 +228,7 @@ main()
         efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
             OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
             if [ "${skip_silabs_apps}" = false ]; then
-                ${repo_dir}/script/build_example_apps ${board} "$@"
+                "${repo_dir}"/script/build_example_apps "${board}" "$@"
             fi
             ;;
     esac
@@ -257,8 +237,8 @@ main()
     slc_init
 
     options+=("$@")
+    export OT_CMAKE_BUILD_DIR="$repo_dir/build/${board}"
     build -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
-    create_srec "${builddir}"
 }
 
 main "$@"
