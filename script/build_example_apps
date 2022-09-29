@@ -100,6 +100,8 @@ generate()
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
 
+        echo "${current_project_export_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
+
     elif [[ ${cmake_library} == "openthread-efr32-soc-with-buttons-power-manager" ]]; then
         # ==============================================================================================================
         # Generate openthread-efr32-soc-with-buttons-power-manager and openthread-efr32-soc-with-buttons-power-manager-mbedtls libs
@@ -121,6 +123,8 @@ generate()
         # TODO: Remove this when slc supports generic jinja template generation
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
+
+        echo "${current_project_export_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
 
     fi
 }

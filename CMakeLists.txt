@@ -56,13 +56,15 @@ message(STATUS "Package Version: ${OT_PACKAGE_VERSION}")
 # ==============================================================================
 # Set platform libs and allow overriding
 # ==============================================================================
+
+# SoC (mtd/ftd) platform library
 if(NOT OT_PLATFORM_LIB)
-    set(OT_PLATFORM_LIB "openthread-efr32-soc")
+    set(OT_PLATFORM_LIB "openthread-efr32-soc" CACHE STRING "default efr32 SoC platform library" FORCE)
 endif()
 
+# RCP platform library
 if(NOT OT_PLATFORM_LIB_RCP)
-    set(OT_PLATFORM_LIB_RCP "openthread-efr32-rcp")
-    set(OT_MBEDTLS_RCP "openthread-efr32-rcp-mbedtls")
+    set(OT_PLATFORM_LIB_RCP "openthread-efr32-rcp" CACHE STRING "default efr32 RCP platform library" FORCE)
 endif()
 
 set(OT_PLATFORM "external" CACHE STRING "disable example platforms" FORCE)
@@ -70,12 +72,23 @@ set(OT_PLATFORM "external" CACHE STRING "disable example platforms" FORCE)
 # ==============================================================================
 # mbedtls
 # ==============================================================================
-if(NOT DEFINED OT_EXTERNAL_MBEDTLS)
+
+# SoC mbedtls library
+if(NOT OT_EXTERNAL_MBEDTLS)
     set(OT_EXTERNAL_MBEDTLS "openthread-efr32-soc-mbedtls" CACHE STRING "external mbedtls library" FORCE)
 endif()
-set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls management" FORCE)
 set(OT_MBEDTLS ${OT_EXTERNAL_MBEDTLS})
 
+# RCP mbedtls library
+if(NOT OT_MBEDTLS_RCP)
+    set(OT_MBEDTLS_RCP "openthread-efr32-rcp-mbedtls" CACHE STRING "default efr32 RCP mbedtls library" FORCE)
+endif()
+
+set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls management" FORCE)
+
+# ==============================================================================
+# mbedtls
+# ==============================================================================
 # NOTE: The "openthread" subdirectory needs to be added after all OT_* variables are defined
 add_subdirectory(openthread)
 
@@ -90,12 +103,16 @@ target_compile_options(ot-config INTERFACE
 # ==============================================================================
 # Generated platform projects
 # ==============================================================================
-set(slc_generated_projects
-    ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc-with-buttons-power-manager
-    ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc-with-buttons
-    ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc/
-    ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp/
-)
+file(READ ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/generated_projects.txt slc_generated_projects)
+
+# Convert file contents into a CMake list (where each element in the list
+# is one line of the file)
+#
+STRING(REGEX REPLACE ";" "\\\\;" slc_generated_projects "${slc_generated_projects}")
+STRING(REGEX REPLACE "\n" ";" slc_generated_projects "${slc_generated_projects}")
+
+# Remove trailing empty list entry
+STRING(REGEX REPLACE ";$" "" slc_generated_projects "${slc_generated_projects}")
 
 foreach(slc_project IN LISTS slc_generated_projects)
     message("Checking ${slc_project}")

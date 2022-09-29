@@ -97,6 +97,8 @@ generate()
         # TODO: Remove this when slc supports generic jinja template generation
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
+
+        echo "${current_project_export_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
     fi
     if contains "ot-rcp" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         # ==============================================================================================================
@@ -120,6 +122,7 @@ generate()
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
 
+        echo "${current_project_export_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
     fi
 }
 
@@ -228,7 +231,12 @@ main()
         efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
             OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
             if [ "${skip_silabs_apps}" = false ]; then
-                "${repo_dir}"/script/build_example_apps "${board}" "$@"
+
+                if [ "${skip_generation}" = true ]; then
+                    "${repo_dir}"/script/build_example_apps --skip-generation "${board}" "$@"
+                else
+                    "${repo_dir}"/script/build_example_apps "${board}" "$@"
+                fi
             fi
             ;;
     esac
