@@ -73,20 +73,22 @@ generate()
     fi
 
     local slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
+    local cmake_library="$1"
+    shift
 
     run_slc -v 1 signature trust --sdk "${sdk_dir}"
 
-    if contains ".*-(ftd|mtd)" "${OT_CMAKE_NINJA_TARGET[@]}"; then
+    if [[ ${cmake_library} == "openthread-efr32-soc-with-buttons" ]]; then
         # ==============================================================================================================
-        # Generate openthread-efr32-soc and openthread-efr32-soc-mbedtls libs
+        # Generate openthread-efr32-soc-with-buttons and openthread-efr32-soc-with-buttons-mbedtls libs
         # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/soc"
-        project_name="openthread-efr32-soc"
+        current_project_export_dir="${slc_generated_projects_dir}/soc-with-buttons"
+        project_name="openthread-efr32-soc-with-buttons"
 
         run_slc -v 1 generate \
             --sdk="${sdk_dir}" \
             --clear-cache \
-            --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc.slcp" \
+            --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc-with-buttons.slcp" \
             --project-name="${project_name}" \
             --output-type=makefile \
             --no-copy \
@@ -99,30 +101,31 @@ generate()
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
 
         echo "${current_project_export_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
-    fi
-    if contains "ot-rcp" "${OT_CMAKE_NINJA_TARGET[@]}"; then
+
+    elif [[ ${cmake_library} == "openthread-efr32-soc-with-buttons-power-manager" ]]; then
         # ==============================================================================================================
-        # Generate openthread-efr32-rcp and openthread-efr32-rcp-mbedtls libs
+        # Generate openthread-efr32-soc-with-buttons-power-manager and openthread-efr32-soc-with-buttons-power-manager-mbedtls libs
         # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/rcp"
-        project_name="openthread-efr32-rcp"
+        current_project_export_dir="${slc_generated_projects_dir}/soc-with-buttons-power-manager"
+        project_name="openthread-efr32-soc-with-buttons-power-manager"
 
         run_slc -v 1 generate \
             --sdk="${sdk_dir}" \
             --clear-cache \
-            --project-file="${repo_dir}/src/platform_projects/openthread-efr32-rcp.slcp" \
+            --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc-with-buttons.slcp" \
             --project-name="${project_name}" \
             --output-type=makefile \
             --no-copy \
             --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
             --export-destination="${current_project_export_dir}" \
-            --with "${board}"
+            --with "${board}",power_manager
 
         # TODO: Remove this when slc supports generic jinja template generation
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
 
         echo "${current_project_export_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
+
     fi
 }
 
@@ -139,23 +142,28 @@ create_srec()
     find "$1" -type f "${executable_flag[@]}" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
 }
 
-build()
+build_example_app()
 {
-    # Generate the platform lib and related libs
-    generate
+    local example_app_ninja_target=${1:-}
+    local ot_platform_lib=${2:-}
+    shift 2
 
-    builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}"
+    # Generate the platform lib and related libs
+    generate "${ot_platform_lib}"
+
+    builddir="${OT_CMAKE_BUILD_DIR}/examples/${example_app_ninja_target}"
 
     mkdir -p "${builddir}"
     cd "${builddir}"
 
-    cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON "$@" "${repo_dir}"
+    cmake -GNinja \
+        -DOT_COMPILE_WARNING_AS_ERROR=ON \
+        -DOT_PLATFORM_LIB="${ot_platform_lib}" \
+        -DOT_EXTERNAL_MBEDTLS="${ot_platform_lib}-mbedtls" \
+        "$@" \
+        "${repo_dir}"
 
-    if [[ -n ${OT_CMAKE_NINJA_TARGET[*]} ]]; then
-        ninja "${OT_CMAKE_NINJA_TARGET[@]}"
-    else
-        ninja
-    fi
+    ninja "${example_app_ninja_target}"
 
     create_srec "${builddir}"
     cd "${repo_dir}"
@@ -165,7 +173,6 @@ main()
 {
     local usage="usage: $0 [-h] [--skip-silabs-apps] <efr32 platform> -DBOARD=<brdXXXXy> [-D<OT_XXXX=ON> -D<OT_YYYY=OFF>]"
 
-    local skip_silabs_apps=false
     skip_generation=false
     # Parse flags
     optspec=":h-:"
@@ -176,11 +183,6 @@ main()
                     skip-generation)
                         printf '\n\nSkipping SLC generation...\n\n' >&2
                         skip_generation=true
-                        shift 1
-                        ;;
-                    skip-silabs-apps)
-                        printf '\n\nSkipping silabs example apps...\n\n' >&2
-                        skip_silabs_apps=true
                         shift 1
                         ;;
                     *)
@@ -224,29 +226,19 @@ main()
 
     options+=("-DCMAKE_TOOLCHAIN_FILE=src/${platform}/arm-none-eabi.cmake")
 
-    case "${platform}" in
-        efr32mg1)
-            OT_CMAKE_NINJA_TARGET=("ot-rcp")
-            ;;
-        efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
-            OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
-            if [ "${skip_silabs_apps}" = false ]; then
-
-                if [ "${skip_generation}" = true ]; then
-                    "${repo_dir}"/script/build_example_apps --skip-generation "${board}" "$@"
-                else
-                    "${repo_dir}"/script/build_example_apps "${board}" "$@"
-                fi
-            fi
-            ;;
-    esac
-
     # Find slc-cli installation
     slc_init
 
     options+=("$@")
     export OT_CMAKE_BUILD_DIR="$repo_dir/build/${board}"
-    build -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
+
+    build_example_app sleepy-demo-ftd openthread-efr32-soc-with-buttons \
+        -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
+    build_example_app sleepy-demo-mtd openthread-efr32-soc-with-buttons-power-manager \
+        -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
+
+    ls -alh "${OT_CMAKE_BUILD_DIR}"/examples/sleepy-demo-ftd/bin/* \
+        "${OT_CMAKE_BUILD_DIR}"/examples/sleepy-demo-mtd/bin/*
 }
 
 main "$@"

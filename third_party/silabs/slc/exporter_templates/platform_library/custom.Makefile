@@ -41,24 +41,24 @@
     with context -%}
 
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
-include({{PROJECT_NAME}}-sdk.cmake)
+include({{PROJECT_NAME}}-mbedtls.cmake)
 
 # ==============================================================================
 # Platform library
 # ==============================================================================
-add_library({{PROJECT_NAME}}
+
+# Create the platform as an OBJECT library target
+#
+# **NOTE**: Defining the library target as STATIC will cause linking issues
+#           where the WEAK implementation of a function is taken when both
+#           weakly and strongly defined implementations of the same function
+#           exist.
+add_library({{PROJECT_NAME}} OBJECT
     $<TARGET_OBJECTS:openthread-platform-utils>
 )
 
 # Interface lib for sharing efr32 config to relevant targets
 add_library({{PROJECT_NAME}}-config INTERFACE)
-
-{% if PROJECT_NAME.startswith("openthread-efr32-rcp") -%}
-# Define RCP specific libraries
-set(OT_PLATFORM_LIB_RCP openthread-efr32-rcp)
-set(OT_MBEDTLS_RCP silabs-mbedtls-rcp)
-
-{% endif -%}
 
 set_target_properties({{PROJECT_NAME}}
     PROPERTIES
@@ -83,13 +83,6 @@ target_include_directories({{PROJECT_NAME}}-config INTERFACE
     config
 )
 
-{% if PROJECT_NAME.startswith("openthread-efr32-soc") -%}
-target_link_libraries(openthread-ftd PUBLIC {{PROJECT_NAME}}-config)
-target_link_libraries(openthread-mtd PUBLIC {{PROJECT_NAME}}-config)
-{%- elif PROJECT_NAME.startswith("openthread-efr32-rcp") -%}
-target_link_libraries(openthread-radio PUBLIC {{PROJECT_NAME}}-config)
-{%- endif %}
-
 target_include_directories({{PROJECT_NAME}} PRIVATE
     ${OT_PUBLIC_INCLUDES}
 )
@@ -101,8 +94,8 @@ target_sources({{PROJECT_NAME}} PRIVATE
 {%- for source in (ALL_SOURCES | sort) %}
     {%- set source = prepare_path(source) -%}
 
-    {#- Only take PAL sources #}
-    {%- if ('{PROJECT_SOURCE_DIR}/src/src' in source) -%}
+    {#- Only take non-crypto sources #}
+    {%- if not ('util/third_party/crypto' in source) %}
         {%- if source.endswith('.c') or source.endswith('.cpp') or source.endswith('.h') or source.endswith('.hpp') %}
     {{source}}
         {%- endif %}
@@ -114,24 +107,79 @@ target_sources({{PROJECT_NAME}} PRIVATE
     {%- set source = prepare_path(source) -%}
 
     {#- Only take PAL sources #}
-    {%- if ('${PROJECT_SOURCE_DIR}/src/src' in source) -%}
         {%- if source.endswith('.s') or source.endswith('.S') %}
 target_sources({{PROJECT_NAME}} PRIVATE {{source}})
 set_property(SOURCE {{source}} PROPERTY LANGUAGE C)
         {%- endif %}
-    {%- endif %}
 {%- endfor %}
 
 # ==============================================================================
 # Compile definitions
 # ==============================================================================
-target_compile_definitions(ot-config INTERFACE
+
+target_compile_definitions({{PROJECT_NAME}}-config INTERFACE
 {%- for define in C_CXX_DEFINES %}
-    {%- if not ( define.startswith("MBEDTLS_PSA_CRYPTO_CLIENT") or ("OPENTHREAD_RADIO" == define) or ("OPENTHREAD_FTD" == define) or ("OPENTHREAD_MTD" == define) or ("OPENTHREAD_COPROCESSOR" == define) ) %}
+    {%- if not (define.startswith("MBEDTLS_")
+                or define.startswith("OPENTHREAD_")
+                ) %}
     {{define}}={{C_CXX_DEFINES[define]}}
     {%- endif %}
 {%- endfor %}
 )
+
+{% if dict_contains_key_starting_with(C_CXX_DEFINES, "OPENTHREAD_") -%}
+target_compile_definitions(ot-config INTERFACE
+{%- for define in C_CXX_DEFINES %}
+    {%- if define.startswith("OPENTHREAD_")
+            and not ( ("OPENTHREAD_RADIO" == define)
+                or ("OPENTHREAD_FTD" == define)
+                or ("OPENTHREAD_MTD" == define)
+                or ("OPENTHREAD_COPROCESSOR" == define) ) %}
+    {{define}}={{C_CXX_DEFINES[define]}}
+    {%- endif %}
+{%- endfor %}
+)
+
+{% endif -%}
+
+{% if dict_contains_key_starting_with(C_CXX_DEFINES, "MBEDTLS_")
+        or dict_contains_key_starting_with(C_CXX_DEFINES, "PSA_")
+        -%}
+target_compile_definitions({{PROJECT_NAME}}-mbedtls-config INTERFACE
+{%- for define in C_CXX_DEFINES %}
+    {%- if define.startswith("MBEDTLS_") or
+           define.startswith("PSA_")
+     %}
+    {{define}}={{C_CXX_DEFINES[define]}}
+    {%- endif %}
+{%- endfor %}
+)
+
+{% endif -%}
+
+target_include_directories({{PROJECT_NAME}}-mbedtls-config INTERFACE
+    autogen
+    config
+)
+
+target_link_libraries({{PROJECT_NAME}}-mbedtls PRIVATE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries({{PROJECT_NAME}} PRIVATE {{PROJECT_NAME}}-mbedtls-config)
+
+{% if PROJECT_NAME.startswith("openthread-efr32-rcp") -%}
+target_link_libraries(ot-config-radio INTERFACE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries(ot-config-radio INTERFACE {{PROJECT_NAME}}-config)
+{% elif PROJECT_NAME.startswith("openthread-efr32-mtd") -%}
+target_link_libraries(ot-config-ftd INTERFACE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries(ot-config-ftd INTERFACE {{PROJECT_NAME}}-config)
+{% elif PROJECT_NAME.startswith("openthread-efr32-ftd") -%}
+target_link_libraries(ot-config-mtd INTERFACE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries(ot-config-mtd INTERFACE {{PROJECT_NAME}}-config)
+{% elif PROJECT_NAME.startswith("openthread-efr32-soc") -%}
+target_link_libraries(ot-config-ftd INTERFACE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries(ot-config-mtd INTERFACE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries(ot-config-ftd INTERFACE {{PROJECT_NAME}}-config)
+target_link_libraries(ot-config-mtd INTERFACE {{PROJECT_NAME}}-config)
+{% endif -%}
 
 {% if dict_contains_key_starting_with(C_CXX_DEFINES, "MBEDTLS_PSA_CRYPTO_CLIENT") -%}
 target_compile_definitions({{PROJECT_NAME}}-config INTERFACE
@@ -145,10 +193,7 @@ target_compile_definitions({{PROJECT_NAME}}-config INTERFACE
 {% endif -%}
 
 {% if openthread_device_type() -%}
-target_compile_definitions({{PROJECT_NAME}} PUBLIC {{ openthread_device_type() }}
-)
-
-target_compile_definitions({{PROJECT_NAME}}-sdk PRIVATE {{ openthread_device_type() }}
+target_compile_definitions({{PROJECT_NAME}} PRIVATE {{ openthread_device_type() }}
 )
 
 {% endif -%}
@@ -163,7 +208,6 @@ target_compile_options({{PROJECT_NAME}} PRIVATE {{ compile_flags() }}
 # Linking
 # ==============================================================================
 set(LD_FILE "${CMAKE_CURRENT_SOURCE_DIR}/autogen/linkerfile.ld")
-set({{PROJECT_NAME}}-sdk_location $<TARGET_FILE:{{PROJECT_NAME}}-sdk>)
 
 target_link_libraries({{PROJECT_NAME}}
     PUBLIC
@@ -181,8 +225,6 @@ target_link_libraries({{PROJECT_NAME}}
         -T${LD_FILE}
         -Wl,--gc-sections
 
-        # The --whole-archive flags are necessary to resolve all symbols from the GSDK
-        -Wl,--whole-archive ${ {{-PROJECT_NAME}}-sdk_location} -Wl,--no-whole-archive
         ot-config
 )
 
@@ -221,7 +263,7 @@ foreach(lib_file ${GSDK_LIBS})
     set_target_properties(${imported_lib_name}
         PROPERTIES
             IMPORTED_LOCATION "${lib_file}"
-            IMPORTED_LINK_INTERFACE_LIBRARIES {{PROJECT_NAME}}-sdk
+            IMPORTED_LINK_INTERFACE_LIBRARIES {{PROJECT_NAME}}
     )
     target_link_libraries({{PROJECT_NAME}} PUBLIC ${imported_lib_name})
 endforeach()
