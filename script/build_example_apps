@@ -160,6 +160,9 @@ build_example_app()
         -DOT_COMPILE_WARNING_AS_ERROR=ON \
         -DOT_PLATFORM_LIB="${ot_platform_lib}" \
         -DOT_EXTERNAL_MBEDTLS="${ot_platform_lib}-mbedtls" \
+        -DOT_APP_CLI=OFF \
+        -DOT_APP_NCP=OFF \
+        -DOT_APP_RCP=OFF \
         "$@" \
         "${repo_dir}"
 

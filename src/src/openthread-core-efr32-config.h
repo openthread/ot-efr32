@@ -47,6 +47,7 @@
 #endif
 
 #include "board_config.h"
+#include "em_device.h"
 
 /**
  * @def OPENTHREAD_CONFIG_PLATFORM_MAC_KEYS_EXPORTABLE_ENABLE

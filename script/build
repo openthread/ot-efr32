@@ -97,8 +97,6 @@ generate()
         # TODO: Remove this when slc supports generic jinja template generation
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
-
-        echo "${current_project_export_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
     fi
     if contains "ot-rcp" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         # ==============================================================================================================
@@ -121,8 +119,6 @@ generate()
         # TODO: Remove this when slc supports generic jinja template generation
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
-
-        echo "${current_project_export_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
     fi
 }
 
@@ -139,23 +135,51 @@ create_srec()
     find "$1" -type f "${executable_flag[@]}" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
 }
 
-build()
+build_rcp()
 {
-    # Generate the platform lib and related libs
-    generate
-
-    builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}"
+    builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}/openthread/rcp"
 
     mkdir -p "${builddir}"
     cd "${builddir}"
 
-    cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON "$@" "${repo_dir}"
+    cmake \
+        -GNinja \
+        -DOT_FTD=OFF \
+        -DOT_MTD=OFF \
+        -DOT_RCP=ON \
+        -DOT_APP_CLI=OFF \
+        -DOT_APP_NCP=OFF \
+        -DOT_APP_RCP=ON \
+        -DOT_COMPILE_WARNING_AS_ERROR=ON \
+        "$@" "${repo_dir}" \
+        --graphviz=graph.dot
 
-    if [[ -n ${OT_CMAKE_NINJA_TARGET[*]} ]]; then
-        ninja "${OT_CMAKE_NINJA_TARGET[@]}"
-    else
-        ninja
-    fi
+    ninja "${rcp_targets[@]}"
+
+    create_srec "${builddir}"
+    cd "${repo_dir}"
+}
+
+build_soc()
+{
+    builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}/openthread/soc"
+
+    mkdir -p "${builddir}"
+    cd "${builddir}"
+
+    cmake \
+        -GNinja \
+        -DOT_FTD=ON \
+        -DOT_MTD=ON \
+        -DOT_RCP=OFF \
+        -DOT_APP_CLI=ON \
+        -DOT_APP_NCP=ON \
+        -DOT_APP_RCP=OFF \
+        -DOT_COMPILE_WARNING_AS_ERROR=ON \
+        "$@" "${repo_dir}" \
+        --graphviz=graph.dot
+
+    ninja "${soc_targets[@]}"
 
     create_srec "${builddir}"
     cd "${repo_dir}"
@@ -246,7 +270,23 @@ main()
 
     options+=("$@")
     export OT_CMAKE_BUILD_DIR="$repo_dir/build/${board}"
-    build -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
+
+    # Generate the platform libs and related libs
+    generate
+
+    # Separate OT_CMAKE_NINJA_TARGET into two lists
+    rcp_targets=()
+    soc_targets=()
+    for t in "${OT_CMAKE_NINJA_TARGET[@]}"; do [[ $t =~ .*rcp.* ]] && rcp_targets+=("$t") || soc_targets+=("$t"); done
+
+    if [ ! ${#rcp_targets[@]} -eq 0 ]; then
+        build_rcp -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
+    fi
+    if [ ! ${#soc_targets[@]} -eq 0 ]; then
+        build_soc -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
+    fi
+
+    ls -alh "${OT_CMAKE_BUILD_DIR}"/openthread/*/bin/*
 }
 
 main "$@"
