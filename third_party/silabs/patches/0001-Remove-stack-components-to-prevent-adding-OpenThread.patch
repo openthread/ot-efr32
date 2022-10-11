@@ -1,0 +1,26 @@
+diff --git a/protocol/openthread/component/ot_ncp_spidrv.slcc b/protocol/openthread/component/ot_ncp_spidrv.slcc
+index a7e77bd97329..c2eb8a26ae83 100644
+--- a/protocol/openthread/component/ot_ncp_spidrv.slcc
++++ b/protocol/openthread/component/ot_ncp_spidrv.slcc
+@@ -7,8 +7,8 @@ description: This component provides SPIDRV (SPI) support for the OpenThread sta
+ provides:
+   - name: ot_ncp_spidrv
+ requires:
+-  - name: ot_stack
+-  - name: ot_ncp
++  #- name: ot_stack
++  #- name: ot_ncp
+   - name: gpiointerrupt
+   - name: emlib_ldma
+   - name: spidrv_core
+@@ -25,8 +25,8 @@ config_file:
+   - path: protocol/openthread/config/ot_ncp_spidrv/s2/sl_ncp_spidrv_usart_config.h
+     file_id: sl_ncp_spidrv_usart_config
+     condition: [device_series_2]
+-recommends:
+-  - id: ot_stack_rcp
++#recommends:
++#  - id: ot_stack_rcp
+ define:
+   - name: OPENTHREAD_CONFIG_NCP_HDLC_ENABLE
+     value: 0

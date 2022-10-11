@@ -98,17 +98,17 @@ generate()
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
     fi
-    if contains "ot-rcp" "${OT_CMAKE_NINJA_TARGET[@]}"; then
+    if contains "ot-rcp-uart" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         # ==============================================================================================================
-        # Generate openthread-efr32-rcp and openthread-efr32-rcp-mbedtls libs
+        # Generate openthread-efr32-rcp-uart and openthread-efr32-rcp-uart-mbedtls libs
         # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/rcp"
-        project_name="openthread-efr32-rcp"
+        current_project_export_dir="${slc_generated_projects_dir}/rcp_uart"
+        project_name="openthread-efr32-rcp-uart"
 
         run_slc -v 1 generate \
             --sdk="${sdk_dir}" \
             --clear-cache \
-            --project-file="${repo_dir}/src/platform_projects/openthread-efr32-rcp.slcp" \
+            --project-file="${repo_dir}/src/platform_projects/${project_name}.slcp" \
             --project-name="${project_name}" \
             --output-type=makefile \
             --no-copy \
@@ -119,6 +119,40 @@ generate()
         # TODO: Remove this when slc supports generic jinja template generation
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
+    fi
+    if contains "ot-rcp-spi" "${OT_CMAKE_NINJA_TARGET[@]}"; then
+        # ==============================================================================================================
+        # Generate openthread-efr32-rcp-spi and openthread-efr32-rcp-spi-mbedtls libs
+        # ==============================================================================================================
+        current_project_export_dir="${slc_generated_projects_dir}/rcp_spi"
+        project_name="openthread-efr32-rcp-spi"
+        local silabs_dir="${repo_dir}"/third_party/silabs
+
+        # Apply patch(es) to gecko_sdk for rcp-spi libs
+        echo "Applying patch(es) to Gecko SDK..."
+        cd "${silabs_dir}"/gecko_sdk
+        # Read the tag to restore the gecko_sdk head back to original
+        tag=$(git describe --tag)
+        git apply "${silabs_dir}"/patches/*.patch
+
+        run_slc -v 1 generate \
+            --sdk="${sdk_dir}" \
+            --clear-cache \
+            --project-file="${repo_dir}/src/platform_projects/${project_name}.slcp" \
+            --project-name="${project_name}" \
+            --output-type=makefile \
+            --no-copy \
+            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
+            --export-destination="${current_project_export_dir}" \
+            --with "${board}"
+
+        # TODO: Remove this when slc supports generic jinja template generation
+        mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
+        mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
+
+        echo "Restoring gecko_sdk back to tag ${tag}."
+        cd "${silabs_dir}"/gecko_sdk
+        git reset --hard "${tag}"
     fi
 }
 
@@ -135,9 +169,9 @@ create_srec()
     find "$1" -type f "${executable_flag[@]}" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
 }
 
-build_rcp()
+build_rcp_uart()
 {
-    builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}/openthread/rcp"
+    builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}/openthread/rcp_uart"
 
     mkdir -p "${builddir}"
     cd "${builddir}"
@@ -154,7 +188,33 @@ build_rcp()
         "$@" "${repo_dir}" \
         --graphviz=graph.dot
 
-    ninja "${rcp_targets[@]}"
+    ninja "ot-rcp"
+
+    create_srec "${builddir}"
+    cd "${repo_dir}"
+}
+
+build_rcp_spi()
+{
+    builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}/openthread/rcp_spi"
+
+    mkdir -p "${builddir}"
+    cd "${builddir}"
+
+    cmake \
+        -GNinja \
+        -DOT_FTD=OFF \
+        -DOT_MTD=OFF \
+        -DOT_RCP=ON \
+        -DOT_APP_CLI=OFF \
+        -DOT_APP_NCP=OFF \
+        -DOT_APP_RCP=ON \
+        -DOT_COMPILE_WARNING_AS_ERROR=ON \
+        -DOT_NCP_SPI=ON \
+        "$@" "${repo_dir}" \
+        --graphviz=graph.dot
+
+    ninja "ot-rcp"
 
     create_srec "${builddir}"
     cd "${repo_dir}"
@@ -250,10 +310,10 @@ main()
 
     case "${platform}" in
         efr32mg1)
-            OT_CMAKE_NINJA_TARGET=("ot-rcp")
+            OT_CMAKE_NINJA_TARGET=("ot-rcp-uart")
             ;;
         efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
-            OT_CMAKE_NINJA_TARGET=("ot-rcp" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
+            OT_CMAKE_NINJA_TARGET=("ot-rcp-uart" "ot-rcp-spi" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
             if [ "${skip_silabs_apps}" = false ]; then
 
                 if [ "${skip_generation}" = true ]; then
@@ -279,9 +339,14 @@ main()
     soc_targets=()
     for t in "${OT_CMAKE_NINJA_TARGET[@]}"; do [[ $t =~ .*rcp.* ]] && rcp_targets+=("$t") || soc_targets+=("$t"); done
 
-    if [ ! ${#rcp_targets[@]} -eq 0 ]; then
-        build_rcp -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
+    # Build ot-rcp targets
+    if contains "ot-rcp-uart" "${rcp_targets[@]}"; then
+        build_rcp_uart -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
     fi
+    if contains "ot-rcp-spi" "${rcp_targets[@]}"; then
+        build_rcp_spi -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
+    fi
+    # Build soc targets
     if [ ! ${#soc_targets[@]} -eq 0 ]; then
         build_soc -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
     fi
