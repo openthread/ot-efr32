@@ -66,7 +66,7 @@ slc_init()
             echo "The 'slc-cli' command could not be found in your PATH."
 
             # Find the slc executable
-            slc_cmd=$(find "${repo_dir}/third_party/silabs/slc" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f)
+            slc_cmd=$(find "${repo_dir}/third_party/silabs/slc" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f | head -n 1)
 
             # Automatically download slc if not found
             if [ -z "${slc_cmd}" ]; then
@@ -74,7 +74,7 @@ slc_init()
             fi
 
             # Find the slc executable
-            slc_cmd=$(find "${repo_dir}/third_party/silabs/slc" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f)
+            slc_cmd=$(find "${repo_dir}/third_party/silabs/slc" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f | head -n 1)
 
         fi
     fi

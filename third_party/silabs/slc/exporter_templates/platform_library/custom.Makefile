@@ -72,9 +72,7 @@ set_target_properties({{PROJECT_NAME}}
 target_include_directories(ot-config INTERFACE
 {%- for include in C_CXX_INCLUDES %}
     {%- set include = prepare_path(include) | replace('-I', '') | replace('\"', '') %}
-    {%- if not (('autogen' == include) or ('config' == include)) %}
     {{ include }}
-    {%- endif %}
 {%- endfor %}
 )
 
@@ -117,7 +115,7 @@ set_property(SOURCE {{source}} PROPERTY LANGUAGE C)
 # Compile definitions
 # ==============================================================================
 
-target_compile_definitions({{PROJECT_NAME}}-config INTERFACE
+target_compile_definitions(ot-config INTERFACE
 {%- for define in C_CXX_DEFINES %}
     {%- if not (define.startswith("MBEDTLS_")
                 or define.startswith("OPENTHREAD_")

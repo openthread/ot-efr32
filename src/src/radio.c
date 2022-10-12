@@ -481,7 +481,7 @@ static securityMaterial sMacKeys[RADIO_INTERFACE_COUNT];
 
 #if OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
 
-#define CSL_TX_UNCERTAINTY 20 // Uncertainty of scheduling a CSL transmission, in ±10 us units.
+#define CSL_TX_UNCERTAINTY 100 // Uncertainty of scheduling a CSL transmission, in ±10 us units.
 
 // CSL parameters
 static uint32_t sCslPeriod;
@@ -584,7 +584,7 @@ static otError radioProcessTransmitSecurity(otRadioFrame *aFrame, uint8_t iid)
         otMacFrameSetFrameCounter(aFrame, sMacKeys[iid].macFrameCounter++);
     }
 
-#if defined(_SILICON_LABS_32B_SERIES_2) && OPENTHREAD_RADIO
+#if defined(_SILICON_LABS_32B_SERIES_2)
     efr32PlatProcessTransmitAesCcm(aFrame, &sExtAddress[panIndex]);
 #else
     otMacFrameProcessTransmitAesCcm(aFrame, &sExtAddress[panIndex]);
@@ -931,13 +931,11 @@ static void efr32RailConfigLoad(efr32BandConfig *aBandConfig)
     }
 
 #if (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
-#if OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
     // 802.15.4E support (only on platforms that support it, so error checking is disabled)
     // Note: This has to be called after RAIL_IEEE802154_Config2p4GHzRadio due to a bug where this call
     // can overwrite options set below.
     RAIL_IEEE802154_ConfigEOptions(gRailHandle, (RAIL_IEEE802154_E_OPTION_GB868 | RAIL_IEEE802154_E_OPTION_ENH_ACK),
                                    (RAIL_IEEE802154_E_OPTION_GB868 | RAIL_IEEE802154_E_OPTION_ENH_ACK));
-#endif // OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
 #endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 
     configureTxPower(&txPowerConfig);
@@ -1784,6 +1782,25 @@ void otPlatRadioSetMacKey(otInstance *            aInstance,
     memcpy(&sMacKeys[iid].keys[MAC_KEY_PREV], aPrevKey, sizeof(otMacKeyMaterial));
     memcpy(&sMacKeys[iid].keys[MAC_KEY_CURRENT], aCurrKey, sizeof(otMacKeyMaterial));
     memcpy(&sMacKeys[iid].keys[MAC_KEY_NEXT], aNextKey, sizeof(otMacKeyMaterial));
+
+#if defined(_SILICON_LABS_32B_SERIES_2) && (OPENTHREAD_CONFIG_CRYPTO_LIB == OPENTHREAD_CONFIG_CRYPTO_LIB_PSA)
+    size_t aKeyLen = 0;
+
+    assert(otPlatCryptoExportKey(sMacKeys[iid].keys[MAC_KEY_PREV].mKeyMaterial.mKeyRef,
+                                 sMacKeys[iid].keys[MAC_KEY_PREV].mKeyMaterial.mKey.m8,
+                                 sizeof(sMacKeys[iid].keys[MAC_KEY_PREV]), &aKeyLen)
+           == OT_ERROR_NONE);
+
+    assert(otPlatCryptoExportKey(sMacKeys[iid].keys[MAC_KEY_CURRENT].mKeyMaterial.mKeyRef,
+                                 sMacKeys[iid].keys[MAC_KEY_CURRENT].mKeyMaterial.mKey.m8,
+                                 sizeof(sMacKeys[iid].keys[MAC_KEY_CURRENT]), &aKeyLen)
+           == OT_ERROR_NONE);
+
+    assert(otPlatCryptoExportKey(sMacKeys[iid].keys[MAC_KEY_NEXT].mKeyMaterial.mKeyRef,
+                                 sMacKeys[iid].keys[MAC_KEY_NEXT].mKeyMaterial.mKey.m8,
+                                 sizeof(sMacKeys[iid].keys[MAC_KEY_NEXT]), &aKeyLen)
+           == OT_ERROR_NONE);
+#endif
 
     CORE_EXIT_ATOMIC();
 }
@@ -2653,20 +2670,36 @@ static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
 {
     assert(pPacketDetails != NULL);
 
+    // Current time > sync-receive timestamp
+    // Therefore lower 32 bits of current time should always be greater than lower 32 bits
+    // of sync-rx timestamp unless there is a overflow.  In such cases, we do not want to
+    // take overflow into consideration for sync-rx timestamp.
+    uint64_t railUsTimeNow    = otPlatTimeGet();
+    uint32_t railUsTimerWraps = railUsTimeNow >> 32;
+
+    // Address multiple overflows, such as what would happen if the current time overflows
+    // from 0x00000001FFFFFFFF to 0x0000000200000000 (leave the higher 32 bits as 0)
+    if ((railUsTimeNow & 0xFFFFFFFF) <= pPacketDetails->timeReceived.packetTime)
+    {
+        railUsTimerWraps--;
+    }
+
     if (pPacketDetails->isAck)
     {
-        sReceiveAckFrame.mInfo.mRxInfo.mRssi      = pPacketDetails->rssi;
-        sReceiveAckFrame.mInfo.mRxInfo.mLqi       = pPacketDetails->lqi;
-        sReceiveAckFrame.mInfo.mRxInfo.mTimestamp = pPacketDetails->timeReceived.packetTime;
+        sReceiveAckFrame.mInfo.mRxInfo.mRssi = pPacketDetails->rssi;
+        sReceiveAckFrame.mInfo.mRxInfo.mLqi  = pPacketDetails->lqi;
+        sReceiveAckFrame.mInfo.mRxInfo.mTimestamp =
+            pPacketDetails->timeReceived.packetTime + ((uint64_t)railUsTimerWraps << 32);
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
         sReceiveAckFrame.mIid = iid;
 #endif
     }
     else
     {
-        sReceiveFrame.mInfo.mRxInfo.mRssi      = pPacketDetails->rssi;
-        sReceiveFrame.mInfo.mRxInfo.mLqi       = pPacketDetails->lqi;
-        sReceiveFrame.mInfo.mRxInfo.mTimestamp = pPacketDetails->timeReceived.packetTime;
+        sReceiveFrame.mInfo.mRxInfo.mRssi = pPacketDetails->rssi;
+        sReceiveFrame.mInfo.mRxInfo.mLqi  = pPacketDetails->lqi;
+        sReceiveFrame.mInfo.mRxInfo.mTimestamp =
+            pPacketDetails->timeReceived.packetTime + ((uint64_t)railUsTimerWraps << 32);
         // Set this flag only when the packet is really acknowledged with a secured enhanced ACK.
         sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck = securedOutgoingEnhancedAck;
         // Set this flag only when the packet is really acknowledged with frame pending set.

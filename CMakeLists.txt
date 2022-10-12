@@ -103,26 +103,41 @@ target_compile_options(ot-config INTERFACE
 # ==============================================================================
 # Generated platform projects
 # ==============================================================================
-file(READ ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/generated_projects.txt slc_generated_projects)
+message("OT_RCP     = ${OT_RCP}")
+message("OT_FTD     = ${OT_FTD}")
+message("OT_MTD     = ${OT_MTD}")
+message("OT_APP_RCP = ${OT_APP_RCP}")
+message("OT_APP_NCP = ${OT_APP_NCP}")
+message("OT_APP_CLI = ${OT_APP_CLI}")
+if(OT_APP_RCP)
+    message("Adding ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp")
+    add_subdirectory(${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp)
+elseif(OT_APP_NCP OR OT_APP_CLI)
+    message("Adding ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc")
+    add_subdirectory(${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc)
+else()
+    file(READ ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/generated_projects.txt slc_generated_projects)
 
-# Convert file contents into a CMake list (where each element in the list
-# is one line of the file)
-#
-STRING(REGEX REPLACE ";" "\\\\;" slc_generated_projects "${slc_generated_projects}")
-STRING(REGEX REPLACE "\n" ";" slc_generated_projects "${slc_generated_projects}")
+    # Convert file contents into a CMake list (where each element in the list
+    # is one line of the file)
+    #
+    STRING(REGEX REPLACE ";" "\\\\;" slc_generated_projects "${slc_generated_projects}")
+    STRING(REGEX REPLACE "\n" ";" slc_generated_projects "${slc_generated_projects}")
 
-# Remove trailing empty list entry
-STRING(REGEX REPLACE ";$" "" slc_generated_projects "${slc_generated_projects}")
+    # Remove trailing empty list entry
+    STRING(REGEX REPLACE ";$" "" slc_generated_projects "${slc_generated_projects}")
 
-foreach(slc_project IN LISTS slc_generated_projects)
-    message("Checking ${slc_project}")
-    if(EXISTS ${slc_project})
-        message("......... EXISTS")
-        add_subdirectory(${slc_project})
-    else()
-        message("......... NOT EXISTS")
-    endif()
-endforeach()
+    foreach(slc_project IN LISTS slc_generated_projects)
+        message("Checking ${slc_project}")
+        if(EXISTS ${slc_project})
+            message("......... EXISTS")
+            add_subdirectory(${slc_project})
+        else()
+            message("......... NOT EXISTS")
+        endif()
+    endforeach()
+endif()
+
 
 # efr32mg12 Sub-GHz support
 set(EFR32MG12_915MHZ_PHY_SOURCES

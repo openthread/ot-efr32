@@ -59,29 +59,82 @@ readonly OT_OPTIONS=(
 )
 
 # List of boards to test
-readonly BOARDS=(
+readonly MG1_BOARDS=(
     brd4151a
+)
+
+readonly MG12_BOARDS=(
     brd4161a
     brd4164a
     brd4166a
-    brd4168a
     brd4170a
-    brd4180a
-    brd4180b
-    brd4181a
-    brd4186c
-    brd4187c
     brd4304a
 )
 
-# Sanity check to ensure each board has its platform before it.
-if [[ ! "$((${#BOARDS[@]} % 2))" -eq "0" ]]; then
-    echo "BOARDS is not properly defined."
-    # exit 1
-fi
+readonly MG13_BOARDS=(
+    brd4168a
+)
+
+readonly MG21_BOARDS=(
+    brd4180a
+    brd4180b
+    brd4181a
+)
+
+readonly MG24_BOARDS=(
+    brd4186c
+    brd4187c
+)
 
 main()
 {
+    local usage="usage: $0 [-h] [--all-boards]"
+
+    local all_boards=false
+
+    # Parse flags
+    optspec=":h-:"
+    while getopts "$optspec" optchar; do
+        case "${optchar}" in
+            -)
+                case "${OPTARG}" in
+                    all-boards)
+                        printf '\n\nSkipping silabs example apps...\n\n' >&2
+                        all_boards=true
+                        shift 1
+                        ;;
+                    *)
+                        echo "Unknown option --${OPTARG}" >&2
+                        exit 2
+                        ;;
+                esac
+                ;;
+            h)
+                echo "${usage}" >&2
+                exit 2
+                ;;
+        esac
+    done
+
+    BOARDS=()
+    if [ "${all_boards}" = true ]; then
+        BOARDS+=(
+            "${MG1_BOARDS[@]}"
+            "${MG12_BOARDS[@]}"
+            "${MG13_BOARDS[@]}"
+            "${MG21_BOARDS[@]}"
+            "${MG24_BOARDS[@]}"
+        )
+    else
+        BOARDS+=(
+            "${MG1_BOARDS[0]}"
+            "${MG12_BOARDS[0]}"
+            "${MG13_BOARDS[0]}"
+            "${MG21_BOARDS[0]}"
+            "${MG24_BOARDS[0]}"
+        )
+    fi
+
     export CPPFLAGS="${CPPFLAGS:-} -DNDEBUG"
     for ((idx = 0; idx < ${#BOARDS[@]}; idx = idx + 1)); do
         local board="${BOARDS[idx]}"
