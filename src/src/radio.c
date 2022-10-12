@@ -209,6 +209,10 @@ static volatile otError sTransmitError;
 static volatile bool    sTransmitBusy = false;
 static otRadioFrame *   sTxFrame      = NULL;
 
+#if OPENTHREAD_CONFIG_MAC_HEADER_IE_SUPPORT
+static otRadioIeInfo sTransmitIeInfo;
+#endif
+
 // Radio
 #define CCA_THRESHOLD_UNINIT 127
 #define CCA_THRESHOLD_DEFAULT -75 // dBm  - default for 2.4GHz 802.15.4
@@ -1034,6 +1038,10 @@ void efr32RadioInit(void)
     sTransmitFrame.mLength   = 0;
     sTransmitFrame.mPsdu     = sTransmitPsdu;
 
+#if OPENTHREAD_CONFIG_MAC_HEADER_IE_SUPPORT
+    sTransmitFrame.mInfo.mTxInfo.mIeInfo = &sTransmitIeInfo;
+#endif
+
 #if OPENTHREAD_CONFIG_MLE_LINK_METRICS_SUBJECT_ENABLE
     otLinkMetricsInit(EFR32_RECEIVE_SENSITIVITY);
 #endif
@@ -1388,7 +1396,7 @@ void updateIeInfoTxFrame(void)
     if (sTxFrame->mInfo.mTxInfo.mIeInfo->mTimeIeOffset != 0)
     {
         uint8_t *timeIe = sTxFrame->mPsdu + sTxFrame->mInfo.mTxInfo.mIeInfo->mTimeIeOffset;
-        uint64_t time   = RAIL_GetTime() + sTxFrame->mInfo.mTxInfo.mIeInfo->mNetworkTimeOffset;
+        uint64_t time   = otPlatTimeGet() + sTxFrame->mInfo.mTxInfo.mIeInfo->mNetworkTimeOffset;
 
         *timeIe = sTxFrame->mInfo.mTxInfo.mIeInfo->mTimeSyncSeq;
 
