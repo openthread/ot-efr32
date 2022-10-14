@@ -57,6 +57,7 @@ readonly OT_OPTIONS=(
     "-DCMAKE_BUILD_TYPE=Release"
     "-DOT_DIAGNOSTIC=ON"
     "-DOT_EXTERNAL_HEAP=ON"
+    "-DOT_PING_SENDER=ON"
     "-DOT_SLAAC=ON"
 )
 
