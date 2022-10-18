@@ -6,7 +6,6 @@ category: OpenThread Examples
 quality: production
 
 component:
-  - id: brd4001a
   - id: ot_platform_abstraction_core
   - id: ot_psa_crypto
   - id: ot_thirdparty
