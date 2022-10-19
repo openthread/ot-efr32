@@ -74,10 +74,11 @@ generate()
     fi
 
     local slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
+    local openthread_slc_data="${OT_CMAKE_BUILD_DIR}"/slc/openthread_slc.data
     local cmake_library="$1"
     shift
 
-    run_slc -v 1 signature trust --sdk "${sdk_dir}"
+    run_slc -v 1 signature trust --sdk "${sdk_dir}" -data "${openthread_slc_data}"
 
     if [[ ${cmake_library} == "openthread-efr32-soc-with-buttons" ]]; then
         # ==============================================================================================================
@@ -87,6 +88,7 @@ generate()
         project_name="openthread-efr32-soc-with-buttons"
 
         run_slc -v 1 generate \
+            -data "${openthread_slc_data}" \
             --sdk="${sdk_dir}" \
             --clear-cache \
             --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc-with-buttons.slcp" \
@@ -111,6 +113,7 @@ generate()
         project_name="openthread-efr32-soc-with-buttons-power-manager"
 
         run_slc -v 1 generate \
+            -data "${openthread_slc_data}" \
             --sdk="${sdk_dir}" \
             --clear-cache \
             --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc-with-buttons.slcp" \

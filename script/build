@@ -73,8 +73,9 @@ generate()
     fi
 
     local slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
+    local openthread_slc_data="${OT_CMAKE_BUILD_DIR}"/slc/openthread_slc.data
 
-    run_slc -v 1 signature trust --sdk "${sdk_dir}"
+    run_slc -v 1 signature trust --sdk "${sdk_dir}" -data "${openthread_slc_data}"
 
     if contains ".*-(ftd|mtd)" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         # ==============================================================================================================
@@ -84,6 +85,7 @@ generate()
         project_name="openthread-efr32-soc"
 
         run_slc -v 1 generate \
+            -data "${openthread_slc_data}" \
             --sdk="${sdk_dir}" \
             --clear-cache \
             --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc.slcp" \
@@ -106,6 +108,7 @@ generate()
         project_name="openthread-efr32-rcp-uart"
 
         run_slc -v 1 generate \
+            -data "${openthread_slc_data}" \
             --sdk="${sdk_dir}" \
             --clear-cache \
             --project-file="${repo_dir}/src/platform_projects/${project_name}.slcp" \
@@ -136,6 +139,7 @@ generate()
         git apply "${silabs_dir}"/patches/*.patch
 
         run_slc -v 1 generate \
+            -data "${openthread_slc_data}" \
             --sdk="${sdk_dir}" \
             --clear-cache \
             --project-file="${repo_dir}/src/platform_projects/${project_name}.slcp" \
