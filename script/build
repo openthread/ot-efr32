@@ -60,6 +60,50 @@ readonly OT_OPTIONS=(
     "-DOT_SLAAC=ON"
 )
 
+need_patch_revert=false
+
+find_patches()
+{
+    patches=()
+    while IFS= read -r -d $'\0'; do
+        patches+=("$REPLY")
+    done < <(find "${repo_dir}"/third_party/silabs/patches -type f -name '*.patch' -print0 | sort -rnz)
+}
+apply_patches()
+{
+    find_patches
+
+    # Apply patch(es) to gecko_sdk for rcp-spi libs
+    echo "Applying patch(es) to Gecko SDK..."
+    for p in "${patches[@]}"; do
+        if git -C "${sdk_dir}" apply --check "${p}"; then
+            git -C "${sdk_dir}" apply "${p}"
+        else
+            exit 1
+        fi
+    done
+
+    need_patch_revert=true
+}
+
+revert_patches()
+{
+    if [ "${need_patch_revert}" = false ]; then
+        return
+    fi
+
+    find_patches
+
+    echo "Reverting patches to '${sdk_dir}'"
+    for p in "${patches[@]}"; do
+        if git -C "${sdk_dir}" apply -R --check "${p}"; then
+            git -C "${sdk_dir}" apply -R "${p}"
+        fi
+    done
+
+    need_patch_revert=false
+}
+
 die()
 {
     echo " ** ERROR: $1"
@@ -73,8 +117,9 @@ generate()
     fi
 
     local slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
+    local openthread_slc_data="${OT_CMAKE_BUILD_DIR}"/slc/openthread_slc.data
 
-    run_slc -v 1 signature trust --sdk "${sdk_dir}"
+    run_slc -v 1 signature trust --sdk "${sdk_dir}" -data "${openthread_slc_data}"
 
     if contains ".*-(ftd|mtd)" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         # ==============================================================================================================
@@ -84,6 +129,7 @@ generate()
         project_name="openthread-efr32-soc"
 
         run_slc -v 1 generate \
+            -data "${openthread_slc_data}" \
             --sdk="${sdk_dir}" \
             --clear-cache \
             --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc.slcp" \
@@ -106,6 +152,7 @@ generate()
         project_name="openthread-efr32-rcp-uart"
 
         run_slc -v 1 generate \
+            -data "${openthread_slc_data}" \
             --sdk="${sdk_dir}" \
             --clear-cache \
             --project-file="${repo_dir}/src/platform_projects/${project_name}.slcp" \
@@ -126,16 +173,11 @@ generate()
         # ==============================================================================================================
         current_project_export_dir="${slc_generated_projects_dir}/rcp_spi"
         project_name="openthread-efr32-rcp-spi"
-        local silabs_dir="${repo_dir}"/third_party/silabs
 
-        # Apply patch(es) to gecko_sdk for rcp-spi libs
-        echo "Applying patch(es) to Gecko SDK..."
-        cd "${silabs_dir}"/gecko_sdk
-        # Read the tag to restore the gecko_sdk head back to original
-        tag=$(git describe --tag)
-        git apply "${silabs_dir}"/patches/*.patch
+        apply_patches
 
         run_slc -v 1 generate \
+            -data "${openthread_slc_data}" \
             --sdk="${sdk_dir}" \
             --clear-cache \
             --project-file="${repo_dir}/src/platform_projects/${project_name}.slcp" \
@@ -149,10 +191,6 @@ generate()
         # TODO: Remove this when slc supports generic jinja template generation
         mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
         mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
-
-        echo "Restoring gecko_sdk back to tag ${tag}."
-        cd "${silabs_dir}"/gecko_sdk
-        git reset --hard "${tag}"
     fi
 }
 
@@ -215,9 +253,10 @@ build_rcp_spi()
         --graphviz=graph.dot
 
     ninja "ot-rcp"
-
+    revert_patches
     create_srec "${builddir}"
     cd "${repo_dir}"
+
 }
 
 build_soc()
@@ -353,5 +392,12 @@ main()
 
     ls -alh "${OT_CMAKE_BUILD_DIR}"/openthread/*/bin/*
 }
+
+cleanup()
+{
+    revert_patches
+}
+
+trap cleanup EXIT
 
 main "$@"
