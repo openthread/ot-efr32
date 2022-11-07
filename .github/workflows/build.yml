@@ -63,14 +63,6 @@ jobs:
             gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
             gcc_extract_dir: gcc-arm-none-eabi-10.3-2021.10
             os: ubuntu-22.04
-          - gcc_ver: 9
-            gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-mac.tar.bz2
-            gcc_extract_dir: gcc-arm-none-eabi-9-2019-q4-major
-            os: macos-latest
-          - gcc_ver: 10.3
-            gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-mac.tar.bz2
-            gcc_extract_dir: gcc-arm-none-eabi-10.3-2021.10
-            os: macos-latest
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
