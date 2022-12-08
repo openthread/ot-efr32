@@ -258,7 +258,7 @@ void efr32PlatProcessTransmitAesCcm(otRadioFrame *aFrame, const otExtAddress *aE
     uint8_t              tagLength;
     uint8_t              securityLevel;
     uint8_t              nonce[Crypto::AesCcm::kNonceSize];
-    Mac::TxFrame *       aTxFrame = static_cast<Mac::TxFrame *>(aFrame);
+    Mac::TxFrame        *aTxFrame = static_cast<Mac::TxFrame *>(aFrame);
     TxSecurityProcessing packetSecurityHandler;
 
     VerifyOrExit(aTxFrame->GetSecurityEnabled());

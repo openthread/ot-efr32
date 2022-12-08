@@ -205,8 +205,8 @@ void applicationTick(void)
 {
     otLinkModeConfig config;
     otMessageInfo    messageInfo;
-    otMessage *      message = NULL;
-    const char *     payload = MTD_MESSAGE;
+    otMessage       *message = NULL;
+    const char      *payload = MTD_MESSAGE;
 
     // Check for BTN0 button press
     if (sRxOnIdleButtonPressed)

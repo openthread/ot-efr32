@@ -67,7 +67,7 @@ static bool em1_requirement_set = false;
 
 static sl_power_manager_em_transition_event_handle_t pm_handle;
 static sl_power_manager_em_transition_event_info_t   pm_event_info = {POWER_MANAGER_EVENTS_OF_INTEREST,
-                                                                    energy_mode_transition_callback};
+                                                                      energy_mode_transition_callback};
 
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT && !SL_CATALOG_KERNEL_PRESENT
 

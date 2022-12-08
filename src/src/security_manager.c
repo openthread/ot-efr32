@@ -83,7 +83,7 @@ sl_sec_man_status_t sl_sec_man_init(void)
     return retStatus;
 }
 
-static void sl_sec_man_set_key_attributes(psa_key_id_t *        sl_psa_key_id,
+static void sl_sec_man_set_key_attributes(psa_key_id_t         *sl_psa_key_id,
                                           psa_key_attributes_t *sl_psa_key_attr,
                                           psa_key_type_t        sl_psa_key_type,
                                           psa_algorithm_t       sl_psa_key_algorithm,
@@ -115,12 +115,12 @@ static void sl_sec_man_set_key_attributes(psa_key_id_t *        sl_psa_key_id,
     psa_set_key_bits(sl_psa_key_attr, sl_psa_key_len);
 }
 
-sl_sec_man_status_t sl_sec_man_import_key(psa_key_id_t *        sl_psa_key_id,
+sl_sec_man_status_t sl_sec_man_import_key(psa_key_id_t         *sl_psa_key_id,
                                           psa_key_type_t        sl_psa_key_type,
                                           psa_algorithm_t       sl_psa_key_algorithm,
                                           psa_key_usage_t       sl_psa_key_usage,
                                           psa_key_persistence_t sl_psa_key_persistence,
-                                          const uint8_t *       sl_psa_key_literal,
+                                          const uint8_t        *sl_psa_key_literal,
                                           size_t                sl_key_literal_len)
 {
     psa_status_t         status;
@@ -142,7 +142,7 @@ exit:
     return (SEC_MAN_GET_STATUS(status));
 }
 
-sl_sec_man_status_t sl_sec_man_generate_key(psa_key_id_t *        sl_psa_key_id,
+sl_sec_man_status_t sl_sec_man_generate_key(psa_key_id_t         *sl_psa_key_id,
                                             psa_key_type_t        sl_psa_key_type,
                                             psa_algorithm_t       sl_psa_key_algorithm,
                                             psa_key_usage_t       sl_psa_key_usage,
@@ -169,9 +169,9 @@ exit:
 }
 
 sl_sec_man_status_t sl_sec_man_export_key(psa_key_id_t sl_psa_key_id,
-                                          uint8_t *    sl_psa_key_buffer,
+                                          uint8_t     *sl_psa_key_buffer,
                                           size_t       sl_psa_key_buffer_len,
-                                          size_t *     sl_psa_key_len)
+                                          size_t      *sl_psa_key_len)
 {
     psa_status_t status;
 
@@ -212,8 +212,8 @@ sl_sec_man_status_t sl_sec_man_destroy_key(psa_key_id_t sl_psa_key_id)
 
 sl_sec_man_status_t sl_sec_man_aes_encrypt(psa_key_id_t    sl_psa_key_id,
                                            psa_algorithm_t sl_psa_aes_alg,
-                                           const uint8_t * sl_psa_aes_input,
-                                           uint8_t *       sl_psa_aes_output)
+                                           const uint8_t  *sl_psa_aes_input,
+                                           uint8_t        *sl_psa_aes_output)
 {
     size_t              sl_psa_aes_enc_len = 0;
     sl_sec_man_status_t status             = SL_SECURITY_MAN_SUCCESS;
@@ -248,7 +248,7 @@ exit:
 }
 
 sl_sec_man_status_t sl_sec_man_hmac_update(psa_mac_operation_t *sl_psa_hmac_ctx,
-                                           const uint8_t *      sl_psa_hmac_buffer,
+                                           const uint8_t       *sl_psa_hmac_buffer,
                                            size_t               sl_psa_hmac_buffer_len)
 {
     sl_sec_man_status_t status = SL_SECURITY_MAN_SUCCESS;
@@ -266,7 +266,7 @@ exit:
 }
 
 sl_sec_man_status_t sl_sec_man_hmac_finish(psa_mac_operation_t *sl_psa_hmac_ctx,
-                                           const uint8_t *      sl_psa_hmac_buffer,
+                                           const uint8_t       *sl_psa_hmac_buffer,
                                            size_t               sl_psa_hmac_buffer_len)
 {
     sl_sec_man_status_t status            = SL_SECURITY_MAN_SUCCESS;
@@ -303,7 +303,7 @@ exit:
 sl_sec_man_status_t sl_sec_man_key_derivation_extract(psa_key_derivation_operation_t *sl_psa_key_derivation_ctx,
                                                       psa_algorithm_t                 sl_psa_key_derivation_algorithm,
                                                       psa_key_id_t                    sl_psa_key_id,
-                                                      const uint8_t *                 sl_psa_key_derivation_salt,
+                                                      const uint8_t                  *sl_psa_key_derivation_salt,
                                                       uint16_t                        sl_psa_key_derivation_salt_length)
 {
     psa_status_t        sl_psa_status;
@@ -355,9 +355,9 @@ exit:
 }
 
 sl_sec_man_status_t sl_sec_man_key_derivation_expand(psa_key_derivation_operation_t *sl_psa_key_derivation_ctx,
-                                                     const uint8_t *                 sl_psa_key_derivation_info,
+                                                     const uint8_t                  *sl_psa_key_derivation_info,
                                                      uint16_t                        sl_psa_key_derivation_info_length,
-                                                     uint8_t *                       sl_psa_key_derivation_output_key,
+                                                     uint8_t                        *sl_psa_key_derivation_output_key,
                                                      uint16_t sl_psa_key_derivation_output_key_len)
 {
     psa_status_t        sl_psa_status;
@@ -436,7 +436,7 @@ exit:
 }
 
 sl_sec_man_status_t sl_sec_man_hash_update(psa_hash_operation_t *sl_psa_hash_ctx,
-                                           uint8_t *             sl_psa_hash_buffer,
+                                           uint8_t              *sl_psa_hash_buffer,
                                            uint16_t              sl_psa_hash_buffer_len)
 {
     sl_sec_man_status_t status = SL_SECURITY_MAN_SUCCESS;
@@ -454,9 +454,9 @@ exit:
 }
 
 sl_sec_man_status_t sl_sec_man_hash_finish(psa_hash_operation_t *sl_psa_hash_ctx,
-                                           uint8_t *             sl_psa_hash,
+                                           uint8_t              *sl_psa_hash,
                                            uint16_t              sl_psa_hash_size,
-                                           size_t *              sl_psa_hash_len)
+                                           size_t               *sl_psa_hash_len)
 {
     sl_sec_man_status_t status = SL_SECURITY_MAN_SUCCESS;
 

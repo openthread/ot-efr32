@@ -165,8 +165,8 @@ void sl_button_on_change(const sl_button_t *handle)
 void applicationTick(void)
 {
     otMessageInfo messageInfo;
-    otMessage *   message = NULL;
-    const char *  payload = FTD_MESSAGE;
+    otMessage    *message = NULL;
+    const char   *payload = FTD_MESSAGE;
 
     // Check for button press
     if (sFtdButtonPressed)
