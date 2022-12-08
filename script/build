@@ -53,12 +53,13 @@ source "$script_dir/util"
 # ==============================================================================
 OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET:-}
 
-readonly OT_OPTIONS=(
+OT_OPTIONS=(
     "-DCMAKE_BUILD_TYPE=Release"
     "-DOT_DIAGNOSTIC=ON"
     "-DOT_EXTERNAL_HEAP=ON"
     "-DOT_SLAAC=ON"
 )
+readonly OT_OPTIONS
 
 need_patch_revert=false
 

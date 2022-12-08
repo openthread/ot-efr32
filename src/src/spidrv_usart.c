@@ -87,7 +87,7 @@ static volatile LDMA_Descriptor_t rx_descriptor;
 // TRANSACTION EVENT'S CALLBACK
 static volatile otPlatSpiSlaveTransactionCompleteCallback complete_callback;
 static volatile otPlatSpiSlaveTransactionProcessCallback  process_callback;
-static volatile void *                                    context;
+static volatile void                                     *context;
 
 // SPI Peripheral
 static volatile SPIDRV_HandleData_t sl_spidrv_handle_data;
@@ -173,7 +173,7 @@ static void rcp_spidrv_spi_transaction_end_interrupt(uint8_t intNo)
 
 otError otPlatSpiSlaveEnable(otPlatSpiSlaveTransactionCompleteCallback aCompleteCallback,
                              otPlatSpiSlaveTransactionProcessCallback  aProcessCallback,
-                             void *                                    aContext)
+                             void                                     *aContext)
 {
     CORE_DECLARE_IRQ_STATE;
     otError error = OT_ERROR_NONE;

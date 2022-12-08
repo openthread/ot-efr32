@@ -137,12 +137,12 @@ void otPlatCryptoInit(void)
     (void)sl_sec_man_init();
 }
 
-otError otPlatCryptoImportKey(otCryptoKeyRef *     aKeyId,
+otError otPlatCryptoImportKey(otCryptoKeyRef      *aKeyId,
                               otCryptoKeyType      aKeyType,
                               otCryptoKeyAlgorithm aKeyAlgorithm,
                               int                  aKeyUsage,
                               otCryptoKeyStorage   aKeyPersistence,
-                              const uint8_t *      aKey,
+                              const uint8_t       *aKey,
                               size_t               aKeyLen)
 {
     otError             error = OT_ERROR_NONE;
@@ -216,7 +216,7 @@ otError otPlatCryptoAesEncrypt(otCryptoContext *aContext, const uint8_t *aInput,
 {
     otError             error = OT_ERROR_NONE;
     sl_sec_man_status_t status;
-    otCryptoKeyRef *    mKeyRef = NULL;
+    otCryptoKeyRef     *mKeyRef = NULL;
 
     otEXPECT_ACTION(((aContext != NULL) && (aContext->mContext != NULL) && (aOutput != NULL) && (aInput != NULL)),
                     error = OT_ERROR_INVALID_ARGS);
@@ -304,9 +304,9 @@ exit:
 // HKDF platform implementations
 // As the HKDF does not actually use mbedTLS APIs but uses HMAC module, this feature is not implemented.
 otError otPlatCryptoHkdfExpand(otCryptoContext *aContext,
-                               const uint8_t *  aInfo,
+                               const uint8_t   *aInfo,
                                uint16_t         aInfoLength,
-                               uint8_t *        aOutputKey,
+                               uint8_t         *aOutputKey,
                                uint16_t         aOutputKeyLength)
 {
     otError             error = OT_ERROR_NONE;
@@ -323,8 +323,8 @@ exit:
     return error;
 }
 
-otError otPlatCryptoHkdfExtract(otCryptoContext *  aContext,
-                                const uint8_t *    aSalt,
+otError otPlatCryptoHkdfExtract(otCryptoContext   *aContext,
+                                const uint8_t     *aSalt,
                                 uint16_t           aSaltLength,
                                 const otCryptoKey *aKey)
 {

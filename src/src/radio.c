@@ -207,7 +207,7 @@ static otRadioFrame     sTransmitFrame;
 static uint8_t          sTransmitPsdu[IEEE802154_MAX_LENGTH];
 static volatile otError sTransmitError;
 static volatile bool    sTransmitBusy = false;
-static otRadioFrame *   sTxFrame      = NULL;
+static otRadioFrame    *sTxFrame      = NULL;
 
 #if OPENTHREAD_CONFIG_MAC_HEADER_IE_SUPPORT
 static otRadioIeInfo sTransmitIeInfo;
@@ -222,7 +222,7 @@ static otRadioState sState       = OT_RADIO_STATE_DISABLED;
 
 static efr32CommonConfig sCommonConfig;
 static efr32BandConfig   sBandConfig;
-static efr32BandConfig * sCurrentBandConfig = NULL;
+static efr32BandConfig  *sCurrentBandConfig = NULL;
 
 static int8_t sCcaThresholdDbm = CCA_THRESHOLD_DEFAULT;
 
@@ -602,7 +602,7 @@ exit:
 static uint8_t readInitialPacketData(RAIL_RxPacketInfo_t *packetInfo,
                                      uint8_t              expected_data_bytes_max,
                                      uint8_t              expected_data_bytes_min,
-                                     uint8_t *            buffer,
+                                     uint8_t             *buffer,
                                      uint8_t              buffer_len)
 {
     uint8_t packetBytesRead = 0;
@@ -664,8 +664,8 @@ static void txFailedCallback(bool isAck, uint8_t status);
 
 static bool validatePacketDetails(RAIL_RxPacketHandle_t   packetHandle,
                                   RAIL_RxPacketDetails_t *pPacketDetails,
-                                  RAIL_RxPacketInfo_t *   pPacketInfo,
-                                  uint16_t *              packetLength);
+                                  RAIL_RxPacketInfo_t    *pPacketInfo,
+                                  uint16_t               *packetLength);
 static bool validatePacketTimestamp(RAIL_RxPacketDetails_t *pPacketDetails, uint16_t packetLength);
 static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
                                  bool                    securedOutgoingEnhancedAck,
@@ -1767,7 +1767,7 @@ otError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, uint1
 // Radio Config: Thread 1.2 transmit security support
 
 #if (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
-void otPlatRadioSetMacKey(otInstance *            aInstance,
+void otPlatRadioSetMacKey(otInstance             *aInstance,
                           uint8_t                 aKeyIdMode,
                           uint8_t                 aKeyId,
                           const otMacKeyMaterial *aPrevKey,
@@ -1831,7 +1831,7 @@ void otPlatRadioSetMacFrameCounter(otInstance *aInstance, uint32_t aMacFrameCoun
 // Radio Config: Enhanced Acks, CSL
 
 #if OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
-otError otPlatRadioEnableCsl(otInstance *        aInstance,
+otError otPlatRadioEnableCsl(otInstance         *aInstance,
                              uint32_t            aCslPeriod,
                              otShortAddress      aShortAddr,
                              const otExtAddress *aExtAddr)
@@ -1872,10 +1872,10 @@ uint8_t otPlatRadioGetCslUncertainty(otInstance *aInstance)
 // Radio Config: Link Metrics
 
 #if OPENTHREAD_CONFIG_MLE_LINK_METRICS_SUBJECT_ENABLE
-otError otPlatRadioConfigureEnhAckProbing(otInstance *         aInstance,
+otError otPlatRadioConfigureEnhAckProbing(otInstance          *aInstance,
                                           otLinkMetrics        aLinkMetrics,
                                           const otShortAddress aShortAddress,
-                                          const otExtAddress * aExtAddress)
+                                          const otExtAddress  *aExtAddress)
 {
     OT_UNUSED_VARIABLE(aInstance);
 
@@ -1929,8 +1929,8 @@ exit:
 // Return true otherwise
 static bool writeIeee802154EnhancedAck(RAIL_Handle_t        aRailHandle,
                                        RAIL_RxPacketInfo_t *packetInfoForEnhAck,
-                                       uint8_t *            initialPktReadBytes,
-                                       uint8_t *            receivedPsdu)
+                                       uint8_t             *initialPktReadBytes,
+                                       uint8_t             *receivedPsdu)
 {
     // RAIL will generate an Immediate ACK for us.
     // For an Enhanced ACK, we need to generate the whole packet ourselves.
@@ -1972,7 +1972,7 @@ static bool writeIeee802154EnhancedAck(RAIL_Handle_t        aRailHandle,
 
     otMacAddress aSrcAddress;
     uint8_t      linkMetricsDataLen = 0;
-    uint8_t *    dataPtr            = NULL;
+    uint8_t     *dataPtr            = NULL;
     bool         setFramePending    = false;
 
     otMacFrameGetSrcAddr(&receivedFrame, &aSrcAddress);
@@ -2622,8 +2622,8 @@ static void RAILCb_Generic(RAIL_Handle_t aRailHandle, RAIL_Events_t aEvents)
 
 static bool validatePacketDetails(RAIL_RxPacketHandle_t   packetHandle,
                                   RAIL_RxPacketDetails_t *pPacketDetails,
-                                  RAIL_RxPacketInfo_t *   pPacketInfo,
-                                  uint16_t *              packetLength)
+                                  RAIL_RxPacketInfo_t    *pPacketInfo,
+                                  uint16_t               *packetLength)
 {
     bool pktValid = true;
 

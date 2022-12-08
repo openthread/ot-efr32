@@ -54,7 +54,7 @@
 #define RECEIVE_BUFFER_SIZE 128
 
 static uint8_t           sReceiveBuffer[RECEIVE_BUFFER_SIZE];
-static const uint8_t *   sTransmitBuffer = NULL;
+static const uint8_t    *sTransmitBuffer = NULL;
 static volatile uint16_t sTransmitLength = 0;
 
 #ifdef SL_CATALOG_KERNEL_PRESENT
