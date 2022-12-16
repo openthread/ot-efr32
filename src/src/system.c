@@ -32,11 +32,11 @@
  *   This file includes the platform-specific initializers.
  */
 
-#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
 #include <assert.h>
 #include <string.h>
 
 #include "openthread-system.h"
+#include <openthread-core-config.h>
 #include "utils/uart.h"
 
 #include "common/logging.hpp"
@@ -141,6 +141,10 @@ void otSysProcessDrivers(otInstance *aInstance)
     // Do not remove this call: Silicon Labs components process action routine
     // must be called from the super loop.
     sl_system_process_action();
+#endif
+
+#if (SL_GP_RCP_INTERFACE_ENABLED == 1)
+    efr32GpProcess();
 #endif
 
 #if OPENTHREAD_CONFIG_NCP_HDLC_ENABLE

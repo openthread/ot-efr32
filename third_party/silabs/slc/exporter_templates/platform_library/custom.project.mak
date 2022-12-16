@@ -76,7 +76,7 @@ set(SILABS_MBEDTLS_SOURCES
     {%- set source = prepare_path(source) -%}
 
     {#- Filter-out non-mbedtls sources #}
-    {%- if 'util/third_party/crypto' in source %}
+    {%- if 'util/third_party/mbedtls' in source %}
     {{source}}
     {%- endif %}
 {%- endfor %}
