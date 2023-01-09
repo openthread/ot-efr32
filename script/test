@@ -135,7 +135,7 @@ main()
         )
     fi
 
-    export CPPFLAGS="${CPPFLAGS:-} -DNDEBUG"
+    export CPPFLAGS="${CPPFLAGS-} -DNDEBUG"
     for ((idx = 0; idx < ${#BOARDS[@]}; idx = idx + 1)); do
         local board="${BOARDS[idx]}"
         echo "Building [${board}]..."
