@@ -51,7 +51,7 @@ source "$script_dir/slc_cli"
 source "$script_dir/util"
 
 # ==============================================================================
-OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET:-}
+OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET-}
 
 OT_OPTIONS=(
     "-DCMAKE_BUILD_TYPE=Release"
@@ -60,50 +60,6 @@ OT_OPTIONS=(
     "-DOT_SLAAC=ON"
 )
 readonly OT_OPTIONS
-
-need_patch_revert=false
-
-find_patches()
-{
-    patches=()
-    while IFS= read -r -d $'\0'; do
-        patches+=("$REPLY")
-    done < <(find "${repo_dir}"/third_party/silabs/patches -type f -name '*.patch' -print0 | sort -rnz)
-}
-apply_patches()
-{
-    find_patches
-
-    # Apply patch(es) to gecko_sdk for rcp-spi libs
-    echo "Applying patch(es) to Gecko SDK..."
-    for p in "${patches[@]}"; do
-        if git -C "${sdk_dir}" apply --check "${p}"; then
-            git -C "${sdk_dir}" apply "${p}"
-        else
-            exit 1
-        fi
-    done
-
-    need_patch_revert=true
-}
-
-revert_patches()
-{
-    if [ "${need_patch_revert}" = false ]; then
-        return
-    fi
-
-    find_patches
-
-    echo "Reverting patches to '${sdk_dir}'"
-    for p in "${patches[@]}"; do
-        if git -C "${sdk_dir}" apply -R --check "${p}"; then
-            git -C "${sdk_dir}" apply -R "${p}"
-        fi
-    done
-
-    need_patch_revert=false
-}
 
 die()
 {
@@ -174,8 +130,6 @@ generate()
         # ==============================================================================================================
         current_project_export_dir="${slc_generated_projects_dir}/rcp_spi"
         project_name="openthread-efr32-rcp-spi"
-
-        apply_patches
 
         run_slc -v 1 generate \
             -data "${openthread_slc_data}" \
@@ -254,7 +208,6 @@ build_rcp_spi()
         --graphviz=graph.dot
 
     ninja "ot-rcp"
-    revert_patches
     create_srec "${builddir}"
     cd "${repo_dir}"
 
@@ -396,7 +349,8 @@ main()
 
 cleanup()
 {
-    revert_patches
+    # Placeholder for any cleanup tasks
+    :
 }
 
 trap cleanup EXIT

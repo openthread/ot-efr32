@@ -32,8 +32,6 @@
  *
  */
 
-#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -41,6 +39,7 @@
 
 #include "platform-efr32.h"
 #include "rail_ieee802154.h"
+#include <openthread-core-config.h>
 #include <openthread/cli.h>
 #include <openthread/config.h>
 #include <openthread/logging.h>
@@ -96,7 +95,7 @@ otError otPlatDiagTxStreamRandom(void)
 
     RAIL_GetChannel(gRailHandle, &streamChannel);
 
-    otLogInfoPlat("Diag Stream PN9 Process", NULL);
+    otLogInfoPlat("Diag Stream PN9 Process");
 
     status = RAIL_StartTxStream(gRailHandle, streamChannel, RAIL_STREAM_PN9_STREAM);
     assert(status == RAIL_STATUS_NO_ERROR);
@@ -111,7 +110,7 @@ otError otPlatDiagTxStreamTone(void)
 
     RAIL_GetChannel(gRailHandle, &streamChannel);
 
-    otLogInfoPlat("Diag Stream CARRIER-WAVE Process", NULL);
+    otLogInfoPlat("Diag Stream CARRIER-WAVE Process");
 
     status = RAIL_StartTxStream(gRailHandle, streamChannel, RAIL_STREAM_CARRIER_WAVE);
     assert(status == RAIL_STATUS_NO_ERROR);
@@ -123,7 +122,7 @@ otError otPlatDiagTxStreamStop(void)
 {
     RAIL_Status_t status;
 
-    otLogInfoPlat("Diag Stream STOP Process", NULL);
+    otLogInfoPlat("Diag Stream STOP Process");
 
     status = RAIL_StopTxStream(gRailHandle);
     assert(status == RAIL_STATUS_NO_ERROR);
@@ -135,7 +134,7 @@ otError otPlatDiagTxStreamAddrMatch(uint8_t enable)
 {
     RAIL_Status_t status;
 
-    otLogInfoPlat("Diag Stream Disable addressMatch", NULL);
+    otLogInfoPlat("Diag Stream Disable addressMatch");
 
     status = RAIL_IEEE802154_SetPromiscuousMode(gRailHandle, !enable);
     assert(status == RAIL_STATUS_NO_ERROR);
@@ -147,7 +146,7 @@ otError otPlatDiagTxStreamAutoAck(uint8_t autoAckEnabled)
 {
     RAIL_Status_t status = RAIL_STATUS_NO_ERROR;
 
-    otLogInfoPlat("Diag Stream Disable autoAck", NULL);
+    otLogInfoPlat("Diag Stream Disable autoAck");
 
     RAIL_PauseRxAutoAck(gRailHandle, !autoAckEnabled);
 

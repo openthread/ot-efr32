@@ -51,7 +51,7 @@ source "$script_dir/slc_cli"
 source "$script_dir/util"
 
 # ==============================================================================
-OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET:-}
+OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET-}
 
 OT_OPTIONS=(
     "-DCMAKE_BUILD_TYPE=Release"
@@ -149,8 +149,8 @@ create_srec()
 
 build_example_app()
 {
-    local example_app_ninja_target=${1:-}
-    local ot_platform_lib=${2:-}
+    local example_app_ninja_target=${1-}
+    local ot_platform_lib=${2-}
     shift 2
 
     # Generate the platform lib and related libs

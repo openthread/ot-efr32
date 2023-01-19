@@ -32,13 +32,11 @@
  *
  */
 
-#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
-
 #include "openthread-system.h"
 #include <assert.h>
+#include <openthread-core-config.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <openthread/config.h>
 #include <openthread/platform/alarm-micro.h>
 #include <openthread/platform/alarm-milli.h>
 #include <openthread/platform/diag.h>
@@ -65,6 +63,8 @@ static bool                         sIsMsRunning = false;
 static uint32_t sUsAlarm     = 0;
 static bool     sIsUsRunning = false;
 
+static RAIL_MultiTimer_t rail_timer;
+
 static void AlarmCallback(sl_sleeptimer_timer_handle_t *aHandle, void *aData)
 {
     OT_UNUSED_VARIABLE(aHandle);
@@ -72,18 +72,18 @@ static void AlarmCallback(sl_sleeptimer_timer_handle_t *aHandle, void *aData)
     otSysEventSignalPending();
 }
 
-static void radioTimerExpired(RAIL_Handle_t cbArg)
+static void radioTimerExpired(struct RAIL_MultiTimer *tmr, RAIL_Time_t expectedTimeOfEvent, void *cbArg)
 {
+    OT_UNUSED_VARIABLE(tmr);
+    OT_UNUSED_VARIABLE(expectedTimeOfEvent);
     OT_UNUSED_VARIABLE(cbArg);
+
     otSysEventSignalPending();
 }
 
 void efr32AlarmInit(void)
 {
     memset(&sl_handle, 0, sizeof sl_handle);
-#if OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE
-    (void)RAIL_ConfigMultiTimer(true);
-#endif
 }
 
 uint32_t otPlatAlarmMilliGetNow(void)
@@ -247,15 +247,13 @@ uint64_t otPlatTimeGet(void)
     return now64TimeUs;
 }
 
-// Note: If we ever use OpenThread in a multi-instance scenario, we need to
-// switch to using RAIL_SetMultiTimer / RAIL_CancelMultiTimer calls below.
 void otPlatAlarmMicroStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 {
     OT_UNUSED_VARIABLE(aInstance);
     RAIL_Status_t status;
     int32_t       remaining;
 
-    RAIL_CancelTimer(gRailHandle);
+    RAIL_CancelMultiTimer(&rail_timer);
 
     sUsAlarm     = aT0 + aDt;
     remaining    = (int32_t)(sUsAlarm - otPlatAlarmMicroGetNow());
@@ -267,7 +265,7 @@ void otPlatAlarmMicroStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
     }
     else
     {
-        status = RAIL_SetTimer(gRailHandle, remaining, RAIL_TIME_DELAY, &radioTimerExpired);
+        status = RAIL_SetMultiTimer(&rail_timer, remaining, RAIL_TIME_DELAY, radioTimerExpired, NULL);
         assert(status == RAIL_STATUS_NO_ERROR);
     }
 }
@@ -276,6 +274,6 @@ void otPlatAlarmMicroStop(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
 
-    RAIL_CancelTimer(gRailHandle);
+    RAIL_CancelMultiTimer(&rail_timer);
     sIsUsRunning = false;
 }

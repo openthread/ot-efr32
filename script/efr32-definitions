@@ -84,7 +84,7 @@ efr32_check_platform()
     #
     # Arg $1 -- value
     local match=false
-    local platform="${1:-}"
+    local platform="${1-}"
 
     for efr32_platform in $(efr32_get_platforms); do
         if [[ $efr32_platform == "$platform" ]]; then

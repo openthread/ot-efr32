@@ -34,13 +34,13 @@
  */
 
 #define CURRENT_MODULE_NAME "OPENTHREAD"
-#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
 
 #include "sleep.h"
 #include "em_core.h"
 #include "platform-efr32.h"
 #include "sl_component_catalog.h"
 #include <assert.h>
+#include <openthread-core-config.h>
 #include <openthread/tasklet.h>
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)

@@ -26,21 +26,52 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "platform-efr32.h"
-#include <openthread-core-config.h>
+/*******************************************************************************
+ * @file
+ * @brief This file implements Green Power interface.
+ ******************************************************************************/
 
-#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
-#include <openthread/platform/memory.h>
+#ifndef SL_RCP_GP_INTERFACE_H_
+#define SL_RCP_GP_INTERFACE_H_
 
-#include "sl_malloc.h"
+#include <stdbool.h>
+#include <openthread/platform/radio.h>
 
-void *otPlatCAlloc(size_t aNum, size_t aSize)
+// GP state-machine states
+typedef enum
 {
-    return sl_calloc(aNum, aSize);
-}
+    SL_GP_STATE_INIT,
+    SL_GP_STATE_IDLE,
+    SL_GP_STATE_WAITING_FOR_PKT,
+    SL_GP_STATE_SEND_RESPONSE,
+    SL_GP_STATE_SENDING_RESPONSE,
+    SL_GP_STATE_MAX
+} sl_gp_state_t;
 
-void otPlatFree(void *aPtr)
-{
-    sl_free(aPtr);
-}
+/**
+ * This function returns if the given frame is a GP frame.
+ *
+ * @param[in]  aFrame       A pointer to the MAC frame buffer.
+ * @param[in]  isRxFrame    If the give frame is a incoming or outgoing frame.
+ *
+ * @retval  true    Frame is a GP packet.
+ * @retval  false   Frame is not a GP packet.
+ */
+bool sl_gp_intf_is_gp_pkt(otRadioFrame *aFrame, bool isRxFrame);
+
+/**
+ * This function stores the provided packet in global memory, to be sent as
+ * a response for specific incoming packet.
+ *
+ * @param[in]  aFrame       A pointer to the MAC frame buffer.
+ */
+void sl_gp_intf_buffer_pkt(otRadioFrame *aFrame);
+
+/**
+ * This function returns current state of GP state machine.
+ *
+ * @retval  true    Status of GP state machine.
+ */
+sl_gp_state_t sl_gp_intf_get_state(void);
+
 #endif

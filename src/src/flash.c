@@ -31,8 +31,11 @@
  *   This file implements the OpenThread platform abstraction for the non-volatile storage.
  */
 
-#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
-#include <openthread/config.h>
+#include <openthread-core-config.h>
+
+#ifdef SL_COMPONENT_CATALOG_PRESENT
+#include "sl_component_catalog.h"
+#endif // SL_COMPONENT_CATALOG_PRESENT
 
 #if OPENTHREAD_CONFIG_PLATFORM_FLASH_API_ENABLE // Use OT NV system
 
@@ -98,7 +101,7 @@ void otPlatFlashRead(otInstance *aInstance, uint8_t aSwapIndex, uint32_t aOffset
     memcpy(aData, (const uint8_t *)mapAddress(aSwapIndex, aOffset), aSize);
 }
 
-#else // Defaults to Silabs nvm3 system
+#elif defined(SL_CATALOG_NVM3_PRESENT) // Defaults to Silabs nvm3 system
 
 #include "nvm3_default.h"
 #include <string.h>
