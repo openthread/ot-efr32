@@ -178,4 +178,6 @@ RAIL_Status_t efr32RadioSetCcaMode(uint8_t aMode);
 
 bool efr32AllowSleepCallback(void);
 
+otError railStatusToOtError(RAIL_Status_t status);
+
 #endif // PLATFORM_EFR32_H_

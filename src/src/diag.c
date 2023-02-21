@@ -104,7 +104,7 @@ otError otPlatDiagTxStreamRandom(void)
     status = RAIL_StartTxStream(gRailHandle, streamChannel, RAIL_STREAM_PN9_STREAM);
     assert(status == RAIL_STATUS_NO_ERROR);
 
-    return status;
+    return railStatusToOtError(status);
 }
 
 otError otPlatDiagTxStreamTone(void)
@@ -119,7 +119,7 @@ otError otPlatDiagTxStreamTone(void)
     status = RAIL_StartTxStream(gRailHandle, streamChannel, RAIL_STREAM_CARRIER_WAVE);
     assert(status == RAIL_STATUS_NO_ERROR);
 
-    return status;
+    return railStatusToOtError(status);
 }
 
 otError otPlatDiagTxStreamStop(void)
@@ -131,7 +131,7 @@ otError otPlatDiagTxStreamStop(void)
     status = RAIL_StopTxStream(gRailHandle);
     assert(status == RAIL_STATUS_NO_ERROR);
 
-    return status;
+    return railStatusToOtError(status);
 }
 
 otError otPlatDiagTxStreamAddrMatch(uint8_t enable)
@@ -143,119 +143,166 @@ otError otPlatDiagTxStreamAddrMatch(uint8_t enable)
     status = RAIL_IEEE802154_SetPromiscuousMode(gRailHandle, !enable);
     assert(status == RAIL_STATUS_NO_ERROR);
 
-    return status;
+    return railStatusToOtError(status);
 }
 
 otError otPlatDiagTxStreamAutoAck(uint8_t autoAckEnabled)
 {
-    RAIL_Status_t status = RAIL_STATUS_NO_ERROR;
-
     otLogInfoPlat("Diag Stream Disable autoAck");
 
     RAIL_PauseRxAutoAck(gRailHandle, !autoAckEnabled);
 
-    return status;
+    return OT_ERROR_NONE;
 }
-
 
 // coex
 otError otPlatDiagCoexSetPriorityPulseWidth(uint8_t pulseWidthUs)
 {
+    OT_UNUSED_VARIABLE(pulseWidthUs);
+    otError error = OT_ERROR_FAILED;
+
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
     // Actual call on rcp side
     sl_status_t status = sl_rail_util_coex_set_directional_priority_pulse_width(pulseWidthUs);
 
-    return (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
+    error = (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    return OT_ERROR_FAILED;
+
+    return error;
 }
 
 otError otPlatDiagCoexSetRadioHoldoff(bool enabled)
 {
+    OT_UNUSED_VARIABLE(enabled);
+    otError error = OT_ERROR_FAILED;
+
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
     // Actual call on rcp side
     sl_status_t status = sl_rail_util_coex_set_radio_holdoff(enabled);
 
-    return (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
+    error = (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    return OT_ERROR_FAILED;
+
+    return error;
 }
 
 otError otPlatDiagCoexSetRequestPwm(uint8_t ptaReq, void *ptaCb, uint8_t dutyCycle, uint8_t periodHalfMs)
 {
+    OT_UNUSED_VARIABLE(ptaReq);
     OT_UNUSED_VARIABLE(ptaCb);
+    OT_UNUSED_VARIABLE(dutyCycle);
+    OT_UNUSED_VARIABLE(periodHalfMs);
+    otError error = OT_ERROR_FAILED;
+
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
     sl_status_t status = sl_rail_util_coex_set_request_pwm(ptaReq, NULL, dutyCycle, periodHalfMs);
-    return (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
+    error              = (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    return OT_ERROR_FAILED;
+
+    return error;
 }
 otError otPlatDiagCoexSetPhySelectTimeout(uint8_t timeoutMs)
 {
+    OT_UNUSED_VARIABLE(timeoutMs);
+    otError error = OT_ERROR_FAILED;
+
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
     sl_status_t status = sl_rail_util_coex_set_phy_select_timeout(timeoutMs);
-    return (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
+    error              = (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    return OT_ERROR_FAILED;
+
+    return error;
 }
 
 otError otPlatDiagCoexSetOptions(uint32_t options)
 {
+    OT_UNUSED_VARIABLE(options);
+    otError error = OT_ERROR_FAILED;
+
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
     sl_status_t status = sl_rail_util_coex_set_options(options);
-    return (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
+    error              = (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    return OT_ERROR_FAILED;
+
+    return error;
 }
 
 otError otPlatDiagCoexGetPhySelectTimeout(uint8_t *timeoutMs)
 {
+    OT_UNUSED_VARIABLE(timeoutMs);
+    otError error = OT_ERROR_FAILED;
+
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    if (timeoutMs != NULL)
+    if (timeoutMs == NULL)
     {
-        *timeoutMs = sl_rail_util_coex_get_phy_select_timeout();
-        return OT_ERROR_NONE;
+        return OT_ERROR_INVALID_ARGS;
     }
+
+    *timeoutMs = sl_rail_util_coex_get_phy_select_timeout();
+    error      = OT_ERROR_NONE;
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    return OT_ERROR_FAILED;
+
+    return error;
 }
 
 otError otPlatDiagCoexGetOptions(uint32_t *options)
 {
+    OT_UNUSED_VARIABLE(options);
+    otError error = OT_ERROR_FAILED;
+
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    if (options != NULL)
+    if (options == NULL)
     {
-        *options = sl_rail_util_coex_get_options();
-        return OT_ERROR_NONE;
+        return OT_ERROR_INVALID_ARGS;
     }
+
+    *options = sl_rail_util_coex_get_options();
+    error    = OT_ERROR_NONE;
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    return OT_ERROR_FAILED;
+
+    return error;
 }
 
 otError otPlatDiagCoexGetPriorityPulseWidth(uint8_t *pulseWidthUs)
 {
+    OT_UNUSED_VARIABLE(pulseWidthUs);
+    otError error = OT_ERROR_FAILED;
+
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    if (pulseWidthUs != NULL)
+    if (pulseWidthUs == NULL)
     {
-        *pulseWidthUs = sl_rail_util_coex_get_directional_priority_pulse_width();
-        return OT_ERROR_NONE;
+        return OT_ERROR_INVALID_ARGS;
     }
+
+    *pulseWidthUs = sl_rail_util_coex_get_directional_priority_pulse_width();
+    error         = OT_ERROR_NONE;
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    return OT_ERROR_FAILED;
+
+    return error;
 }
 
 otError otPlatDiagCoexGetRequestPwmArgs(uint8_t *req, uint8_t *dutyCycle, uint8_t *periodHalfMs)
 {
+    OT_UNUSED_VARIABLE(req);
+    OT_UNUSED_VARIABLE(dutyCycle);
+    OT_UNUSED_VARIABLE(periodHalfMs);
+    otError error = OT_ERROR_NONE;
+
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    if (req != NULL && dutyCycle != NULL && periodHalfMs != NULL)
+    if (req == NULL || dutyCycle == NULL || periodHalfMs == NULL)
     {
-        const sl_rail_util_coex_pwm_args_t *p = sl_rail_util_coex_get_request_pwm_args();
-        *req                                  = p->req;
-        *dutyCycle                            = p->dutyCycle;
-        *periodHalfMs                         = p->periodHalfMs;
-        return OT_ERROR_NONE;
-}
+        return OT_ERROR_INVALID_ARGS;
+    }
+
+    const sl_rail_util_coex_pwm_args_t *p = sl_rail_util_coex_get_request_pwm_args();
+    *req                                  = p->req;
+    *dutyCycle                            = p->dutyCycle;
+    *periodHalfMs                         = p->periodHalfMs;
+    error                                 = OT_ERROR_NONE;
+#else
+    error = OT_ERROR_FAILED;
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    return OT_ERROR_FAILED;
+
+    return error;
 }
 #endif // #if OPENTHREAD_CONFIG_DIAG_ENABLE
