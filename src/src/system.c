@@ -64,6 +64,10 @@
 #include "sl_system_process_action.h"
 #endif
 
+#if defined(SL_CATALOG_OT_RCP_GP_INTERFACE_PRESENT)
+#include "sl_rcp_gp_interface.h"
+#endif // SL_CATALOG_OT_RCP_GP_INTERFACE_PRESENT
+
 #if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 #include "sl_malloc.h"
 #include "openthread/heap.h"
@@ -143,7 +147,7 @@ void otSysProcessDrivers(otInstance *aInstance)
     sl_system_process_action();
 #endif
 
-#if (SL_GP_RCP_INTERFACE_ENABLED == 1)
+#if defined(SL_CATALOG_OT_RCP_GP_INTERFACE_PRESENT)
     efr32GpProcess();
 #endif
 
