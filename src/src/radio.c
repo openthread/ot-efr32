@@ -292,17 +292,17 @@ RAIL_Handle_t emPhyRailHandle;
 #endif // SL_CATALOG_RAIL_MULTIPLEXER_PRESENT
 
 static const RAIL_StateTiming_t cTimings = {
-    100,      // timings.idleToRx
-    192 - 10, // timings.txToRx
-    100,      // timings.idleToTx
+    .idleToRx = 100,
+    .txToRx   = 192 - 10,
+    .idleToTx = 100,
 #if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
-    256, // timings.rxToTx - accommodate enhanced ACKs
+    .rxToTx = 256,
 #else
-    192, // timings.rxToTx
+    .rxToTx = 192,
 #endif
-    0, // timings.rxSearchTimeout
-    0, // timings.txToRxSearchTimeout
-    0  // timings.txToTx
+    .rxSearchTimeout     = 0,
+    .txToRxSearchTimeout = 0,
+    .txToTx              = 0,
 };
 
 #ifdef NONCOMPLIANT_ACK_TIMING_WORKAROUND
@@ -310,27 +310,27 @@ static RAIL_StateTiming_t gTimings = cTimings;
 #endif
 
 static const RAIL_IEEE802154_Config_t sRailIeee802154Config = {
-    NULL, // addresses
-    {
-        // ackConfig
-        true, // ackConfig.enable
-        672,  // ackConfig.ackTimeout
+    .addresses = NULL,
+    .ackConfig =
         {
-            // ackConfig.rxTransitions
-            RAIL_RF_STATE_RX, // ackConfig.rxTransitions.success
-            RAIL_RF_STATE_RX, // ackConfig.rxTransitions.error
+            .enable     = true,
+            .ackTimeout = 672,
+            .rxTransitions =
+                {
+                    .success = RAIL_RF_STATE_RX,
+                    .error   = RAIL_RF_STATE_RX,
+                },
+            .txTransitions =
+                {
+                    .success = RAIL_RF_STATE_RX,
+                    .error   = RAIL_RF_STATE_RX,
+                },
         },
-        {
-            // ackConfig.txTransitions
-            RAIL_RF_STATE_RX, // ackConfig.txTransitions.success
-            RAIL_RF_STATE_RX, // ackConfig.txTransitions.error
-        },
-    },
-    cTimings,
-    RAIL_IEEE802154_ACCEPT_STANDARD_FRAMES, // framesMask
-    false,                                  // promiscuousMode
-    false,                                  // isPanCoordinator
-    false,                                  // defaultFramePendingInOutgoingAcks
+    .timings                           = cTimings,
+    .framesMask                        = RAIL_IEEE802154_ACCEPT_STANDARD_FRAMES,
+    .promiscuousMode                   = false,
+    .isPanCoordinator                  = false,
+    .defaultFramePendingInOutgoingAcks = false,
 };
 
 #if RADIO_CONFIG_SUBGHZ_SUPPORT
