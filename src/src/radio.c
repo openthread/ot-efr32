@@ -291,12 +291,13 @@ RAIL_Handle_t gRailHandle;
 RAIL_Handle_t emPhyRailHandle;
 #endif // SL_CATALOG_RAIL_MULTIPLEXER_PRESENT
 
-static const RAIL_StateTiming_t cTimings = {
+#ifdef NONCOMPLIANT_ACK_TIMING_WORKAROUND
+static RAIL_StateTiming_t gTimings = {
     .idleToRx = 100,
     .txToRx   = 192 - 10,
     .idleToTx = 100,
 #if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
-    .rxToTx = 256,
+    .rxToTx = 256, // accommodate enhanced ACKs
 #else
     .rxToTx = 192,
 #endif
@@ -304,9 +305,6 @@ static const RAIL_StateTiming_t cTimings = {
     .txToRxSearchTimeout = 0,
     .txToTx              = 0,
 };
-
-#ifdef NONCOMPLIANT_ACK_TIMING_WORKAROUND
-static RAIL_StateTiming_t gTimings = cTimings;
 #endif
 
 static const RAIL_IEEE802154_Config_t sRailIeee802154Config = {
@@ -326,7 +324,20 @@ static const RAIL_IEEE802154_Config_t sRailIeee802154Config = {
                     .error   = RAIL_RF_STATE_RX,
                 },
         },
-    .timings                           = cTimings,
+    .timings =
+        {
+            .idleToRx = 100,
+            .txToRx   = 192 - 10,
+            .idleToTx = 100,
+#if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
+            .rxToTx = 256, // accommodate enhanced ACKs
+#else
+            .rxToTx = 192,
+#endif
+            .rxSearchTimeout     = 0,
+            .txToRxSearchTimeout = 0,
+            .txToTx              = 0,
+        },
     .framesMask                        = RAIL_IEEE802154_ACCEPT_STANDARD_FRAMES,
     .promiscuousMode                   = false,
     .isPanCoordinator                  = false,
