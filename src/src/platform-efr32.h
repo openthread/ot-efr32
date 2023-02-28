@@ -129,14 +129,6 @@ void efr32CpcProcess(void);
  */
 void efr32SpiProcess(void);
 
-#if (SL_GP_RCP_INTERFACE_ENABLED == 1)
-/**
- * This function performs GP RCP processing.
- *
- */
-void efr32GpProcess(void);
-#endif
-
 /**
  * Initialization of Misc module.
  *
@@ -185,5 +177,7 @@ RAIL_Status_t efr32RadioSetCcaMode(uint8_t aMode);
  */
 
 bool efr32AllowSleepCallback(void);
+
+otError railStatusToOtError(RAIL_Status_t status);
 
 #endif // PLATFORM_EFR32_H_
