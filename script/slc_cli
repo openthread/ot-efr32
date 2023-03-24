@@ -36,7 +36,7 @@ fi
 repo_dir="$(git rev-parse --show-toplevel)"
 
 # slc-cli installation dir
-[ -n "${SLC_INSTALL_DIR-}" ] || SLC_INSTALL_DIR="${repo_dir}/third_party/silabs/slc"
+[ -n "${SLC_INSTALL_DIR-}" ] || SLC_INSTALL_DIR="${repo_dir}/slc"
 
 slc_cmd=""
 

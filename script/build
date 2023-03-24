@@ -75,7 +75,17 @@ generate()
     local slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
     local openthread_slc_data="${OT_CMAKE_BUILD_DIR}"/slc/openthread_slc.data
 
+    # Ensure GSDK extension folder exists
+    [ -d ${sdk_dir}/extension ] && echo "Directory ${sdk_dir}/extension exists." || mkdir ${sdk_dir}/extension
+
+    #
+    EXTENSION_DIR=${sdk_dir}/extension/ot-efr32
+    if [ ! -L "$EXTENSION_DIR" ]; then
+        ln -s "${repo_dir}" "${EXTENSION_DIR}"
+    fi
+
     run_slc -v 1 signature trust --sdk "${sdk_dir}" -data "${openthread_slc_data}"
+    run_slc -v 1 signature trust --sdk "${sdk_dir}" -extpath "${sdk_dir}/extension/ot-efr32" -data "${openthread_slc_data}"
 
     if contains ".*-(ftd|mtd)" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         # ==============================================================================================================
@@ -92,7 +102,7 @@ generate()
             --project-name="${project_name}" \
             --output-type=makefile \
             --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
+            --export-templates="${repo_dir}"/slc/exporter_templates/platform_library \
             --export-destination="${current_project_export_dir}" \
             --with "${board}"
 
@@ -115,7 +125,7 @@ generate()
             --project-name="${project_name}" \
             --output-type=makefile \
             --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
+            --export-templates="${repo_dir}"/slc/exporter_templates/platform_library \
             --export-destination="${current_project_export_dir}" \
             --with "${board}"
 
@@ -138,7 +148,7 @@ generate()
             --project-name="${project_name}" \
             --output-type=makefile \
             --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
+            --export-templates="${repo_dir}"/slc/exporter_templates/platform_library \
             --export-destination="${current_project_export_dir}" \
             --with "${board}"
 

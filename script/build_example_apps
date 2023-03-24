@@ -95,7 +95,7 @@ generate()
             --project-name="${project_name}" \
             --output-type=makefile \
             --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
+            --export-templates="${repo_dir}"/slc/exporter_templates/platform_library \
             --export-destination="${current_project_export_dir}" \
             --with "${board}"
 
@@ -120,7 +120,7 @@ generate()
             --project-name="${project_name}" \
             --output-type=makefile \
             --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
+            --export-templates="${repo_dir}"/slc/exporter_templates/platform_library \
             --export-destination="${current_project_export_dir}" \
             --with "${board}",power_manager
 
