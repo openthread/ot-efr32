@@ -37,18 +37,17 @@ else
     script_path="$0"
 fi
 
-script_dir="$(dirname "$(realpath "$script_path")")"
-repo_dir="$(dirname "$script_dir")"
+repo_dir="$(git rev-parse --show-toplevel)"
 board="brdXXXXY"
 
 # shellcheck source=script/efr32-definitions
-source "$script_dir/efr32-definitions"
+source "${repo_dir}/script/efr32-definitions"
 
 # shellcheck source=script/slc_cli
-source "$script_dir/slc_cli"
+source "${repo_dir}/script/slc_cli"
 
 # shellcheck source=script/util
-source "$script_dir/util"
+source "${repo_dir}/script/util"
 
 # ==============================================================================
 OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET-}
@@ -134,19 +133,6 @@ generate()
     fi
 }
 
-create_srec()
-{
-    local executable_flag
-
-    if [ "$(uname)" = 'Linux' ]; then
-        executable_flag=(-executable)
-    elif [ "$(uname)" = 'Darwin' ]; then
-        executable_flag=(-perm +111)
-    fi
-
-    find "$1" -type f "${executable_flag[@]}" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
-}
-
 build_example_app()
 {
     local example_app_ninja_target=${1-}
@@ -179,7 +165,7 @@ build_example_app()
 
 main()
 {
-    local usage="usage: $0 [-h] [--skip-silabs-apps] <efr32 platform> -DBOARD=<brdXXXXy> [-D<OT_XXXX=ON> -D<OT_YYYY=OFF>]"
+    local usage="usage: $0 [-h] [--skip-silabs-apps] <brdXXXXy> [-D<OT_XXXX=ON> -D<OT_YYYY=OFF>]"
 
     skip_generation=false
     # Parse flags

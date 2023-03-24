@@ -35,11 +35,10 @@ else
     script_path="$0"
 fi
 
-script_dir="$(dirname "$(realpath "$script_path")")"
-repo_dir="$(dirname "$script_dir")"
+repo_dir="$(git rev-parse --show-toplevel)"
 
 # shellcheck source=script/efr32-definitions
-source "$script_dir/efr32-definitions"
+source "${repo_dir}/script/efr32-definitions"
 
 readonly OT_OPTIONS=(
     "-DOT_COMPILE_WARNING_AS_ERROR=ON"
@@ -139,7 +138,7 @@ main()
     for ((idx = 0; idx < ${#BOARDS[@]}; idx = idx + 1)); do
         local board="${BOARDS[idx]}"
         echo "Building [${board}]..."
-        "$script_dir"/build "$board" "${OT_OPTIONS[@]}"
+        "${repo_dir}"/script/build "$board" "${OT_OPTIONS[@]}"
     done
 }
 

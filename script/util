@@ -34,3 +34,16 @@ contains()
     IFS=" " read -r -a list <<<"$@"
     echo "${list[@]}" | grep -w -q -E "$search_term"
 }
+
+create_srec()
+{
+    local executable_flag
+
+    if [ "$(uname)" = 'Linux' ]; then
+        executable_flag=(-executable)
+    elif [ "$(uname)" = 'Darwin' ]; then
+        executable_flag=(-perm +111)
+    fi
+
+    find "$1" -type f "${executable_flag[@]}" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
+}

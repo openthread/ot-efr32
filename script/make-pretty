@@ -58,7 +58,7 @@ set -euo pipefail
 OT_BUILD_JOBS=$(getconf _NPROCESSORS_ONLN)
 readonly OT_BUILD_JOBS
 
-OT_EXCLUDE_DIRS=(openthread third_party)
+OT_EXCLUDE_DIRS=(openthread third_party '.*/autogen' '.*/config')
 readonly OT_EXCLUDE_DIRS
 
 OT_CLANG_SOURCES=('*.c' '*.cc' '*.cpp' '*.h' '*.hpp')
@@ -70,6 +70,9 @@ readonly OT_MARKDOWN_SOURCES
 OT_SCRIPT_DIR="$(dirname "$0")"/../openthread/script
 readonly OT_SCRIPT_DIR
 
+repo_dir="$(git rev-parse --show-toplevel)"
+readonly repo_dir
+
 do_clang_format()
 {
     echo -e '========================================'
@@ -77,7 +80,7 @@ do_clang_format()
     echo -e '========================================'
 
     git ls-files "${OT_CLANG_SOURCES[@]}" | grep -v -E "^($(echo "${OT_EXCLUDE_DIRS[@]}" | tr ' ' '|'))" \
-        | xargs -n3 -P"$OT_BUILD_JOBS" "$OT_SCRIPT_DIR"/clang-format -style=file -i -verbose
+        | xargs -t -n1 -P"$OT_BUILD_JOBS" "$OT_SCRIPT_DIR"/clang-format -style=file -i -verbose
 }
 
 do_clang_format_check()
@@ -87,7 +90,7 @@ do_clang_format_check()
     echo -e '========================================'
 
     git ls-files "${OT_CLANG_SOURCES[@]}" | grep -v -E "^($(echo "${OT_EXCLUDE_DIRS[@]}" | tr ' ' '|'))" \
-        | xargs -n3 -P"$OT_BUILD_JOBS" "$OT_SCRIPT_DIR"/clang-format-check
+        | xargs -n1 -P"$OT_BUILD_JOBS" "$OT_SCRIPT_DIR"/clang-format-check
 }
 
 do_markdown_format()
@@ -97,7 +100,7 @@ do_markdown_format()
     echo -e '========================================'
 
     git ls-files "${OT_MARKDOWN_SOURCES[@]}" | grep -v -E "^($(echo "${OT_EXCLUDE_DIRS[@]}" | tr ' ' '|'))" \
-        | xargs -n10 -P"$OT_BUILD_JOBS" npx prettier@2.0.4 --write
+        | xargs npx prettier@2.0.4 --write
 }
 
 do_markdown_check()
@@ -107,7 +110,7 @@ do_markdown_check()
     echo -e '========================================'
 
     git ls-files "${OT_MARKDOWN_SOURCES[@]}" | grep -v -E "^($(echo "${OT_EXCLUDE_DIRS[@]}" | tr ' ' '|'))" \
-        | xargs -n10 -P"$OT_BUILD_JOBS" npx prettier@2.0.4 --check
+        | xargs npx prettier@2.0.4 --check
 }
 
 do_shell_format()
@@ -117,7 +120,7 @@ do_shell_format()
     echo -e '========================================'
 
     git ls-files | xargs shfmt -f | grep -v -E "^($(echo "${OT_EXCLUDE_DIRS[@]}" | tr ' ' '|'))" \
-        | xargs -n10 -P"$OT_BUILD_JOBS" shfmt -i 4 -bn -ci -fn -s -w
+        | xargs -n1 -P"$OT_BUILD_JOBS" shfmt -i 4 -bn -ci -fn -s -w
 }
 
 do_shell_check()
@@ -126,11 +129,10 @@ do_shell_check()
     echo -e '     check shell'
     echo -e '========================================'
 
-    git ls-files | xargs shfmt -f | grep -v -E "^($(echo "${OT_EXCLUDE_DIRS[@]}" | tr ' ' '|'))" \
-        | xargs -n10 -P"$OT_BUILD_JOBS" shfmt -i 4 -bn -ci -fn -s -d
-
-    git ls-files | xargs shfmt -f | grep -v -E "^($(echo "${OT_EXCLUDE_DIRS[@]}" | tr ' ' '|'))" \
-        | xargs -n10 -P"$OT_BUILD_JOBS" shellcheck
+    local files
+    files=$(git ls-files | xargs shfmt -f | grep -v -E "^($(echo "${OT_EXCLUDE_DIRS[@]}" | tr ' ' '|'))")
+    printf '%s\n' "${files[@]}" | xargs -t -n1 -P"$OT_BUILD_JOBS" shfmt -i 4 -bn -ci -fn -s -d
+    printf '%s\n' "${files[@]}" | xargs -t -n1 -P"$OT_BUILD_JOBS" shellcheck -x --source-path="${repo_dir}"
 }
 
 do_check()

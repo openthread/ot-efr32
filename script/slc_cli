@@ -33,8 +33,7 @@ else
     script_path="$0"
 fi
 
-script_dir="$(dirname "$(realpath "$script_path")")"
-repo_dir="$(dirname "$script_dir")"
+repo_dir="$(git rev-parse --show-toplevel)"
 
 # slc-cli installation dir
 [ -n "${SLC_INSTALL_DIR-}" ] || SLC_INSTALL_DIR="${repo_dir}/third_party/silabs/slc"

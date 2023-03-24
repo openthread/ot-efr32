@@ -35,8 +35,7 @@ else
     script_path="$0"
 fi
 
-script_dir="$(dirname "$(realpath "$script_path")")"
-repo_dir="$(dirname "$script_dir")"
+repo_dir="$(git rev-parse --show-toplevel)"
 
 install_slc_cli()
 {
