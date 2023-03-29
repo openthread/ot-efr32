@@ -71,6 +71,30 @@ efr32_get_board_slcc()
     echo "${board_slcc}"
 }
 
+efr32_get_platform()
+{
+    local board=${board-$1}
+
+    # Find component file for latest revision of board
+    local board_slcc
+    board_slcc=$(efr32_get_board_slcc "${board}")
+
+    # Determine board's platform and exit if unsupported
+    local platform
+    platform=$(
+        grep -Eo 'board:device:.*' "${board_slcc}" \
+            | sed "s/board:device:${efr32_device_regex}/efr32\2\4/" \
+            | head -n 1
+    )
+
+    if [ -z "${platform}" ]; then
+        echo "Error parsing platform"
+        exit 3
+    fi
+
+    echo "${platform}"
+}
+
 efr32_get_platforms()
 {
     local platform_dir="$repo_dir/src" \
@@ -83,7 +107,7 @@ efr32_check_platform()
     #
     # Arg $1 -- value
     local match=false
-    local platform="${1-}"
+    local platform="${1?}"
 
     for efr32_platform in $(efr32_get_platforms); do
         if [[ $efr32_platform == "$platform" ]]; then

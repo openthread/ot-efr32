@@ -38,8 +38,6 @@ repo_dir="$(git rev-parse --show-toplevel)"
 # slc-cli installation dir
 [ -n "${SLC_INSTALL_DIR-}" ] || SLC_INSTALL_DIR="${repo_dir}/slc"
 
-slc_cmd=""
-
 # Set to 0 to force using slc-cli from 'third_party'/silabs/slc.
 use_slc_from_path=1
 
@@ -53,30 +51,33 @@ run_slc()
 # Find the command to use for slc
 slc_init()
 {
-
+    # use_slc_from_path:
     # 0 - Use slc-cli from ${repo_dir}/third_party/silabs/slc
     # 1 - Use slc-cli or slc from PATH
-    if command -v slc && [ "$use_slc_from_path" -eq "1" ]; then
+    set -x
+
+    if [ "$use_slc_from_path" -eq "1" ] && command -v slc; then
         slc_cmd="slc"
+    elif [ "$use_slc_from_path" -eq "1" ] && command -v slc-cli; then
+        slc_cmd="slc-cli"
     else
-        if command -v slc-cli && [ "$use_slc_from_path" -eq "1" ]; then
-            slc_cmd="slc-cli"
-        else
-            echo "The 'slc-cli' command could not be found in your PATH."
+        echo "Searching for 'slc*' executable in '${SLC_INSTALL_DIR}'"
+
+        # Find the slc executable
+        slc_cmd=$(find "${SLC_INSTALL_DIR}" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f | head -n 1)
+
+        # Automatically download slc if not found
+        if [ -z "${slc_cmd}" ]; then
+            echo "-- No 'slc*' executable found. Downloading"
+            "${repo_dir}"/script/bootstrap_silabs
 
             # Find the slc executable
-            slc_cmd=$(find "${repo_dir}/third_party/silabs/slc" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f | head -n 1)
-
-            # Automatically download slc if not found
-            if [ -z "${slc_cmd}" ]; then
-                "${repo_dir}"/script/bootstrap_silabs
-            fi
-
-            # Find the slc executable
-            slc_cmd=$(find "${repo_dir}/third_party/silabs/slc" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f | head -n 1)
-
+            slc_cmd=$(find "${SLC_INSTALL_DIR}" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f | head -n 1)
         fi
+
+
     fi
+    set +x
 }
 
 cleanup()

@@ -47,3 +47,9 @@ create_srec()
 
     find "$1" -type f "${executable_flag[@]}" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
 }
+
+die()
+{
+    echo " ** ERROR: $1"
+    exit 1
+}

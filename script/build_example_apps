@@ -38,7 +38,6 @@ else
 fi
 
 repo_dir="$(git rev-parse --show-toplevel)"
-board="brdXXXXY"
 
 # shellcheck source=script/efr32-definitions
 source "${repo_dir}/script/efr32-definitions"
