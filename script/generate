@@ -69,8 +69,17 @@ trust_sdk_and_extensions()
                 ;;
             *)
                 # relative path
-                vendor_extension_abs_path=$(realpath "${script_dir}/${VENDOR_EXTENSION}")
-            esac
+                vendor_extension_abs_path=$(realpath "$(pwd)/${VENDOR_EXTENSION}")
+                if [ ! -d ${vendor_extension_abs_path} ]; then
+                    set +x
+                    echo "VENDOR_EXTENSION=${VENDOR_EXTENSION}"
+                    echo "script_dir=${script_dir}"
+                    echo "vendor_extension_abs_path=${vendor_extension_abs_path}"
+                    echo "ERROR: '${vendor_extension_abs_path}' does not exist"
+                    exit 5
+                fi
+                ;;
+        esac
 
         extension_dirs+=("${vendor_extension_abs_path}")
     fi
@@ -87,6 +96,14 @@ trust_sdk_and_extensions()
     # Ensure GSDK extension folder exists
     [ -d ${sdk_dir}/extension ] && echo "Directory ${sdk_dir}/extension exists." || mkdir ${sdk_dir}/extension
 
+
+        set +x
+        echo ""
+        echo ""
+        echo "======================================================================"
+        echo "extension_dirs = ("${extension_dirs[@]}")"
+        echo "======================================================================"
+        set -x
     # Symlink and trust the extensions
     for extension_dir in "${extension_dirs[@]}"; do
 
@@ -192,7 +209,6 @@ generate()
     set -x
 
     run_slc -v 1 generate \
-        \
         -data "${openthread_slc_data?}" \
         --sdk="${sdk_dir?}" \
         --clear-cache \

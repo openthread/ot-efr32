@@ -54,20 +54,36 @@ endif()
 message(STATUS "Package Version: ${OT_PACKAGE_VERSION}")
 
 # ==============================================================================
+# Pull in Vendor library target names and paths
+# ==============================================================================
+if(VENDOR_EXTENSION)
+    message(STATUS "Using vendor libraries from ${VENDOR_EXTENSION}")
+    add_subdirectory(${VENDOR_EXTENSION})
+endif()
+
+# ==============================================================================
 # Set platform libs and allow overriding
 # ==============================================================================
 
 # SoC (mtd/ftd) platform library
 if(NOT OT_PLATFORM_LIB)
-    set(OT_PLATFORM_LIB "openthread-efr32-soc" CACHE STRING "default efr32 SoC platform library" FORCE)
+    set(OT_PLATFORM_LIB "openthread-efr32-soc" CACHE STRING "default efr32 SoC platform library")
+endif()
+
+if(NOT OT_PLATFORM_LIB_RCP_SPI)
+    set(OT_PLATFORM_LIB_RCP_SPI "openthread-efr32-rcp-spi" CACHE STRING "default efr32 RCP platform library")
+endif()
+if(NOT OT_PLATFORM_LIB_RCP_UART)
+    set(OT_PLATFORM_LIB_RCP_UART "openthread-efr32-rcp-uart" CACHE STRING "default efr32 RCP platform library")
 endif()
 
 # RCP platform library
+unset(OT_PLATFORM_LIB_RCP CACHE)
 if(NOT OT_PLATFORM_LIB_RCP)
     if(OT_NCP_SPI)
-        set(OT_PLATFORM_LIB_RCP "openthread-efr32-rcp-spi" CACHE STRING "default efr32 RCP platform library" FORCE)
+        set(OT_PLATFORM_LIB_RCP "${OT_PLATFORM_LIB_RCP_SPI}" CACHE STRING "default efr32 RCP platform library")
     else()
-        set(OT_PLATFORM_LIB_RCP "openthread-efr32-rcp-uart" CACHE STRING "default efr32 RCP platform library" FORCE)
+        set(OT_PLATFORM_LIB_RCP "${OT_PLATFORM_LIB_RCP_UART}" CACHE STRING "default efr32 RCP platform library")
     endif()
 endif()
 
@@ -76,22 +92,18 @@ set(OT_PLATFORM "external" CACHE STRING "disable example platforms" FORCE)
 # ==============================================================================
 # mbedtls
 # ==============================================================================
-
 # SoC mbedtls library
+unset(OT_EXTERNAL_MBEDTLS CACHE)
 if(NOT OT_EXTERNAL_MBEDTLS)
-    set(OT_EXTERNAL_MBEDTLS "openthread-efr32-soc-mbedtls" CACHE STRING "external mbedtls library" FORCE)
+    set(OT_EXTERNAL_MBEDTLS "${OT_PLATFORM_LIB}-mbedtls" CACHE STRING "external mbedtls library")
 endif()
 set(OT_MBEDTLS ${OT_EXTERNAL_MBEDTLS})
 
 # RCP mbedtls library
+unset(OT_MBEDTLS_RCP CACHE)
 if(NOT OT_MBEDTLS_RCP)
-    if(OT_NCP_SPI)
-        set(OT_MBEDTLS_RCP "openthread-efr32-rcp-spi-mbedtls" CACHE STRING "default efr32 RCP mbedtls library" FORCE)
-    else()
-        set(OT_MBEDTLS_RCP "openthread-efr32-rcp-uart-mbedtls" CACHE STRING "default efr32 RCP mbedtls library" FORCE)
-    endif()
+    set(OT_MBEDTLS_RCP "${OT_PLATFORM_LIB_RCP}-mbedtls" CACHE STRING "default efr32 RCP mbedtls library")
 endif()
-
 set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls management" FORCE)
 
 # ==============================================================================
@@ -111,23 +123,60 @@ target_compile_options(ot-config INTERFACE
 # ==============================================================================
 # Generated platform projects
 # ==============================================================================
+# Default library definition paths
+if(NOT RCP_SPI_DIR)
+    set(RCP_SPI_DIR     "${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp_spi"    CACHE STRING "Path to RCP (SPI) library definition")
+endif()
+if(NOT RCP_UART_DIR)
+    set(RCP_UART_DIR    "${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp_uart"   CACHE STRING "Path to RCP (UART) library definition")
+endif()
+if(NOT SOC_DIR)
+    set(SOC_DIR         "${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc"        CACHE STRING "Path to SoC library definition")
+endif()
+
 message("OT_RCP     = ${OT_RCP}")
 message("OT_FTD     = ${OT_FTD}")
 message("OT_MTD     = ${OT_MTD}")
 message("OT_APP_RCP = ${OT_APP_RCP}")
 message("OT_APP_NCP = ${OT_APP_NCP}")
 message("OT_APP_CLI = ${OT_APP_CLI}")
+message("===================================================================")
+message("Using the following platform library targets:")
+
 if(OT_APP_RCP)
     if(OT_NCP_SPI)
-        message("Adding ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp_spi")
-        add_subdirectory(${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp_spi)
+        message("-- OT_PLATFORM_LIB_RCP_SPI  = ${OT_PLATFORM_LIB_RCP_SPI}")
     else()
-        message("Adding ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp_uart")
-        add_subdirectory(${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp_uart)
+        message("-- OT_PLATFORM_LIB_RCP_UART = ${OT_PLATFORM_LIB_RCP_UART}")
+    endif()
+    message("-- OT_PLATFORM_LIB_RCP      = ${OT_PLATFORM_LIB_RCP}")
+    message("-- OT_MBEDTLS_RCP           = ${OT_MBEDTLS_RCP}")
+elseif(OT_APP_NCP OR OT_APP_CLI)
+    message("-- OT_PLATFORM_LIB          = ${OT_PLATFORM_LIB}")
+    message("-- OT_MBEDTLS               = ${OT_MBEDTLS}")
+endif()
+
+message("===================================================================")
+message("Using generated SLC projects:")
+if(OT_APP_RCP)
+    if(OT_NCP_SPI)
+        message("-- RCP_SPI_DIR  = ${RCP_SPI_DIR}")
+    else()
+        message("-- RCP_UART_DIR = ${RCP_UART_DIR}")
     endif()
 elseif(OT_APP_NCP OR OT_APP_CLI)
-    message("Adding ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc")
-    add_subdirectory(${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc)
+    message("-- SOC_DIR      = ${SOC_DIR}")
+endif()
+message("===================================================================")
+
+if(OT_APP_RCP)
+    if(OT_NCP_SPI)
+        add_subdirectory(${RCP_SPI_DIR})
+    else()
+        add_subdirectory(${RCP_UART_DIR})
+    endif()
+elseif(OT_APP_NCP OR OT_APP_CLI)
+    add_subdirectory(${SOC_DIR})
 else()
     file(READ ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/generated_projects.txt slc_generated_projects)
 

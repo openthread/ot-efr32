@@ -41,8 +41,6 @@ repo_dir="$(git rev-parse --show-toplevel)"
 # shellcheck source=script/efr32-definitions
 source "${repo_dir}/script/efr32-definitions"
 
-# shellcheck source=script/slc_cli
-
 # shellcheck source=script/util
 source "${repo_dir}/script/util"
 
@@ -230,42 +228,50 @@ main()
         esac
     done
 
-    # Parse board
-    lowercase_args=$(echo "$@" | tr '[:upper:]' '[:lower:]')
-    board=$([[ ${lowercase_args} =~ (brd[0-9]{4}[a-z]{1}) ]] && echo "${BASH_REMATCH[1]}")
+    # Add a vendor slc extension if the path to one is defined
+    if [ ! -z "${VENDOR_EXTENSION-}" ]; then
+        echo "Vendor SLC extension found: ${VENDOR_EXTENSION}"
+        parse_configuration "${VENDOR_EXTENSION}"
+        echo " - Board: ${board}"
+    else
+        # Parse board
+        lowercase_args=$(echo "$@" | tr '[:upper:]' '[:lower:]')
+        board=$([[ ${lowercase_args} =~ (brd[0-9]{4}[a-z]{1}) ]] && echo "${BASH_REMATCH[1]}")
+        shift
+    fi
 
     platform=$(efr32_get_platform "${board}")
-
     efr32_check_platform "${platform}" || die "Unsupported platform ${platform}"
-
-    shift
 
     local options=("${OT_OPTIONS[@]}")
 
     options+=("-DCMAKE_TOOLCHAIN_FILE=src/${platform}/arm-none-eabi.cmake")
 
-    case "${platform}" in
-        efr32mg1)
-            OT_CMAKE_NINJA_TARGET=("ot-rcp-uart")
-            ;;
-        efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
-            OT_CMAKE_NINJA_TARGET=("ot-rcp-uart" "ot-rcp-spi" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
-            if [ "${skip_silabs_apps}" = false ]; then
-
-                if [ "${skip_generation}" = true ]; then
-                    "${repo_dir}"/script/build_example_apps --skip-generation "${board}" "$@"
-                else
-                    "${repo_dir}"/script/build_example_apps "${board}" "$@"
-                fi
-            fi
-            ;;
-    esac
+    if [ -z "${OT_CMAKE_NINJA_TARGET}" ]; then
+        case "${platform}" in
+            efr32mg1)
+                OT_CMAKE_NINJA_TARGET=("ot-rcp-uart")
+                skip_silabs_apps=true
+                ;;
+            efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
+                OT_CMAKE_NINJA_TARGET=("ot-rcp-uart" "ot-rcp-spi" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
+                ;;
+        esac
+    fi
 
     options+=("$@")
     export OT_CMAKE_BUILD_DIR="$repo_dir/build/${board}"
 
     # Generate the platform libs and related libs
-    generate
+    if [ ! -z "${VENDOR_EXTENSION-}" ]; then
+        "${VENDOR_EXTENSION}"/script/generate
+        options+=("-DVENDOR_EXTENSION=${VENDOR_EXTENSION}")
+
+        # TODO: Fix 'script/build_example_apps' so that it works with vendor platform libs
+        skip_silabs_apps=true
+    else
+        generate
+    fi
 
     # Separate OT_CMAKE_NINJA_TARGET into two lists
     rcp_targets=()
@@ -284,7 +290,21 @@ main()
         build_soc -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
     fi
 
+    # Build silabs apps
+    if [ "${skip_silabs_apps}" = false ]; then
+        local before_flags=()
+        local after_flags=()
+
+        if [ "${skip_generation}" = true ]; then
+            before_flags+=("--skip-generation")
+        fi
+
+        "${repo_dir}"/script/build_example_apps "${before_flags[@]}" "${board}" "${after_flags[@]}" "$@"
+
+    fi
+
     ls -alh "${OT_CMAKE_BUILD_DIR}"/openthread/*/bin/*
+
 }
 
 cleanup()
