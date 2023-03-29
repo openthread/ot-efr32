@@ -76,7 +76,7 @@ target_include_directories(ot-config INTERFACE
 {%- endfor %}
 )
 
-target_include_directories({{PROJECT_NAME}}-config INTERFACE
+target_include_directories({{PROJECT_NAME}}-config BEFORE INTERFACE
     autogen
     config
 )
@@ -155,13 +155,13 @@ target_compile_definitions({{PROJECT_NAME}}-mbedtls-config INTERFACE
 
 {% endif -%}
 
-target_include_directories({{PROJECT_NAME}}-mbedtls-config INTERFACE
+target_include_directories({{PROJECT_NAME}}-mbedtls-config BEFORE INTERFACE
     autogen
     config
 )
 
-target_link_libraries({{PROJECT_NAME}}-mbedtls PRIVATE {{PROJECT_NAME}}-mbedtls-config)
-target_link_libraries({{PROJECT_NAME}} PRIVATE {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries({{PROJECT_NAME}}-mbedtls PUBLIC {{PROJECT_NAME}}-mbedtls-config)
+target_link_libraries({{PROJECT_NAME}} PUBLIC {{PROJECT_NAME}}-mbedtls-config)
 
 {% if PROJECT_NAME.startswith("openthread-efr32-rcp") -%}
 target_link_libraries(ot-config-radio INTERFACE {{PROJECT_NAME}}-mbedtls-config)
