@@ -60,9 +60,9 @@ trust_sdk_and_extensions()
     )
 
     # Add a vendor slc extension if the path to one is defined
-    if [ ! -z "${VENDOR_EXTENSION-}" ]; then
+    if [ -n "${VENDOR_EXTENSION-}" ]; then
         local vendor_extension_abs_path=""
-        case ${VENDOR_EXTENSION} in
+        case "${VENDOR_EXTENSION}" in
             /*)
                 # absolute path
                 vendor_extension_abs_path="${VENDOR_EXTENSION}"
@@ -70,7 +70,7 @@ trust_sdk_and_extensions()
             *)
                 # relative path
                 vendor_extension_abs_path=$(realpath "$(pwd)/${VENDOR_EXTENSION}")
-                if [ ! -d ${vendor_extension_abs_path} ]; then
+                if [ ! -d "${vendor_extension_abs_path}" ]; then
                     set +x
                     echo "VENDOR_EXTENSION=${VENDOR_EXTENSION}"
                     echo "script_dir=${script_dir}"
@@ -94,28 +94,30 @@ trust_sdk_and_extensions()
     run_slc -v 1 signature trust --sdk "${sdk_dir}" -data "${openthread_slc_data}"
 
     # Ensure GSDK extension folder exists
-    [ -d ${sdk_dir}/extension ] && echo "Directory ${sdk_dir}/extension exists." || mkdir ${sdk_dir}/extension
+    mkdir -p "${sdk_dir}/extension"
 
+    set +x
+    echo ""
+    echo ""
+    echo "======================================================================"
+    echo "extension_dirs = (${extension_dirs[*]})"
+    echo "======================================================================"
+    set -x
 
-        set +x
-        echo ""
-        echo ""
-        echo "======================================================================"
-        echo "extension_dirs = ("${extension_dirs[@]}")"
-        echo "======================================================================"
-        set -x
     # Symlink and trust the extensions
     for extension_dir in "${extension_dirs[@]}"; do
 
         # Locate .slce file
-        local slce_file=$(find ${extension_dir} -maxdepth 1 -name '*.slce')
+        local slce_file=""
+        slce_file=$(find "${extension_dir}" -maxdepth 1 -name '*.slce')
         if [ -z "${slce_file}" ]; then
             echo "ERROR: Couldn't find .slce file at '${extension_dir}'"
             continue
         fi
 
         # Parse extension name
-        local extension_name=$(grep -oP '^id: \K(.*)' ${slce_file})
+        local extension_name=""
+        extension_name=$(grep -oP '^id: \K(.*)' "${slce_file}")
 
         # Define symlink location
         local extension_symlink="${sdk_dir}/extension/${extension_name}"
@@ -139,7 +141,6 @@ trust_sdk_and_extensions()
 
     ls -alh "${sdk_dir}/extension"
 }
-
 
 generate()
 {
@@ -172,7 +173,8 @@ generate()
 
     # Define generation variables
     local slcp=$1
-    local project_name=$(grep -oP 'project_name: \K(.*)' ${slcp})
+    local project_name=""
+    project_name=$(grep -oP 'project_name: \K(.*)' "${slcp}")
     local generation_dir=$2
     local export_templates="${repo_dir}/slc/exporter_templates/platform_library"
     local board=$3
@@ -233,7 +235,7 @@ cleanup()
 
 trap cleanup EXIT
 
-if [ -z "${slc_cmd-}" ] || ! command -v ${slc_cmd} ; then
+if [ -z "${slc_cmd-}" ] || ! command -v "${slc_cmd}"; then
     # Find slc-cli installation
     slc_init
 fi

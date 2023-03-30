@@ -57,7 +57,7 @@ trap cleanup EXIT
 main()
 {
     local extension_abs_path=""
-    case ${extension_dir} in
+    case "${extension_dir}" in
         /*)
             # absolute path
             extension_abs_path="${extension_dir}"
@@ -65,7 +65,7 @@ main()
         *)
             # relative path
             extension_abs_path=$(realpath "$(pwd)/${extension_dir}")
-            if [ ! -d ${extension_abs_path} ]; then
+            if [ ! -d "${extension_abs_path}" ]; then
                 set +x
                 echo "extension_dir=${extension_dir}"
                 echo "extension_abs_path=${extension_abs_path}"
@@ -79,7 +79,7 @@ main()
     export VENDOR_EXTENSION="${extension_abs_path}"
 
     # Build
-    ${repo_dir}/script/build $@
+    "${repo_dir}/script/build" "$@"
 }
 
-main $@
+main "$@"

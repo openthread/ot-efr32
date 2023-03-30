@@ -30,7 +30,7 @@
 aclocal.m4
 artifact/
 autom4te.cache
-build
+build/
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake

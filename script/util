@@ -75,7 +75,7 @@ parse_configuration()
     fi
 
     # Check that ${config_yml} exists
-    if [ ! -f ${config_yml} ]; then
+    if [ ! -f "${config_yml}" ]; then
         echo "ERROR: '${config_yml}' not found"
         return 2
     fi
@@ -85,10 +85,10 @@ parse_configuration()
     old_setting=${-//[^e]/}
     set +e
     # grep raw values from the configuration file
-    rcp_uart_slcp="$(grep -oP 'rcp_uart_slcp: \K(.*)' ${config_yml})"
-    rcp_spi_slcp="$(grep -oP 'rcp_spi_slcp: \K(.*)' ${config_yml})"
-    soc_slcp="$(grep -oP 'soc_slcp: \K(.*)' ${config_yml})"
-    board="$(grep -oP 'board: \K(.*)' ${config_yml})"
+    rcp_uart_slcp="$(grep -oP 'rcp_uart_slcp: \K(.*)' "${config_yml}")"
+    rcp_spi_slcp="$(grep -oP 'rcp_spi_slcp: \K(.*)' "${config_yml}")"
+    soc_slcp="$(grep -oP 'soc_slcp: \K(.*)' "${config_yml}")"
+    board="$(grep -oP 'board: \K(.*)' "${config_yml}")"
 
     # Strip quotes
     rcp_uart_slcp=$(eval echo "${rcp_uart_slcp}")

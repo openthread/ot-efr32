@@ -27,14 +27,8 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-
 # ==============================================================================
 # Bash definitions
-if [[ -n ${BASH_SOURCE[0]} ]]; then
-    script_path="${BASH_SOURCE[0]}"
-else
-    script_path="$0"
-fi
 
 repo_dir="$(git rev-parse --show-toplevel)"
 
@@ -68,7 +62,7 @@ generate()
     if contains ".*-(ftd|mtd)" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         set +x
         echo "========================================================================================================="
-        echo  "Generate openthread-efr32-soc and openthread-efr32-soc-mbedtls libs"
+        echo "Generate openthread-efr32-soc and openthread-efr32-soc-mbedtls libs"
         echo "========================================================================================================="
         set -x
         "${repo_dir}/script/generate" \
@@ -79,7 +73,7 @@ generate()
     if contains "ot-rcp-uart" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         set +x
         echo "========================================================================================================="
-        echo  "Generate openthread-efr32-rcp-uart and openthread-efr32-rcp-uart-mbedtls libs"
+        echo "Generate openthread-efr32-rcp-uart and openthread-efr32-rcp-uart-mbedtls libs"
         echo "========================================================================================================="
         set -x
         "${repo_dir}/script/generate" \
@@ -90,7 +84,7 @@ generate()
     if contains "ot-rcp-spi" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         set +x
         echo "========================================================================================================="
-        echo  "Generate openthread-efr32-rcp-spi and openthread-efr32-rcp-spi-mbedtls libs"
+        echo "Generate openthread-efr32-rcp-spi and openthread-efr32-rcp-spi-mbedtls libs"
         echo "========================================================================================================="
         set -x
         "${repo_dir}/script/generate" \
@@ -229,7 +223,7 @@ main()
     done
 
     # Add a vendor slc extension if the path to one is defined
-    if [ ! -z "${VENDOR_EXTENSION-}" ]; then
+    if [ -n "${VENDOR_EXTENSION-}" ]; then
         echo "Vendor SLC extension found: ${VENDOR_EXTENSION}"
         parse_configuration "${VENDOR_EXTENSION}"
         echo " - Board: ${board}"
@@ -263,7 +257,7 @@ main()
     export OT_CMAKE_BUILD_DIR="$repo_dir/build/${board}"
 
     # Generate the platform libs and related libs
-    if [ ! -z "${VENDOR_EXTENSION-}" ]; then
+    if [ -n "${VENDOR_EXTENSION-}" ]; then
         "${VENDOR_EXTENSION}"/script/generate
         options+=("-DVENDOR_EXTENSION=${VENDOR_EXTENSION}")
 
