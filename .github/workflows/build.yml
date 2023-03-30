@@ -96,3 +96,19 @@ jobs:
       run: |
         export PATH=/tmp/${{ matrix.gcc_extract_dir }}/bin:$PATH
         script/test
+    - name: Gather SLC generated files
+      if: failure()
+      run: |
+        rm -rf artifact && mkdir artifact
+        for b in build/*/slc; do
+            board=$(basename $(dirname "${b}"))
+
+            echo "Artifacting '${board}'"
+            mkdir -p "artifact/${board}"
+            mv "build/${board}/slc" "artifact/${board}"
+        done
+    - uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: build-${{ matrix.gcc_ver }}-${{ matrix.os }}
+        path: artifact

@@ -28,6 +28,7 @@
 .libs
 .vagrant
 aclocal.m4
+artifact/
 autom4te.cache
 build
 CMakeCache.txt
