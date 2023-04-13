@@ -30,7 +30,7 @@
 aclocal.m4
 artifact/
 autom4te.cache
-build
+build/
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
@@ -76,7 +76,7 @@ __pycache__
 .history/
 
 # slc-cli
-third_party/silabs/slc/slc_cli/
-third_party/silabs/slc/**/*.zip
+slc/slc_cli/
+slc/**/*.zip
 
 .cache

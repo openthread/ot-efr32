@@ -1,0 +1,138 @@
+#!/bin/bash
+#
+#  Copyright (c) 2023, The OpenThread Authors.
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#  3. Neither the name of the copyright holder nor the
+#     names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
+#
+
+repo_dir="$(git rev-parse --show-toplevel)"
+
+# shellcheck source=script/util
+source "${repo_dir}/script/util"
+
+set -exuo pipefail
+# ==============================================================================
+# Bash definitions
+if [[ -n ${BASH_SOURCE[0]} ]]; then
+    script_path="${BASH_SOURCE[0]}"
+else
+    script_path="$0"
+fi
+
+extension_script_dir="$(realpath "$(dirname "${script_path}")")"
+extension_dir="$(dirname "${extension_script_dir}")"
+
+repo_dir="$(git rev-parse --show-toplevel)"
+
+cleanup()
+{
+    # Placeholder for any cleanup tasks
+    :
+}
+
+trap cleanup EXIT
+
+main()
+{
+    local usage="usage: $0 [-h] [--skip-silabs-apps] <brdXXXXy> [-D<OT_XXXX=ON> -D<OT_YYYY=OFF>]"
+
+    # Set 'force' to 1 to force generation. This will overwrite any existing files
+    local force=0
+
+    # Parse flags
+    optspec=":fh-:"
+    while getopts "$optspec" optchar; do
+        case "${optchar}" in
+            f)
+                force=1
+                shift
+                ;;
+            h)
+                echo "${usage}" >&2
+                exit 2
+                ;;
+        esac
+    done
+
+    # Check args
+    if [ $# -gt 1 ]; then
+        echo "${usage}" >&2
+        exit 3
+    fi
+
+    # ==============================================================================
+    # Calculate the absolute path to the root of the vendor extension
+    # ==============================================================================
+    local extension_abs_path=""
+    case "${extension_dir}" in
+        /*)
+            # absolute path
+            extension_abs_path="${extension_dir}"
+            ;;
+        *)
+            # relative path
+            extension_abs_path=$(realpath "$(pwd)/${extension_dir}")
+            if [ ! -d "${extension_abs_path}" ]; then
+                set +x
+                echo "extension_dir=${extension_dir}"
+                echo "extension_abs_path=${extension_abs_path}"
+                echo "ERROR: '${extension_abs_path}' does not exist"
+                exit 5
+            fi
+            ;;
+    esac
+
+    # Set the VENDOR_EXTENSION env variable for the ${repo_dir}/script/generate to pull in the vendor extension
+    export VENDOR_EXTENSION="${extension_abs_path}"
+
+    # ==============================================================================
+    # Generate
+    # ==============================================================================
+    local output_dir=""
+    local board=""
+    local rcp_uart_slcp=""
+    local rcp_spi_slcp=""
+    local soc_slcp=""
+
+    # Parse .slcp paths from ${VENDOR_EXTENSION}/config.yml
+    parse_configuration
+
+    local generate_cmd="${repo_dir}/script/generate"
+    [ "${force}" -eq 1 ] && generate_cmd+=" -f"
+
+    # Generate rcp_uart lib
+    output_dir="${extension_abs_path}/generated_projects/rcp_uart"
+    eval "${generate_cmd}" "${rcp_uart_slcp}" "${output_dir}" "${board}"
+
+    # Generate rcp_spi lib
+    output_dir="${extension_abs_path}/generated_projects/rcp_spi"
+    eval "${generate_cmd}" "${rcp_spi_slcp}" "${output_dir}" "${board}"
+
+    # Generate soc lib
+    output_dir="${extension_abs_path}/generated_projects/soc"
+    eval "${generate_cmd}" "${soc_slcp}" "${output_dir}" "${board}"
+}
+
+main "$@"

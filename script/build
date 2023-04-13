@@ -27,28 +27,18 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-set -euxo pipefail
-
 # ==============================================================================
 # Bash definitions
-if [[ -n ${BASH_SOURCE[0]} ]]; then
-    script_path="${BASH_SOURCE[0]}"
-else
-    script_path="$0"
-fi
 
-script_dir="$(dirname "$(realpath "$script_path")")"
-repo_dir="$(dirname "$script_dir")"
-board="brdXXXXY"
+repo_dir="$(git rev-parse --show-toplevel)"
 
 # shellcheck source=script/efr32-definitions
-source "$script_dir/efr32-definitions"
-
-# shellcheck source=script/slc_cli
-source "$script_dir/slc_cli"
+source "${repo_dir}/script/efr32-definitions"
 
 # shellcheck source=script/util
-source "$script_dir/util"
+source "${repo_dir}/script/util"
+
+set -euxo pipefail
 
 # ==============================================================================
 OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET-}
@@ -61,12 +51,6 @@ OT_OPTIONS=(
 )
 readonly OT_OPTIONS
 
-die()
-{
-    echo " ** ERROR: $1"
-    exit 1
-}
-
 generate()
 {
     if [ "${skip_generation}" = true ]; then
@@ -74,96 +58,49 @@ generate()
     fi
 
     local slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
-    local openthread_slc_data="${OT_CMAKE_BUILD_DIR}"/slc/openthread_slc.data
-
-    run_slc -v 1 signature trust --sdk "${sdk_dir}" -data "${openthread_slc_data}"
 
     if contains ".*-(ftd|mtd)" "${OT_CMAKE_NINJA_TARGET[@]}"; then
-        # ==============================================================================================================
-        # Generate openthread-efr32-soc and openthread-efr32-soc-mbedtls libs
-        # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/soc"
-        project_name="openthread-efr32-soc"
-
-        run_slc -v 1 generate \
-            -data "${openthread_slc_data}" \
-            --sdk="${sdk_dir}" \
-            --clear-cache \
-            --project-file="${repo_dir}/src/platform_projects/openthread-efr32-soc.slcp" \
-            --project-name="${project_name}" \
-            --output-type=makefile \
-            --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
-            --export-destination="${current_project_export_dir}" \
-            --with "${board}"
-
-        # TODO: Remove this when slc supports generic jinja template generation
-        mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
+        set +x
+        echo "========================================================================================================="
+        echo "Generate openthread-efr32-soc and openthread-efr32-soc-mbedtls libs"
+        echo "========================================================================================================="
+        set -x
+        "${repo_dir}/script/generate" \
+            "${repo_dir}/src/platform_projects/openthread-efr32-soc.slcp" \
+            "${slc_generated_projects_dir}/soc" \
+            "${board}"
     fi
     if contains "ot-rcp-uart" "${OT_CMAKE_NINJA_TARGET[@]}"; then
-        # ==============================================================================================================
-        # Generate openthread-efr32-rcp-uart and openthread-efr32-rcp-uart-mbedtls libs
-        # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/rcp_uart"
-        project_name="openthread-efr32-rcp-uart"
-
-        run_slc -v 1 generate \
-            -data "${openthread_slc_data}" \
-            --sdk="${sdk_dir}" \
-            --clear-cache \
-            --project-file="${repo_dir}/src/platform_projects/${project_name}.slcp" \
-            --project-name="${project_name}" \
-            --output-type=makefile \
-            --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
-            --export-destination="${current_project_export_dir}" \
-            --with "${board}"
-
-        # TODO: Remove this when slc supports generic jinja template generation
-        mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
+        set +x
+        echo "========================================================================================================="
+        echo "Generate openthread-efr32-rcp-uart and openthread-efr32-rcp-uart-mbedtls libs"
+        echo "========================================================================================================="
+        set -x
+        "${repo_dir}/script/generate" \
+            "${repo_dir}/src/platform_projects/openthread-efr32-rcp-uart.slcp" \
+            "${slc_generated_projects_dir}/rcp_uart" \
+            "${board}"
     fi
     if contains "ot-rcp-spi" "${OT_CMAKE_NINJA_TARGET[@]}"; then
-        # ==============================================================================================================
-        # Generate openthread-efr32-rcp-spi and openthread-efr32-rcp-spi-mbedtls libs
-        # ==============================================================================================================
-        current_project_export_dir="${slc_generated_projects_dir}/rcp_spi"
-        project_name="openthread-efr32-rcp-spi"
-
-        run_slc -v 1 generate \
-            -data "${openthread_slc_data}" \
-            --sdk="${sdk_dir}" \
-            --clear-cache \
-            --project-file="${repo_dir}/src/platform_projects/${project_name}.slcp" \
-            --project-name="${project_name}" \
-            --output-type=makefile \
-            --no-copy \
-            --export-templates="${repo_dir}"/third_party/silabs/slc/exporter_templates/platform_library \
-            --export-destination="${current_project_export_dir}" \
-            --with "${board}"
-
-        # TODO: Remove this when slc supports generic jinja template generation
-        mv "${current_project_export_dir}/${project_name}.Makefile" "${current_project_export_dir}/CMakeLists.txt"
-        mv "${current_project_export_dir}/${project_name}.project.mak" "${current_project_export_dir}/${project_name}-mbedtls.cmake"
+        set +x
+        echo "========================================================================================================="
+        echo "Generate openthread-efr32-rcp-spi and openthread-efr32-rcp-spi-mbedtls libs"
+        echo "========================================================================================================="
+        set -x
+        "${repo_dir}/script/generate" \
+            "${repo_dir}/src/platform_projects/openthread-efr32-rcp-spi.slcp" \
+            "${slc_generated_projects_dir}/rcp_spi" \
+            "${board}"
     fi
-}
-
-create_srec()
-{
-    local executable_flag
-
-    if [ "$(uname)" = 'Linux' ]; then
-        executable_flag=(-executable)
-    elif [ "$(uname)" = 'Darwin' ]; then
-        executable_flag=(-perm +111)
-    fi
-
-    find "$1" -type f "${executable_flag[@]}" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
 }
 
 build_rcp_uart()
 {
+    set +x
+    echo "======================================================================"
+    echo "Building ot-rcp (UART):"
+    echo "======================================================================"
+    set -x
     builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}/openthread/rcp_uart"
 
     mkdir -p "${builddir}"
@@ -182,13 +119,17 @@ build_rcp_uart()
         --graphviz=graph.dot
 
     ninja "ot-rcp"
-
     create_srec "${builddir}"
     cd "${repo_dir}"
 }
 
 build_rcp_spi()
 {
+    set +x
+    echo "======================================================================"
+    echo "Building ot-rcp (SPI)"
+    echo "======================================================================"
+    set -x
     builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}/openthread/rcp_spi"
 
     mkdir -p "${builddir}"
@@ -210,11 +151,19 @@ build_rcp_spi()
     ninja "ot-rcp"
     create_srec "${builddir}"
     cd "${repo_dir}"
-
 }
 
 build_soc()
 {
+    set +x
+    echo "======================================================================"
+    echo "Building SoC apps:"
+    for t in "${soc_targets[@]}"; do
+        echo " - ${t}"
+    done
+    echo "======================================================================"
+    set -x
+
     builddir="${OT_CMAKE_BUILD_DIR:-$repo_dir/build/${board}}/openthread/soc"
 
     mkdir -p "${builddir}"
@@ -240,7 +189,7 @@ build_soc()
 
 main()
 {
-    local usage="usage: $0 [-h] [--skip-silabs-apps] <efr32 platform> -DBOARD=<brdXXXXy> [-D<OT_XXXX=ON> -D<OT_YYYY=OFF>]"
+    local usage="usage: $0 [-h] [--skip-silabs-apps] <brdXXXXy> [-D<OT_XXXX=ON> -D<OT_YYYY=OFF>]"
 
     local skip_silabs_apps=false
     skip_generation=false
@@ -273,59 +222,50 @@ main()
         esac
     done
 
-    # Parse board
-    lowercase_args=$(echo "$@" | tr '[:upper:]' '[:lower:]')
-    board=$([[ ${lowercase_args} =~ (brd[0-9]{4}[a-z]{1}) ]] && echo "${BASH_REMATCH[1]}")
-
-    # Find component file for latest revision of board
-    local board_slcc
-    board_slcc=$(efr32_get_board_slcc "${board}")
-
-    # Determine board's platform and exit if unsupported
-    local platform
-    platform=$(
-        grep -Eo 'board:device:.*' "${board_slcc}" \
-            | sed "s/board:device:${efr32_device_regex}/efr32\2\4/" \
-            | head -n 1
-    )
-    if [ -z "$platform" ]; then
-        echo "Error parsing platform"
-        exit 3
+    # Add a vendor slc extension if the path to one is defined
+    if [ -n "${VENDOR_EXTENSION-}" ]; then
+        echo "Vendor SLC extension found: ${VENDOR_EXTENSION}"
+        parse_configuration "${VENDOR_EXTENSION}"
+        echo " - Board: ${board}"
+    else
+        # Parse board
+        lowercase_args=$(echo "$@" | tr '[:upper:]' '[:lower:]')
+        board=$([[ ${lowercase_args} =~ (brd[0-9]{4}[a-z]{1}) ]] && echo "${BASH_REMATCH[1]}")
+        shift
     fi
 
+    platform=$(efr32_get_platform "${board}")
     efr32_check_platform "${platform}" || die "Unsupported platform ${platform}"
-
-    shift
 
     local options=("${OT_OPTIONS[@]}")
 
     options+=("-DCMAKE_TOOLCHAIN_FILE=src/${platform}/arm-none-eabi.cmake")
 
-    case "${platform}" in
-        efr32mg1)
-            OT_CMAKE_NINJA_TARGET=("ot-rcp-uart")
-            ;;
-        efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
-            OT_CMAKE_NINJA_TARGET=("ot-rcp-uart" "ot-rcp-spi" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
-            if [ "${skip_silabs_apps}" = false ]; then
-
-                if [ "${skip_generation}" = true ]; then
-                    "${repo_dir}"/script/build_example_apps --skip-generation "${board}" "$@"
-                else
-                    "${repo_dir}"/script/build_example_apps "${board}" "$@"
-                fi
-            fi
-            ;;
-    esac
-
-    # Find slc-cli installation
-    slc_init
+    if [ -z "${OT_CMAKE_NINJA_TARGET}" ]; then
+        case "${platform}" in
+            efr32mg1)
+                OT_CMAKE_NINJA_TARGET=("ot-rcp-uart")
+                skip_silabs_apps=true
+                ;;
+            efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
+                OT_CMAKE_NINJA_TARGET=("ot-rcp-uart" "ot-rcp-spi" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
+                ;;
+        esac
+    fi
 
     options+=("$@")
     export OT_CMAKE_BUILD_DIR="$repo_dir/build/${board}"
 
     # Generate the platform libs and related libs
-    generate
+    if [ -n "${VENDOR_EXTENSION-}" ]; then
+        "${VENDOR_EXTENSION}"/script/generate
+        options+=("-DVENDOR_EXTENSION=${VENDOR_EXTENSION}")
+
+        # TODO: Fix 'script/build_example_apps' so that it works with vendor platform libs
+        skip_silabs_apps=true
+    else
+        generate
+    fi
 
     # Separate OT_CMAKE_NINJA_TARGET into two lists
     rcp_targets=()
@@ -344,7 +284,21 @@ main()
         build_soc -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
     fi
 
+    # Build silabs apps
+    if [ "${skip_silabs_apps}" = false ]; then
+        local before_flags=()
+        local after_flags=()
+
+        if [ "${skip_generation}" = true ]; then
+            before_flags+=("--skip-generation")
+        fi
+
+        "${repo_dir}"/script/build_example_apps "${before_flags[@]}" "${board}" "${after_flags[@]}" "$@"
+
+    fi
+
     ls -alh "${OT_CMAKE_BUILD_DIR}"/openthread/*/bin/*
+
 }
 
 cleanup()

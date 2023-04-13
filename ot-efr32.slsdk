@@ -1,0 +1,9 @@
+# Properties file for Simplicity Studio metadata
+id=com.silabs.sdk.ot-efr32
+
+version=0.0.1
+
+label=Silicon Labs ot-efr32
+description=ot-efr32 extension for Gecko SDK Suite
+
+prop.subLabel=Silicon Labs ot-efr32\\ 0.0.1-1.0

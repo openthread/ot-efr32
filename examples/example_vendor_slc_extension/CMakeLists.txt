@@ -1,6 +1,5 @@
-#!/bin/bash
 #
-#  Copyright (c) 2021, The OpenThread Authors.
+#  Copyright (c) 2023, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -27,33 +26,17 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-set -euxo pipefail
+# ==============================================================================
+# CMake project definitions
+# ==============================================================================
+set(EXAMPLE_VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR})
 
-repo_dir="$(git rev-parse --show-toplevel)"
+# Overwrite the defaults for where each platform library definition is located
+#   This will tell CMake to use the platform libraries from this extension
+set(RCP_SPI_DIR     "${EXAMPLE_VENDOR_DIR}/generated_projects/rcp_spi"    CACHE STRING "Path to RCP (SPI) library definition" FORCE)
+set(RCP_UART_DIR    "${EXAMPLE_VENDOR_DIR}/generated_projects/rcp_uart"   CACHE STRING "Path to RCP (UART) library definition" FORCE)
+set(SOC_DIR         "${EXAMPLE_VENDOR_DIR}/generated_projects/soc"        CACHE STRING "Path to SoC library definition" FORCE)
 
-install_slc_cli()
-{
-    [ -n "${SLC_INSTALL_DIR-}" ] || SLC_INSTALL_DIR="${repo_dir}/slc"
-
-    # Install slc-cli
-    local os_type
-    if [[ $OSTYPE == "linux"* ]]; then
-        os_type="linux"
-    elif [[ $OSTYPE == "darwin"* ]]; then
-        os_type="mac"
-    fi
-
-    local zip_url="https://www.silabs.com/documents/login/software/slc_cli_${os_type}.zip"
-    pushd "${SLC_INSTALL_DIR}"
-    local zip_path="./slc_cli.zip"
-    wget "${zip_url}" -O "${zip_path}"
-    unzip -q -o "${zip_path}" -d "$(dirname ${zip_path})"
-    popd
-}
-
-main()
-{
-    install_slc_cli
-}
-
-main
+set(OT_PLATFORM_LIB             "example_vendor-soc"        CACHE STRING "default efr32 SoC platform library" FORCE)
+set(OT_PLATFORM_LIB_RCP_SPI     "example_vendor-rcp-spi"    CACHE STRING "default efr32 RCP platform library" FORCE)
+set(OT_PLATFORM_LIB_RCP_UART    "example_vendor-rcp-uart"   CACHE STRING "default efr32 RCP platform library" FORCE)

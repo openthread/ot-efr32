@@ -1,6 +1,5 @@
-#!/bin/bash
 #
-#  Copyright (c) 2021, The OpenThread Authors.
+#  Copyright (c) 2023, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -27,33 +26,27 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-set -euxo pipefail
+# See this page for documentation on how to define your own .slcc component file
+# https://siliconlabs.github.io/slc-specification/latest/format/component/
 
-repo_dir="$(git rev-parse --show-toplevel)"
+id: my_custom_board
+label: Example Vendor Board
+package: Vendor
+category: Vendor
+quality: production
+description: This is an example component that adds vendor-specific sources
+provides:
+  - name: my_custom_board
+requires:
+  - efr32mg1p232f256gm48
 
-install_slc_cli()
-{
-    [ -n "${SLC_INSTALL_DIR-}" ] || SLC_INSTALL_DIR="${repo_dir}/slc"
+# Set the root path for all relative paths in this component.
+# The value of root_path is relative to the root of this repo
+root_path: example_vendor
 
-    # Install slc-cli
-    local os_type
-    if [[ $OSTYPE == "linux"* ]]; then
-        os_type="linux"
-    elif [[ $OSTYPE == "darwin"* ]]; then
-        os_type="mac"
-    fi
-
-    local zip_url="https://www.silabs.com/documents/login/software/slc_cli_${os_type}.zip"
-    pushd "${SLC_INSTALL_DIR}"
-    local zip_path="./slc_cli.zip"
-    wget "${zip_url}" -O "${zip_path}"
-    unzip -q -o "${zip_path}" -d "$(dirname ${zip_path})"
-    popd
-}
-
-main()
-{
-    install_slc_cli
-}
-
-main
+include:
+  - path: src
+    file_list:
+      - path: diag.h
+source:
+      - path: src/diag.c

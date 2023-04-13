@@ -1,0 +1,243 @@
+#!/bin/bash
+#
+#  Copyright (c) 2023, The OpenThread Authors.
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#  3. Neither the name of the copyright holder nor the
+#     names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
+#
+
+set -euo pipefail
+
+# ==============================================================================
+# Bash definitions
+if [[ -n ${BASH_SOURCE[0]} ]]; then
+    script_path="${BASH_SOURCE[0]}"
+else
+    script_path="$0"
+fi
+
+script_dir="$(dirname "${script_path}")"
+repo_dir="$(git rev-parse --show-toplevel)"
+sdk_dir="${repo_dir}/third_party/silabs/gecko_sdk"
+
+# shellcheck source=script/slc_cli
+source "${repo_dir}/script/slc_cli"
+
+# shellcheck source=script/util
+source "${repo_dir}/script/util"
+
+# ==============================================================================
+trust_sdk_and_extensions()
+{
+    # TODO: Figure out a way to skip the trust command if the SDK or extensions are already trusted
+
+    # List of dirs containing SDK extensions to trust
+    # NOTE: this list must only contain absolute paths since it will be used to generate symlinks
+    extension_dirs=(
+        # ot-efr32 extension
+        "${repo_dir}"
+    )
+
+    # Add a vendor slc extension if the path to one is defined
+    if [ -n "${VENDOR_EXTENSION-}" ]; then
+        local vendor_extension_abs_path=""
+        case "${VENDOR_EXTENSION}" in
+            /*)
+                # absolute path
+                vendor_extension_abs_path="${VENDOR_EXTENSION}"
+                ;;
+            *)
+                # relative path
+                vendor_extension_abs_path=$(realpath "$(pwd)/${VENDOR_EXTENSION}")
+                if [ ! -d "${vendor_extension_abs_path}" ]; then
+                    set +x
+                    echo "VENDOR_EXTENSION=${VENDOR_EXTENSION}"
+                    echo "script_dir=${script_dir}"
+                    echo "vendor_extension_abs_path=${vendor_extension_abs_path}"
+                    echo "ERROR: '${vendor_extension_abs_path}' does not exist"
+                    exit 5
+                fi
+                ;;
+        esac
+
+        extension_dirs+=("${vendor_extension_abs_path}")
+    fi
+
+    set +x
+    echo "======================================================================"
+    echo "Trusting Gecko SDK              :'${sdk_dir}':"
+    echo "======================================================================"
+    set -x
+
+    # Trust the Gecko SDK submodule
+    run_slc -v 1 signature trust --sdk "${sdk_dir}" -data "${openthread_slc_data}"
+
+    # Ensure GSDK extension folder exists
+    mkdir -p "${sdk_dir}/extension"
+
+    set +x
+    echo ""
+    echo ""
+    echo "======================================================================"
+    echo "extension_dirs = (${extension_dirs[*]})"
+    echo "======================================================================"
+    set -x
+
+    # Symlink and trust the extensions
+    for extension_dir in "${extension_dirs[@]}"; do
+
+        # Locate .slce file
+        local slce_file=""
+        slce_file=$(find "${extension_dir}" -maxdepth 1 -name '*.slce')
+        if [ -z "${slce_file}" ]; then
+            echo "ERROR: Couldn't find .slce file at '${extension_dir}'"
+            continue
+        fi
+
+        # Parse extension name
+        local extension_name=""
+        extension_name=$(grep -oP '^id: \K(.*)' "${slce_file}")
+
+        # Define symlink location
+        local extension_symlink="${sdk_dir}/extension/${extension_name}"
+
+        set +x
+        echo ""
+        echo ""
+        echo "======================================================================"
+        echo "Trusting extension '${extension_name}'"
+        echo "======================================================================"
+        set -x
+
+        # Create symlink if it doesn't already exist
+        if [ ! -L "${extension_symlink}" ]; then
+            ln -s "${extension_dir}" "${extension_symlink}"
+        fi
+
+        # Trust the extension
+        run_slc -v 1 signature trust --sdk "${sdk_dir}" -extpath "${extension_symlink}" -data "${openthread_slc_data}"
+    done
+
+    ls -alh "${sdk_dir}/extension"
+}
+
+generate()
+{
+    local usage="Usage: generate <.slcp file> <output dir> [export_templates]"
+    set -x
+
+    # Set 'force' to 1 to force generation. This will overwrite any existing files
+    local force=0
+
+    # Parse flags
+    optspec=":fh-:"
+    while getopts "$optspec" optchar; do
+        case "${optchar}" in
+            f)
+                force=1
+                shift
+                ;;
+            h)
+                echo "${usage}" >&2
+                exit 2
+                ;;
+        esac
+    done
+
+    # Check args
+    if [ $# -lt 2 ] || [ $# -gt 4 ]; then
+        echo "Usage: generate <.slcp file> <output dir> <board> [export_templates]"
+        return 1
+    fi
+
+    # Define generation variables
+    local slcp=$1
+    local project_name=""
+    project_name=$(grep -oP 'project_name: \K(.*)' "${slcp}")
+    local generation_dir=$2
+    local export_templates="${repo_dir}/slc/exporter_templates/platform_library"
+    local board=$3
+    local build_dir=${OT_CMAKE_BUILD_DIR-"${repo_dir}/build/${board}"}
+    local openthread_slc_data=${openthread_slc_data-"${build_dir}/slc/openthread_slc.data"}
+
+    if [ $# -eq 4 ]; then
+        export_templates=$4
+    fi
+
+    # Skip generation if previously generated
+    if [ -d "${generation_dir}" ] && [ ${force} -ne 1 ]; then
+        set +x
+        echo "======================================================================"
+        echo "Skipping generation for '${project_name}'."
+        echo "output dir already exists: ${generation_dir}:"
+        echo "======================================================================"
+        set -x
+        exit
+    fi
+
+    trust_sdk_and_extensions
+
+    set +x
+    echo
+    echo
+    echo "======================================================================"
+    echo "Generating '${project_name?}':"
+    echo " - project file    : ${slcp}"
+    echo " - export_templates: ${export_templates}"
+    echo " - output dir      : ${generation_dir}"
+    echo " - board           : ${board}"
+    echo "======================================================================"
+    set -x
+
+    run_slc -v 1 generate \
+        -data "${openthread_slc_data?}" \
+        --sdk="${sdk_dir?}" \
+        --clear-cache \
+        --project-file="${slcp}" \
+        --project-name="${project_name}" \
+        --output-type=makefile \
+        --no-copy \
+        --export-templates="${export_templates}" \
+        --export-destination="${generation_dir}" \
+        --with "${board?}"
+
+    # TODO: Remove this when slc supports generic jinja template generation
+    mv "${generation_dir}/${project_name}.Makefile" "${generation_dir}/CMakeLists.txt"
+    mv "${generation_dir}/${project_name}.project.mak" "${generation_dir}/${project_name}-mbedtls.cmake"
+}
+
+cleanup()
+{
+    # Placeholder for any cleanup tasks
+    :
+}
+
+trap cleanup EXIT
+
+if [ -z "${slc_cmd-}" ] || ! command -v "${slc_cmd}"; then
+    # Find slc-cli installation
+    slc_init
+fi
+
+generate "$@"

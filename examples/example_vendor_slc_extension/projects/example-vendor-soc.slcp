@@ -1,6 +1,5 @@
-#!/bin/bash
 #
-#  Copyright (c) 2021, The OpenThread Authors.
+#  Copyright (c) 2023, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -27,33 +26,49 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-set -euxo pipefail
+project_name: example_vendor-soc
+label: ot-efr32
+package: OpenThread
+description: This is the platform project that will enable the ot-efr32 repo on GitHub to generate a CMake library for EFR32
+category: OpenThread Examples
+quality: production
 
-repo_dir="$(git rev-parse --show-toplevel)"
+component:
+  - id: ot_platform_abstraction_core
+  - id: ot_psa_crypto
+  - id: ot_thirdparty
+  - id: uartdrv_usart
+    instance:
+      - vcom
+  - id: rail_util_pti
 
-install_slc_cli()
-{
-    [ -n "${SLC_INSTALL_DIR-}" ] || SLC_INSTALL_DIR="${repo_dir}/slc"
+  # Use the 'vendor_diag' component from the 'example_vendor' SDK extension
+  - id: vendor_diag
+    from: example_vendor
+sdk_extension:
+  - id: ot-efr32
+    version: 0.0.1
+  - id: example_vendor
+    version: 0.0.1
 
-    # Install slc-cli
-    local os_type
-    if [[ $OSTYPE == "linux"* ]]; then
-        os_type="linux"
-    elif [[ $OSTYPE == "darwin"* ]]; then
-        os_type="mac"
-    fi
-
-    local zip_url="https://www.silabs.com/documents/login/software/slc_cli_${os_type}.zip"
-    pushd "${SLC_INSTALL_DIR}"
-    local zip_path="./slc_cli.zip"
-    wget "${zip_url}" -O "${zip_path}"
-    unzip -q -o "${zip_path}" -d "$(dirname ${zip_path})"
-    popd
-}
-
-main()
-{
-    install_slc_cli
-}
-
-main
+configuration:
+  - name: SL_BOARD_ENABLE_VCOM
+    value: 1
+  - name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
+    value: 1
+  - name: SL_MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
+    value: 1
+  - name: UARTDRV_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
+    value: 0
+    condition: [freertos, uartdrv_usart]
+  - name: SL_IOSTREAM_USART_VCOM_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
+    value: 0
+    condition: [freertos, iostream_usart]
+  - name: SL_IOSTREAM_USART_VCOM_RX_BUFFER_SIZE
+    value: 128 # Increase from default 32
+    condition: [iostream_usart]
+  - name: SL_HEAP_SIZE
+    value: 16384
+    condition: [freertos]
+  - name: SL_STACK_SIZE
+    value: 4608

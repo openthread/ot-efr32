@@ -1,6 +1,5 @@
-#!/bin/bash
 #
-#  Copyright (c) 2021, The OpenThread Authors.
+#  Copyright (c) 2023, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -27,33 +26,21 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-set -euxo pipefail
 
-repo_dir="$(git rev-parse --show-toplevel)"
+# This is an example of an SLC SDK extension.
+#
+# By creating an SDK extension, a vendor is able to define components that are
+# available for use when generating a SLC project.
+#
+# See this page for more details
+# https://siliconlabs.github.io/slc-specification/latest/format/extension/
 
-install_slc_cli()
-{
-    [ -n "${SLC_INSTALL_DIR-}" ] || SLC_INSTALL_DIR="${repo_dir}/slc"
-
-    # Install slc-cli
-    local os_type
-    if [[ $OSTYPE == "linux"* ]]; then
-        os_type="linux"
-    elif [[ $OSTYPE == "darwin"* ]]; then
-        os_type="mac"
-    fi
-
-    local zip_url="https://www.silabs.com/documents/login/software/slc_cli_${os_type}.zip"
-    pushd "${SLC_INSTALL_DIR}"
-    local zip_path="./slc_cli.zip"
-    wget "${zip_url}" -O "${zip_path}"
-    unzip -q -o "${zip_path}" -d "$(dirname ${zip_path})"
-    popd
-}
-
-main()
-{
-    install_slc_cli
-}
-
-main
+id: example_vendor
+version: 0.0.1
+description: "example_vendor extension for Gecko SDK Suite"
+label: "Example Vendor extension"
+sdk:
+  id: gecko_sdk
+  version: 4.2.1
+component_path:
+  - path: component

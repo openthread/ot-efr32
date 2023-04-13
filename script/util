@@ -34,3 +34,72 @@ contains()
     IFS=" " read -r -a list <<<"$@"
     echo "${list[@]}" | grep -w -q -E "$search_term"
 }
+
+create_srec()
+{
+    local executable_flag
+
+    if [ "$(uname)" = 'Linux' ]; then
+        executable_flag=(-executable)
+    elif [ "$(uname)" = 'Darwin' ]; then
+        executable_flag=(-perm +111)
+    fi
+
+    find "$1" -type f "${executable_flag[@]}" -not -name '*.*' -exec arm-none-eabi-objcopy -O srec {} {}.s37 \; -exec ls -alh {} {}.s37 \;
+}
+
+die()
+{
+    echo " ** ERROR: $1"
+    exit 1
+}
+
+parse_configuration()
+{
+    local extension_dir="${extension_dir-.}"
+    local config_yml=""
+
+    if [ $# -eq 0 ]; then
+        # No args passed. Use defaults
+        config_yml="${extension_dir}/config.yml"
+    elif [ $# -eq 1 ]; then
+        extension_dir=$1
+        config_yml="${extension_dir}/config.yml"
+    elif [ $# -eq 2 ]; then
+        extension_dir=$1
+        config_yml=$2
+    else
+        echo "ERROR: Too many args"
+        echo "usage: parse_configuration [extension_dir] [config_yml]"
+        return 1
+    fi
+
+    # Check that ${config_yml} exists
+    if [ ! -f "${config_yml}" ]; then
+        echo "ERROR: '${config_yml}' not found"
+        return 2
+    fi
+
+    # Temporarily disable 'set -e'
+    # This will allow configuration files that only define a subset of "*_slcp" keys
+    old_setting=${-//[^e]/}
+    set +e
+    # grep raw values from the configuration file
+    rcp_uart_slcp="$(grep -oP 'rcp_uart_slcp: \K(.*)' "${config_yml}")"
+    rcp_spi_slcp="$(grep -oP 'rcp_spi_slcp: \K(.*)' "${config_yml}")"
+    soc_slcp="$(grep -oP 'soc_slcp: \K(.*)' "${config_yml}")"
+    board="$(grep -oP 'board: \K(.*)' "${config_yml}")"
+
+    # Strip quotes
+    rcp_uart_slcp=$(eval echo "${rcp_uart_slcp}")
+    rcp_spi_slcp=$(eval echo "${rcp_spi_slcp}")
+    soc_slcp=$(eval echo "${soc_slcp}")
+    board=$(eval echo "${board}")
+
+    # Make paths relative to extension_dir, stripping leading './'
+    rcp_uart_slcp="${extension_dir}/${rcp_uart_slcp#./}"
+    rcp_spi_slcp="${extension_dir}/${rcp_spi_slcp#./}"
+    soc_slcp="${extension_dir}/${soc_slcp#./}"
+    if [[ -n $old_setting ]]; then set -e; else set +e; fi
+
+}
