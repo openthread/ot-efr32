@@ -172,12 +172,12 @@ generate()
     fi
 
     # Define generation variables
-    local slcp=$1
+    local slcp=${1?A .slcp file is expected as the first argument}
     local project_name=""
     project_name=$(grep -oP 'project_name: \K(.*)' "${slcp}")
-    local generation_dir=$2
+    local generation_dir=${2?A generation output dir is expected as the second argument}
     local export_templates="${repo_dir}/slc/exporter_templates/platform_library"
-    local board=$3
+    local board=${3?A board is expected as the third argument}
     local build_dir=${OT_CMAKE_BUILD_DIR-"${repo_dir}/build/${board}"}
     local openthread_slc_data=${openthread_slc_data-"${build_dir}/slc/openthread_slc.data"}
 
@@ -198,13 +198,14 @@ generate()
 
     trust_sdk_and_extensions
 
+    local yaml_export_templates="${repo_dir}/slc/exporter_templates/yaml"
     set +x
     echo
     echo
     echo "======================================================================"
-    echo "Generating '${project_name?}':"
+    echo "Generating '${project_name?}' (yaml):"
     echo " - project file    : ${slcp}"
-    echo " - export_templates: ${export_templates}"
+    echo " - export_templates: ${yaml_export_templates}"
     echo " - output dir      : ${generation_dir}"
     echo " - board           : ${board}"
     echo "======================================================================"
@@ -218,13 +219,30 @@ generate()
         --project-name="${project_name}" \
         --output-type=makefile \
         --no-copy \
-        --export-templates="${export_templates}" \
+        --export-templates="${yaml_export_templates}" \
         --export-destination="${generation_dir}" \
         --with "${board?}"
 
     # TODO: Remove this when slc supports generic jinja template generation
-    mv "${generation_dir}/${project_name}.Makefile" "${generation_dir}/CMakeLists.txt"
-    mv "${generation_dir}/${project_name}.project.mak" "${generation_dir}/${project_name}-mbedtls.cmake"
+    local slc_vars_file="${generation_dir}/slc_vars.yaml"
+    mv "${generation_dir}/${project_name}.Makefile" "${slc_vars_file}"
+    rm -f "${generation_dir}/${project_name}.project.mak"
+
+    set +x
+    echo
+    echo
+    echo "======================================================================"
+    echo "Generating '${project_name?}' (CMake):"
+    echo " - slc_vars_yaml file : ${slc_vars_file}"
+    echo " - export_templates   : ${export_templates}"
+    echo " - output dir         : ${generation_dir}"
+    echo " - board              : ${board}"
+    echo "======================================================================"
+    set -x
+
+    "${repo_dir}"/script/generate_cmake.py \
+        "${generation_dir}/slc_vars.yaml" \
+        "${generation_dir}"
 }
 
 cleanup()
