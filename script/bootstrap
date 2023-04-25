@@ -74,8 +74,7 @@ install_packages_source()
 
 install_packages_pip3()
 {
-    pip3 install -U cmake==3.22.4
-    cmake --version | grep 3.22.4
+    pip3 install -U -r "${repo_dir}/requirements.txt"
 }
 
 install_packages()
