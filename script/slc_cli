@@ -50,6 +50,7 @@ use_slc_from_path=1
 run_slc()
 {
     IFS=" " read -r -a slc_args <<<"${@}"
+    echo ">>>> ${slc_cmd}" "${slc_args[@]}\n"
     "${slc_cmd}" "${slc_args[@]}"
 }
 

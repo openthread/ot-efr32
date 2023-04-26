@@ -154,6 +154,9 @@ if(OT_APP_RCP)
 elseif(OT_APP_NCP OR OT_APP_CLI)
     message("-- OT_PLATFORM_LIB          = ${OT_PLATFORM_LIB}")
     message("-- OT_MBEDTLS               = ${OT_MBEDTLS}")
+else()
+    message("-- OT_PLATFORM_LIB          = ${OT_PLATFORM_LIB}")
+    message("-- OT_MBEDTLS               = ${OT_MBEDTLS}")
 endif()
 
 message("===================================================================")
@@ -167,7 +170,6 @@ if(OT_APP_RCP)
 elseif(OT_APP_NCP OR OT_APP_CLI)
     message("-- SOC_DIR      = ${SOC_DIR}")
 endif()
-message("===================================================================")
 
 if(OT_APP_RCP)
     if(OT_NCP_SPI)
@@ -199,6 +201,7 @@ else()
         endif()
     endforeach()
 endif()
+message("===================================================================")
 
 
 # efr32mg12 Sub-GHz support
