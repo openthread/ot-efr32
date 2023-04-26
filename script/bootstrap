@@ -29,6 +29,19 @@
 
 set -euxo pipefail
 
+# ==============================================================================
+# Bash definitions
+
+if [[ -n ${BASH_SOURCE[0]} ]]; then
+    script_path="${BASH_SOURCE[0]}"
+else
+    script_path="$0"
+fi
+script_dir="$(realpath "$(dirname "${script_path}")")"
+repo_dir="$(git -C "${script_dir}" rev-parse --show-toplevel)"
+
+# ==============================================================================
+
 install_packages_apt()
 {
     echo 'Installing script dependencies...'
@@ -89,10 +102,10 @@ main()
     install_packages
 
     echo "Bootstrapping openthread"
-    "$(dirname "$0")"/../openthread/script/bootstrap
+    "${repo_dir}"/openthread/script/bootstrap
 
     echo "Bootstrapping silabs"
-    "$(dirname "$0")"/bootstrap_silabs
+    "${repo_dir}"/script/bootstrap_silabs
 
     echo "Bootstrap completed successfully."
 }

@@ -27,8 +27,6 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-repo_dir="$(git rev-parse --show-toplevel)"
-
 # shellcheck source=script/util
 source "${repo_dir}/script/util"
 
@@ -43,8 +41,7 @@ fi
 
 extension_script_dir="$(realpath "$(dirname "${script_path}")")"
 extension_dir="$(dirname "${extension_script_dir}")"
-
-repo_dir="$(git rev-parse --show-toplevel)"
+repo_dir="$(git -C "${extension_script_dir}" rev-parse --show-toplevel)"
 
 cleanup()
 {

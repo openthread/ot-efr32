@@ -27,13 +27,24 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-repo_dir="$(git rev-parse --show-toplevel)"
+# ==============================================================================
+# Bash definitions
+
+if [[ -n ${BASH_SOURCE[0]} ]]; then
+    script_path="${BASH_SOURCE[0]}"
+else
+    script_path="$0"
+fi
+script_dir="$(realpath "$(dirname "${script_path}")")"
+repo_dir="$(git -C "${script_dir}" rev-parse --show-toplevel)"
 
 # slc-cli installation dir
 [ -n "${SLC_INSTALL_DIR-}" ] || SLC_INSTALL_DIR="${repo_dir}/slc"
 
 # Set to 0 to force using slc-cli from 'third_party'/silabs/slc.
 use_slc_from_path=1
+
+# ==============================================================================
 
 # Wrapper function to execute an slc command
 run_slc()
