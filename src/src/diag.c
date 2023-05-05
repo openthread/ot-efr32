@@ -148,11 +148,13 @@ otError otPlatDiagTxStreamAddrMatch(uint8_t enable)
 
 otError otPlatDiagTxStreamAutoAck(uint8_t autoAckEnabled)
 {
+    RAIL_Status_t status = RAIL_STATUS_NO_ERROR;
+
     otLogInfoPlat("Diag Stream Disable autoAck");
 
     RAIL_PauseRxAutoAck(gRailHandle, !autoAckEnabled);
 
-    return OT_ERROR_NONE;
+    return railStatusToOtError(status);
 }
 
 // coex
