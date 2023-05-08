@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -416,11 +416,21 @@
 /**
  * @def SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT
  *
- * Max number of RX buffers to use in the rdio driver
+ * Max number of RX buffers to use in the radio driver
  *
  */
 #ifndef SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT
 #define SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT 4
+#endif
+
+/**
+ * @def SL_OPENTHREAD_ECDSA_PRIVATE_KEY_SIZE
+ *
+ * Max Private key size supported by ECDSA Crypto handler.
+ *
+ */
+#ifndef SL_OPENTHREAD_ECDSA_PRIVATE_KEY_SIZE
+#define SL_OPENTHREAD_ECDSA_PRIVATE_KEY_SIZE 32
 #endif
 
 /**
