@@ -45,6 +45,7 @@ jobs:
   arm-gcc:
     name: arm-gcc-${{ matrix.gcc_ver }}-${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - gcc_ver: 6
