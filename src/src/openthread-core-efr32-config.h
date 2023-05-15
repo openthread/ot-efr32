@@ -165,6 +165,16 @@
 #endif
 
 /**
+ * @def OPENTHREAD_CONFIG_UPTIME_ENABLE
+ *
+ * (For FTDs only) Define to 1 to enable tracking the uptime of OpenThread instance.
+ *
+ */
+#ifndef OPENTHREAD_CONFIG_UPTIME_ENABLE
+#define OPENTHREAD_CONFIG_UPTIME_ENABLE OPENTHREAD_FTD
+#endif
+
+/**
  * @def OPENTHREAD_CONFIG_MAC_CSL_REQUEST_AHEAD_US
  *
  * Define how many microseconds ahead should MAC deliver CSL frame to SubMac.
