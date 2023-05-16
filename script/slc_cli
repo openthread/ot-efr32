@@ -50,7 +50,7 @@ use_slc_from_path=1
 run_slc()
 {
     IFS=" " read -r -a slc_args <<<"${@}"
-    "${slc_cmd}" "${slc_args[@]}"
+    eval "${slc_cmd}" "${slc_args[*]}"
 }
 
 # Find the command to use for slc

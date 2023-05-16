@@ -1,9 +1,9 @@
 ####################################################################
 # Automatically-generated file. Do not edit!                       #
-# CMake Version 1                                                  #
+# CMake Version 2                                                  #
 ####################################################################
 #
-#  Copyright (c) 2022, The OpenThread Authors.
+#  Copyright (c) 2023, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@
 {%  from
         'macros.jinja'
     import
-        prepare_path,
         compile_flags,
         print_linker_flags,
         print_all_jinja_vars,
@@ -41,7 +40,7 @@
     with context -%}
 
 include(${PROJECT_SOURCE_DIR}/third_party/silabs/cmake/utility.cmake)
-include({{PROJECT_NAME}}-mbedtls.cmake)
+include(mbedtls.cmake)
 
 # ==============================================================================
 # Platform library
@@ -71,7 +70,6 @@ set_target_properties({{PROJECT_NAME}}
 # ==============================================================================
 target_include_directories(ot-config INTERFACE
 {%- for include in C_CXX_INCLUDES %}
-    {%- set include = prepare_path(include) | replace('-I', '') | replace('\"', '') %}
     {{ include }}
 {%- endfor %}
 )
@@ -89,26 +87,18 @@ target_include_directories({{PROJECT_NAME}} PRIVATE
 # Sources
 # ==============================================================================
 target_sources({{PROJECT_NAME}} PRIVATE
-{%- for source in (ALL_SOURCES | sort) %}
-    {%- set source = prepare_path(source) -%}
-
-    {#- Only take non-crypto sources #}
-    {%- if not ('util/third_party/crypto' in source) %}
-        {%- if source.endswith('.c') or source.endswith('.cpp') or source.endswith('.h') or source.endswith('.hpp') %}
+{%- for source in NON_MBEDTLS_SOURCES %}
+    {%- if source.endswith('.c') or source.endswith('.cpp') or source.endswith('.h') or source.endswith('.hpp') %}
     {{source}}
-        {%- endif %}
     {%- endif %}
 {%- endfor %}
 )
 
-{%- for source in (ALL_SOURCES | sort) %}
-    {%- set source = prepare_path(source) -%}
-
-    {#- Only take PAL sources #}
-        {%- if source.endswith('.s') or source.endswith('.S') %}
+{%- for source in NON_MBEDTLS_SOURCES %}
+    {%- if source.endswith('.s') or source.endswith('.S') %}
 target_sources({{PROJECT_NAME}} PRIVATE {{source}})
 set_property(SOURCE {{source}} PROPERTY LANGUAGE C)
-        {%- endif %}
+    {%- endif %}
 {%- endfor %}
 
 # ==============================================================================
@@ -117,39 +107,23 @@ set_property(SOURCE {{source}} PROPERTY LANGUAGE C)
 
 target_compile_definitions(ot-config INTERFACE
 {%- for define in C_CXX_DEFINES %}
-    {%- if not (define.startswith("MBEDTLS_")
-                or define.startswith("OPENTHREAD_")
-                ) %}
     {{define}}={{C_CXX_DEFINES[define]}}
-    {%- endif %}
 {%- endfor %}
 )
 
-{% if dict_contains_key_starting_with(C_CXX_DEFINES, "OPENTHREAD_") -%}
+{% if OPENTHREAD_DEFINES -%}
 target_compile_definitions(ot-config INTERFACE
-{%- for define in C_CXX_DEFINES %}
-    {%- if define.startswith("OPENTHREAD_")
-            and not ( ("OPENTHREAD_RADIO" == define)
-                or ("OPENTHREAD_FTD" == define)
-                or ("OPENTHREAD_MTD" == define)
-                or ("OPENTHREAD_COPROCESSOR" == define) ) %}
-    {{define}}={{C_CXX_DEFINES[define]}}
-    {%- endif %}
+{%- for define in OPENTHREAD_DEFINES %}
+    {{define}}={{OPENTHREAD_DEFINES[define]}}
 {%- endfor %}
 )
 
 {% endif -%}
 
-{% if dict_contains_key_starting_with(C_CXX_DEFINES, "MBEDTLS_")
-        or dict_contains_key_starting_with(C_CXX_DEFINES, "PSA_")
-        -%}
+{% if MBEDTLS_DEFINES -%}
 target_compile_definitions({{PROJECT_NAME}}-mbedtls-config INTERFACE
-{%- for define in C_CXX_DEFINES %}
-    {%- if define.startswith("MBEDTLS_") or
-           define.startswith("PSA_")
-     %}
-    {{define}}={{C_CXX_DEFINES[define]}}
-    {%- endif %}
+{%- for define in MBEDTLS_DEFINES %}
+    {{define}}={{MBEDTLS_DEFINES[define]}}
 {%- endfor %}
 )
 
@@ -190,8 +164,11 @@ target_compile_definitions({{PROJECT_NAME}}-config INTERFACE
 
 {% endif -%}
 
-{% if openthread_device_type() -%}
-target_compile_definitions({{PROJECT_NAME}} PRIVATE {{ openthread_device_type() }}
+{% if OPENTHREAD_DEVICE_TYPE -%}
+target_compile_definitions({{PROJECT_NAME}} PRIVATE
+{%- for define in OPENTHREAD_DEVICE_TYPE %}
+    {{define}}={{OPENTHREAD_DEVICE_TYPE[define]}}
+{%- endfor %}
 )
 
 {% endif -%}
@@ -210,11 +187,9 @@ set(LD_FILE "${CMAKE_CURRENT_SOURCE_DIR}/autogen/linkerfile.ld")
 target_link_libraries({{PROJECT_NAME}}
     PUBLIC
 {%- for lib_name in SYS_LIBS+USER_LIBS %}
-    {%- set lib_name = prepare_path(lib_name) -%}
-
     {#- Ignore GSDK static libs. These will be added below #}
     {%- if 'SILABS_GSDK_DIR' not in lib_name %}
-        {{lib_name | replace('\\', '/') | replace(' ', '\\ ') | replace('"','')}}
+        {{ lib_name }}
     {%- endif %}
 {%- endfor %}
         {{PROJECT_NAME}}-config
@@ -222,7 +197,6 @@ target_link_libraries({{PROJECT_NAME}}
     PRIVATE
         -T${LD_FILE}
         -Wl,--gc-sections
-
         ot-config
 )
 
@@ -240,9 +214,6 @@ target_link_options({{PROJECT_NAME}} PRIVATE {{ print_linker_flags() }}
 {#- Generate a list of GSDK libs #}
 set(GSDK_LIBS
 {%- for lib_name in lib_list -%}
-    {#- Replace SDK_PATH with SILABS_GSDK_DIR #}
-    {%- set lib_name = prepare_path(lib_name) -%}
-
     {%- if ('SILABS_GSDK_DIR' in lib_name) and ('jlink' not in lib_name) %}
     {{lib_name}}
     {%- endif %}
@@ -277,3 +248,4 @@ endforeach()
 {%- if debug_template %}
 {{ print_all_jinja_vars() }}
 {%- endif %}
+

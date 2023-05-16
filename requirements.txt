@@ -1,0 +1,4 @@
+cmake~=3.26.3
+Jinja2~=3.1.2
+GitPython~=3.1.31
+PyYAML~=6.0

@@ -48,7 +48,13 @@ install_packages_apt()
 
     # apt-get update and install dependencies
     sudo apt-get update
-    sudo apt-get --no-install-recommends install -y coreutils openjdk-11-jre python3-setuptools python3-pip git-lfs unzip
+    sudo apt-get --no-install-recommends install -y \
+        coreutils \
+        openjdk-11-jre \
+        python3-setuptools \
+        python3-pip \
+        git-lfs \
+        unzip
 }
 
 install_packages_opkg()
@@ -64,7 +70,10 @@ install_packages_rpm()
 install_packages_brew()
 {
     echo 'Installing script dependencies...'
-    brew install coreutils openjdk@11 wget
+    brew install \
+        coreutils \
+        openjdk@11 \
+        wget
 }
 
 install_packages_source()
@@ -74,8 +83,7 @@ install_packages_source()
 
 install_packages_pip3()
 {
-    pip3 install -U cmake==3.22.4
-    cmake --version | grep 3.22.4
+    pip3 install -U -r "${repo_dir}/requirements.txt"
 }
 
 install_packages()
@@ -97,17 +105,36 @@ install_packages()
     fi
 }
 
-main()
+do_bootstrap_openthread()
 {
-    install_packages
-
     echo "Bootstrapping openthread"
     "${repo_dir}"/openthread/script/bootstrap
+}
 
+do_bootstrap_silabs()
+{
     echo "Bootstrapping silabs"
     "${repo_dir}"/script/bootstrap_silabs
+}
+main()
+{
+    if [ $# == 0 ]; then
+        install_packages
+        do_bootstrap_openthread
+        do_bootstrap_silabs
+    elif [ "$1" == 'openthread' ]; then
+        do_bootstrap_openthread
+    elif [ "$1" == 'python' ]; then
+        install_packages_pip3
+    elif [ "$1" == 'silabs' ]; then
+        do_bootstrap_silabs
+    else
+        echo >&2 "Unsupported action: $1. Supported: openthread, silabs"
+        # 128 for Invalid arguments
+        exit 128
+    fi
 
     echo "Bootstrap completed successfully."
 }
 
-main
+main "$@"
