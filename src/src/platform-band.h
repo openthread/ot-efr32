@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,7 @@ typedef struct efr32RadioCounters
 {
     uint32_t mRailPlatTxTriggered;
     uint32_t mRailPlatRadioReceiveDoneCbCount;
+    uint32_t mRailPlatRadioReceiveProcessedCount;
     uint32_t mRailPlatRadioEnergyScanDoneCbCount;
     uint32_t mRailPlatRadioTxDoneCbCount;
     uint32_t mRailTxStarted;
