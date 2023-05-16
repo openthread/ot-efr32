@@ -38,7 +38,7 @@ else
     script_path="$0"
 fi
 script_dir="$(realpath "$(dirname "${script_path}")")"
-repo_dir="$(git -C "${script_dir}" rev-parse --show-toplevel)"
+repo_dir="$(dirname "${script_dir}")"
 sdk_dir="${repo_dir}/third_party/silabs/gecko_sdk"
 
 # shellcheck source=script/slc_cli

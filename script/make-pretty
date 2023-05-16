@@ -64,7 +64,7 @@ else
     script_path="$0"
 fi
 script_dir="$(realpath "$(dirname "${script_path}")")"
-repo_dir="$(git -C "${script_dir}" rev-parse --show-toplevel)"
+repo_dir="$(dirname "${script_dir}")"
 
 OT_BUILD_JOBS=$(getconf _NPROCESSORS_ONLN)
 readonly OT_BUILD_JOBS
