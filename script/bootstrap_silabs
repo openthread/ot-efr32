@@ -38,7 +38,7 @@ else
     script_path="$0"
 fi
 script_dir="$(realpath "$(dirname "${script_path}")")"
-repo_dir="$(git -C "${script_dir}" rev-parse --show-toplevel)"
+repo_dir="$(dirname "${script_dir}")"
 
 # ==============================================================================
 
@@ -55,10 +55,11 @@ install_slc_cli()
     fi
 
     local zip_url="https://www.silabs.com/documents/login/software/slc_cli_${os_type}.zip"
+    mkdir -p "${SLC_INSTALL_DIR}"
     pushd "${SLC_INSTALL_DIR}"
     local zip_path="./slc_cli.zip"
     wget "${zip_url}" -O "${zip_path}"
-    unzip -q -o "${zip_path}" -d "$(dirname ${zip_path})"
+    unzip -q -o "${zip_path}" -d "$(dirname ${zip_path})" && rm "${zip_path}"
     popd
 }
 
