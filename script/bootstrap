@@ -54,7 +54,8 @@ install_packages_apt()
         python3-setuptools \
         python3-pip \
         git-lfs \
-        unzip
+        unzip \
+        wget
 }
 
 install_packages_opkg()
@@ -83,7 +84,7 @@ install_packages_source()
 
 install_packages_pip3()
 {
-    pip3 install -U -r "${repo_dir}/requirements.txt"
+    pip3 install --no-cache-dir --upgrade -r "${repo_dir}/requirements.txt"
 }
 
 install_packages()
@@ -122,6 +123,8 @@ main()
         install_packages
         do_bootstrap_openthread
         do_bootstrap_silabs
+    elif [ "$1" == 'packages' ]; then
+        install_packages
     elif [ "$1" == 'openthread' ]; then
         do_bootstrap_openthread
     elif [ "$1" == 'python' ]; then
