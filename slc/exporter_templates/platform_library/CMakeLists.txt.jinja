@@ -53,7 +53,7 @@ include(mbedtls.cmake)
 #           weakly and strongly defined implementations of the same function
 #           exist.
 add_library({{PROJECT_NAME}} OBJECT
-    $<TARGET_OBJECTS:openthread-platform-utils>
+    $<TARGET_OBJECTS:efr32-platform-utils>
 )
 
 # Interface lib for sharing efr32 config to relevant targets
