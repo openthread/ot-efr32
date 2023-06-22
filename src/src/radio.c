@@ -542,7 +542,7 @@ static inline uint8_t getIidFromFilterMask(uint8_t mask)
     // 8 - INDEX 2       - IID(3)
     //
     // The packet should either be directed to one of the PANs or Bcast.
-    //(mask & (mask -1) is a simplistic way of testing if the mask is a power of 2.
+    // (mask & (mask -1) is a simplistic way of testing if the mask is a power of 2.
     otEXPECT_ACTION(((mask != 0) && (mask & (mask - 1)) == 0), iid = 0);
 
     while (mask)
@@ -578,9 +578,13 @@ static bool isFilterMaskValid(uint8_t mask)
      * Case 3: We dont have either the destination addressing feild or destination PanId
      *         in the received packet to determine if the dest address and dest pan match.
      */
-    if (((mask & RADIO_BCAST_PANID_FILTER_MASK) || (mask & RADIO_BCAST_ADDR_FILTER_MASK)) || // Case 1
-        ((mask & 0x0F) == (mask >> 4)) ||                                                    // Case 2
-        (((mask & 0x0F) == 0) || ((mask >> 4) == 0)))                                        // Case 3
+    if (
+        // Case 1
+        ((mask & RADIO_BCAST_PANID_FILTER_MASK) || (mask & RADIO_BCAST_ADDR_FILTER_MASK)) ||
+        // Case 2
+        ((mask & 0x0F) == (mask >> 4)) ||
+        // Case 3
+        (((mask & 0x0F) == 0) || ((mask >> 4) == 0)))
     {
         valid = true;
     }

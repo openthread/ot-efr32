@@ -192,10 +192,11 @@ bool sl_gp_intf_is_gp_pkt(otRadioFrame *aFrame, bool isRxFrame)
                               isRxFrame ? "Rx" : "Tx");
             }
         }
-        else if (GP_NWK_FRAME_TYPE_DATA_WITH_EXTD_FC(
-                     fc) // Data frame with EXT FC present, extract the App Id, SrcId, direction and command Id
-                 && aFrame->mLength
-                        >= GP_MIN_DATA_FRAME_LENGTH) // Minimum Data frame length with extended header and address
+        else if (
+            // Data frame with EXT FC present, extract the App Id, SrcId, direction and command Id
+            GP_NWK_FRAME_TYPE_DATA_WITH_EXTD_FC(fc) &&
+            // Minimum Data frame length with extended header and address
+            aFrame->mLength >= GP_MIN_DATA_FRAME_LENGTH)
         {
             uint8_t extFc = *(gpFrameStartIndex + GP_EXND_FC_INDEX);
 

@@ -174,12 +174,14 @@ bool sl_ot_is_ok_to_sleep(void)
 static void energy_mode_transition_callback(sl_power_manager_em_t from, sl_power_manager_em_t to)
 {
     if (from == SL_POWER_MANAGER_EM2)
-    { // Leaving EM2
-      // emberStackPowerUp(); // TO DO: Do we need to take care of any state?
+    {
+        // Leaving EM2
+        // emberStackPowerUp(); // TO DO: Do we need to take care of any state?
     }
     else if (to == SL_POWER_MANAGER_EM2)
-    { // Going to EM2
-      // emberStackPowerDown(); // TO DO: Do we need to take care of any state?
+    {
+        // Going to EM2
+        // emberStackPowerDown(); // TO DO: Do we need to take care of any state?
     }
 }
 

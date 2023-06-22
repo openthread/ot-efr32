@@ -131,6 +131,7 @@ static void processReceive(void)
 {
     uint8_t        *aData;
     UARTDRV_Count_t aCount, remaining;
+
     CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(sl_uartdrv_usart_vcom_handle, &aData, &aCount, &remaining);
                         if (aCount > lastCount) {
                             memcpy(sReceiveFifo.mBuffer + sReceiveFifo.mTail, aData + lastCount, aCount - lastCount);
