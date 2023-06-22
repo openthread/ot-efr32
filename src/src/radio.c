@@ -3289,11 +3289,20 @@ void efr32AntennaConfigInit(void)
 
 static void changeDynamicEvents(void)
 {
-    const RAIL_Events_t eventMask = RAIL_EVENTS_NONE | RAIL_EVENT_RX_SYNC1_DETECT | RAIL_EVENT_RX_SYNC2_DETECT
-                                    | RAIL_EVENT_RX_FRAME_ERROR | RAIL_EVENT_RX_FIFO_OVERFLOW
-                                    | RAIL_EVENT_RX_ADDRESS_FILTERED | RAIL_EVENT_RX_PACKET_ABORTED
-                                    | RAIL_EVENT_RX_FILTER_PASSED | RAIL_EVENT_TX_CHANNEL_CLEAR
-                                    | RAIL_EVENT_TX_CCA_RETRY | RAIL_EVENT_TX_START_CCA | RAIL_EVENT_SIGNAL_DETECTED;
+    /* clang-format off */
+    const RAIL_Events_t eventMask = RAIL_EVENTS_NONE
+                                    | RAIL_EVENT_RX_SYNC1_DETECT
+                                    | RAIL_EVENT_RX_SYNC2_DETECT
+                                    | RAIL_EVENT_RX_FRAME_ERROR
+                                    | RAIL_EVENT_RX_FIFO_OVERFLOW
+                                    | RAIL_EVENT_RX_ADDRESS_FILTERED
+                                    | RAIL_EVENT_RX_PACKET_ABORTED
+                                    | RAIL_EVENT_RX_FILTER_PASSED
+                                    | RAIL_EVENT_TX_CHANNEL_CLEAR
+                                    | RAIL_EVENT_TX_CCA_RETRY
+                                    | RAIL_EVENT_TX_START_CCA
+                                    | RAIL_EVENT_SIGNAL_DETECTED;
+    /* clang-format on */
     RAIL_Events_t eventValues = RAIL_EVENTS_NONE;
 
     if (phyStackEventIsEnabled())
