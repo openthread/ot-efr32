@@ -163,8 +163,12 @@ static void rcp_spidrv_spi_transaction_end_interrupt(uint8_t intNo)
     }
 
     // call's otPlatSpiSlavePrepareTransaction in the background, the DMA buffer's will be ready after this call.
-    if (complete_callback((void *)context, (uint8_t *)old_tx_buffer, old_tx_buffer_size, (uint8_t *)old_rx_buffer,
-                          old_rx_buffer_size, tx_transaction_size))
+    if (complete_callback((void *)context,
+                          (uint8_t *)old_tx_buffer,
+                          old_tx_buffer_size,
+                          (uint8_t *)old_rx_buffer,
+                          old_rx_buffer_size,
+                          tx_transaction_size))
     {
         otSysEventSignalPending();
         should_process_transaction = true;
@@ -264,10 +268,18 @@ otError otPlatSpiSlaveEnable(otPlatSpiSlaveTransactionCompleteCallback aComplete
     otEXPECT_ACTION(GPIO_PinInGet(SL_NCP_SPIDRV_USART_CS_PORT, SL_NCP_SPIDRV_USART_CS_PIN) != 0U,
                     error = OT_ERROR_FAILED);
 
-    GPIO_ExtIntConfig(SL_NCP_SPIDRV_USART_CS_PORT, SL_NCP_SPIDRV_USART_CS_PIN,
-                      SL_NCP_SPIDRV_USART_CS_RISING_EDGE_INT_NO, true, false, true);
-    GPIO_ExtIntConfig(SL_NCP_SPIDRV_USART_CS_PORT, SL_NCP_SPIDRV_USART_CS_PIN,
-                      SL_NCP_SPIDRV_USART_CS_FALLING_EDGE_INT_NO, false, true, true);
+    GPIO_ExtIntConfig(SL_NCP_SPIDRV_USART_CS_PORT,
+                      SL_NCP_SPIDRV_USART_CS_PIN,
+                      SL_NCP_SPIDRV_USART_CS_RISING_EDGE_INT_NO,
+                      true,
+                      false,
+                      true);
+    GPIO_ExtIntConfig(SL_NCP_SPIDRV_USART_CS_PORT,
+                      SL_NCP_SPIDRV_USART_CS_PIN,
+                      SL_NCP_SPIDRV_USART_CS_FALLING_EDGE_INT_NO,
+                      false,
+                      true,
+                      true);
 
     GPIOINT_CallbackRegister(SL_NCP_SPIDRV_USART_CS_FALLING_EDGE_INT_NO, rcp_spidrv_spi_transaction_end_interrupt);
     GPIOINT_CallbackRegister(SL_NCP_SPIDRV_USART_CS_RISING_EDGE_INT_NO, rcp_spidrv_spi_transaction_end_interrupt);
@@ -276,7 +288,8 @@ otError otPlatSpiSlaveEnable(otPlatSpiSlaveTransactionCompleteCallback aComplete
     sl_spidrv_handle_data.peripheral.usartPort->CMD = USART_CMD_CLEARTX | USART_CMD_CLEARRX;
 
     // Load the default value descriptor.
-    LDMA_StartTransfer(sl_spidrv_handle_data.txDMACh, (LDMA_TransferCfg_t *)&tx_dma_transfer_config,
+    LDMA_StartTransfer(sl_spidrv_handle_data.txDMACh,
+                       (LDMA_TransferCfg_t *)&tx_dma_transfer_config,
                        (LDMA_Descriptor_t *)&tx_descriptor[1]);
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
@@ -295,10 +308,18 @@ void otPlatSpiSlaveDisable(void)
     CORE_ENTER_ATOMIC();
 
     // Disable CS GPIO IRQ.
-    GPIO_ExtIntConfig(SL_NCP_SPIDRV_USART_CS_PORT, SL_NCP_SPIDRV_USART_CS_PIN,
-                      SL_NCP_SPIDRV_USART_CS_RISING_EDGE_INT_NO, true, false, false);
-    GPIO_ExtIntConfig(SL_NCP_SPIDRV_USART_CS_PORT, SL_NCP_SPIDRV_USART_CS_PIN,
-                      SL_NCP_SPIDRV_USART_CS_FALLING_EDGE_INT_NO, false, true, false);
+    GPIO_ExtIntConfig(SL_NCP_SPIDRV_USART_CS_PORT,
+                      SL_NCP_SPIDRV_USART_CS_PIN,
+                      SL_NCP_SPIDRV_USART_CS_RISING_EDGE_INT_NO,
+                      true,
+                      false,
+                      false);
+    GPIO_ExtIntConfig(SL_NCP_SPIDRV_USART_CS_PORT,
+                      SL_NCP_SPIDRV_USART_CS_PIN,
+                      SL_NCP_SPIDRV_USART_CS_FALLING_EDGE_INT_NO,
+                      false,
+                      true,
+                      false);
 
     GPIOINT_CallbackUnRegister(SL_NCP_SPIDRV_USART_CS_RISING_EDGE_INT_NO);
     GPIOINT_CallbackUnRegister(SL_NCP_SPIDRV_USART_CS_FALLING_EDGE_INT_NO);
@@ -353,8 +374,8 @@ otError otPlatSpiSlavePrepareTransaction(uint8_t *aOutputBuf,
         rx_descriptor.xfer.xferCnt = aInputBufLen - 1U;
         rx_descriptor.xfer.dstAddr = (uint32_t)aInputBuf;
 
-        LDMA_StartTransfer(rx_dma_channel_number, (LDMA_TransferCfg_t *)&rx_dma_transfer_config,
-                           (LDMA_Descriptor_t *)&rx_descriptor);
+        LDMA_StartTransfer(
+            rx_dma_channel_number, (LDMA_TransferCfg_t *)&rx_dma_transfer_config, (LDMA_Descriptor_t *)&rx_descriptor);
     }
 
     if (aOutputBuf != NULL)
@@ -365,7 +386,8 @@ otError otPlatSpiSlavePrepareTransaction(uint8_t *aOutputBuf,
         tx_descriptor[0].xfer.xferCnt = aOutputBufLen - 1U;
         tx_descriptor[0].xfer.srcAddr = (uint32_t)aOutputBuf;
 
-        LDMA_StartTransfer(tx_dma_channel_number, (LDMA_TransferCfg_t *)&tx_dma_transfer_config,
+        LDMA_StartTransfer(tx_dma_channel_number,
+                           (LDMA_TransferCfg_t *)&tx_dma_transfer_config,
                            (LDMA_Descriptor_t *)&(tx_descriptor[0]));
     }
 

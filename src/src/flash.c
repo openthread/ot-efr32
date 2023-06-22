@@ -173,8 +173,8 @@ otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint
     {
         // Get the next nvm3 key list.
         nvm3_ObjectKey_t keys[ENUM_NVM3_KEY_LIST_SIZE]; // List holds the next set of nvm3 keys.
-        size_t           objCnt = nvm3_enumObjects(nvm3_defaultHandle, keys, ENUM_NVM3_KEY_LIST_SIZE, nvm3Key,
-                                                   makeNvm3ObjKey(aKey, NUM_INDEXED_SETTINGS));
+        size_t           objCnt = nvm3_enumObjects(
+            nvm3_defaultHandle, keys, ENUM_NVM3_KEY_LIST_SIZE, nvm3Key, makeNvm3ObjKey(aKey, NUM_INDEXED_SETTINGS));
         for (size_t i = 0; i < objCnt; ++i)
         {
             nvm3Key = keys[i];
@@ -267,8 +267,8 @@ otError otPlatSettingsDelete(otInstance *aInstance, uint16_t aKey, int aIndex)
     {
         // Get the next nvm3 key list.
         nvm3_ObjectKey_t keys[ENUM_NVM3_KEY_LIST_SIZE]; // List holds the next set of nvm3 keys.
-        size_t           objCnt = nvm3_enumObjects(nvm3_defaultHandle, keys, ENUM_NVM3_KEY_LIST_SIZE, nvm3Key,
-                                                   makeNvm3ObjKey(aKey, NUM_INDEXED_SETTINGS));
+        size_t           objCnt = nvm3_enumObjects(
+            nvm3_defaultHandle, keys, ENUM_NVM3_KEY_LIST_SIZE, nvm3Key, makeNvm3ObjKey(aKey, NUM_INDEXED_SETTINGS));
         for (size_t i = 0; i < objCnt; ++i)
         {
             nvm3Key = keys[i];

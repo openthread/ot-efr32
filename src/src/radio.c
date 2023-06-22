@@ -730,7 +730,9 @@ static otError radioProcessTransmitSecurity(otRadioFrame *aFrame, uint8_t iid)
     size_t           aKeyLen;
 
     otEXPECT_ACTION(otPlatCryptoExportKey(sMacKeys[iid].keys[keyToUse].mKeyMaterial.mKeyRef,
-                                          aesKey.mKeyMaterial.mKey.m8, sizeof(aesKey.mKeyMaterial.mKey.m8), &aKeyLen)
+                                          aesKey.mKeyMaterial.mKey.m8,
+                                          sizeof(aesKey.mKeyMaterial.mKey.m8),
+                                          &aKeyLen)
                         == OT_ERROR_NONE,
                     error = OT_ERROR_SECURITY);
 
@@ -1089,8 +1091,8 @@ static RAIL_Handle_t efr32RailInit(efr32CommonConfig *aCommonConfig)
 static void efr32RailConfigLoad(efr32BandConfig *aBandConfig, int8_t aTxPower)
 {
     RAIL_Status_t        status;
-    RAIL_TxPowerConfig_t txPowerConfig = {SL_RAIL_UTIL_PA_SELECTION_2P4GHZ, SL_RAIL_UTIL_PA_VOLTAGE_MV,
-                                          SL_RAIL_UTIL_PA_RAMP_TIME_US};
+    RAIL_TxPowerConfig_t txPowerConfig = {
+        SL_RAIL_UTIL_PA_SELECTION_2P4GHZ, SL_RAIL_UTIL_PA_VOLTAGE_MV, SL_RAIL_UTIL_PA_RAMP_TIME_US};
 
     if (aBandConfig->mChannelConfig != NULL)
     {
@@ -1121,7 +1123,8 @@ static void efr32RailConfigLoad(efr32BandConfig *aBandConfig, int8_t aTxPower)
     // 802.15.4E support (only on platforms that support it, so error checking is disabled)
     // Note: This has to be called after RAIL_IEEE802154_Config2p4GHzRadio due to a bug where this call
     // can overwrite options set below.
-    RAIL_IEEE802154_ConfigEOptions(gRailHandle, (RAIL_IEEE802154_E_OPTION_GB868 | RAIL_IEEE802154_E_OPTION_ENH_ACK),
+    RAIL_IEEE802154_ConfigEOptions(gRailHandle,
+                                   (RAIL_IEEE802154_E_OPTION_GB868 | RAIL_IEEE802154_E_OPTION_ENH_ACK),
                                    (RAIL_IEEE802154_E_OPTION_GB868 | RAIL_IEEE802154_E_OPTION_ENH_ACK));
 #endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 
@@ -1394,8 +1397,16 @@ void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aA
         sExtAddress[panIndex].m8[i] = aAddress->m8[sizeof(*aAddress) - 1 - i];
     }
 
-    otLogInfoPlat("ExtAddr=%X%X%X%X%X%X%X%X index=%u", aAddress->m8[7], aAddress->m8[6], aAddress->m8[5],
-                  aAddress->m8[4], aAddress->m8[3], aAddress->m8[2], aAddress->m8[1], aAddress->m8[0], panIndex);
+    otLogInfoPlat("ExtAddr=%X%X%X%X%X%X%X%X index=%u",
+                  aAddress->m8[7],
+                  aAddress->m8[6],
+                  aAddress->m8[5],
+                  aAddress->m8[4],
+                  aAddress->m8[3],
+                  aAddress->m8[2],
+                  aAddress->m8[1],
+                  aAddress->m8[0],
+                  panIndex);
 
     status = RAIL_IEEE802154_SetLongAddress(gRailHandle, (uint8_t *)aAddress->m8, panIndex);
     assert(status == RAIL_STATUS_NO_ERROR);
@@ -1773,8 +1784,8 @@ void txCurrentPacket(void)
                                                          .mode       = RAIL_TIME_ABSOLUTE,
                                                          .txDuringRx = RAIL_SCHEDULED_TX_DURING_RX_POSTPONE_TX};
 
-            status = RAIL_StartScheduledCcaCsmaTx(gRailHandle, sTxFrame->mChannel, txOptions, &scheduleTxOptions,
-                                                  &csmaConfig, &txSchedulerInfo);
+            status = RAIL_StartScheduledCcaCsmaTx(
+                gRailHandle, sTxFrame->mChannel, txOptions, &scheduleTxOptions, &csmaConfig, &txSchedulerInfo);
             if (status == RAIL_STATUS_NO_ERROR)
             {
 #if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
@@ -2183,8 +2194,11 @@ static bool writeIeee802154EnhancedAck(RAIL_Handle_t        aRailHandle,
 
     otEXPECT((packetInfoForEnhAck != NULL) && (initialPktReadBytes != NULL) && (receivedPsdu != NULL));
 
-    *initialPktReadBytes = readInitialPacketData(packetInfoForEnhAck, EARLY_FRAME_PENDING_EXPECTED_BYTES,
-                                                 (PHY_HEADER_SIZE + 2), receivedPsdu, FINAL_PACKET_LENGTH_WITH_IE);
+    *initialPktReadBytes = readInitialPacketData(packetInfoForEnhAck,
+                                                 EARLY_FRAME_PENDING_EXPECTED_BYTES,
+                                                 (PHY_HEADER_SIZE + 2),
+                                                 receivedPsdu,
+                                                 FINAL_PACKET_LENGTH_WITH_IE);
 
     uint8_t iid = INVALID_VALUE;
 
@@ -3363,7 +3377,8 @@ static void emRadioEnablePta(bool enable)
     // When PTA is enabled, we want to negate PTA_REQ as soon as an incoming
     // frame is aborted, e.g. due to filtering.  To do that we must turn off
     // the TRACKABFRAME feature that's normally on to benefit sniffing on PTI.
-    assert(RAIL_ConfigRxOptions(gRailHandle, RAIL_RX_OPTION_TRACK_ABORTED_FRAMES,
+    assert(RAIL_ConfigRxOptions(gRailHandle,
+                                RAIL_RX_OPTION_TRACK_ABORTED_FRAMES,
                                 (enable ? RAIL_RX_OPTIONS_NONE : RAIL_RX_OPTION_TRACK_ABORTED_FRAMES))
            == RAIL_STATUS_NO_ERROR);
 }

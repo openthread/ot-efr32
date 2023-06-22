@@ -266,14 +266,14 @@ void efr32PlatProcessTransmitAesCcm(otRadioFrame *aFrame, const otExtAddress *aE
     SuccessOrExit(aTxFrame->GetSecurityLevel(securityLevel));
     SuccessOrExit(aTxFrame->GetFrameCounter(frameCounter));
 
-    Crypto::AesCcm::GenerateNonce(*static_cast<const Mac::ExtAddress *>(aExtAddress), frameCounter, securityLevel,
-                                  nonce);
+    Crypto::AesCcm::GenerateNonce(
+        *static_cast<const Mac::ExtAddress *>(aExtAddress), frameCounter, securityLevel, nonce);
 
     tagLength = aTxFrame->GetFooterLength() - aTxFrame->GetFcsSize();
 
     packetSecurityHandler.SetKey(aFrame->mInfo.mTxInfo.mAesKey->mKeyMaterial.mKey.m8);
-    packetSecurityHandler.Init(aTxFrame->GetHeaderLength(), aTxFrame->GetPayloadLength(), tagLength, nonce,
-                               sizeof(nonce));
+    packetSecurityHandler.Init(
+        aTxFrame->GetHeaderLength(), aTxFrame->GetPayloadLength(), tagLength, nonce, sizeof(nonce));
     packetSecurityHandler.Header(aTxFrame->GetHeader(), aTxFrame->GetHeaderLength());
     packetSecurityHandler.Payload(aTxFrame->GetPayload(), aTxFrame->GetPayload(), aTxFrame->GetPayloadLength());
     packetSecurityHandler.Finalize(aTxFrame->GetFooter());
