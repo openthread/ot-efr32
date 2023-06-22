@@ -54,9 +54,9 @@
 
 #include "sl_ncp_spidrv_usart_config.h"
 
-#include "openthread-system.h"
 #include "platform-efr32.h"
 #include "spi-slave.h"
+#include <openthread-system.h>
 #include <openthread/error.h>
 #include "utils/code_utils.h"
 

@@ -37,11 +37,11 @@
 #endif // SL_COMPONENT_CATALOG_PRESENT
 
 #include "em_core.h"
-#include "openthread-system.h"
 #include "sl_uartdrv_instances.h"
 #include "sl_uartdrv_usart_vcom_config.h"
 #include "uartdrv.h"
 #include <openthread-core-config.h>
+#include <openthread-system.h>
 #include <stddef.h>
 #include <string.h>
 #include "utils/code_utils.h"

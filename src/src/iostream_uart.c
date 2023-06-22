@@ -37,7 +37,7 @@
 #include "sl_component_catalog.h"
 #endif // SL_COMPONENT_CATALOG_PRESENT
 
-#include "openthread-system.h"
+#include <openthread-system.h>
 #include <stddef.h>
 #include <string.h>
 #include "utils/code_utils.h"

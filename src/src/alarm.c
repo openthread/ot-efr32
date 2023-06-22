@@ -32,9 +32,9 @@
  *
  */
 
-#include "openthread-system.h"
 #include <assert.h>
 #include <openthread-core-config.h>
+#include <openthread-system.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <openthread/platform/alarm-micro.h>

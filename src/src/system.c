@@ -35,8 +35,8 @@
 #include <assert.h>
 #include <string.h>
 
-#include "openthread-system.h"
 #include <openthread-core-config.h>
+#include <openthread-system.h>
 #include "utils/uart.h"
 
 #include "common/logging.hpp"
