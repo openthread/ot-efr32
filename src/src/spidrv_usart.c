@@ -240,16 +240,23 @@ otError otPlatSpiSlaveEnable(otPlatSpiSlaveTransactionCompleteCallback aComplete
     tx_dma_transfer_config = (LDMA_TransferCfg_t)LDMA_TRANSFER_CFG_PERIPHERAL(
         SL_OT_SPIDRV_SPI_LDMA_TX_PERIPH_TRIGGER(SL_NCP_SPIDRV_USART_PERIPHERAL_NO));
 
-    rx_descriptor = (LDMA_Descriptor_t)LDMA_DESCRIPTOR_SINGLE_P2M_BYTE(
-        &(sl_spidrv_handle_data.peripheral.usartPort->RXDATA), NULL, 1U);
+    rx_descriptor =
+        (LDMA_Descriptor_t)LDMA_DESCRIPTOR_SINGLE_P2M_BYTE(&(sl_spidrv_handle_data.peripheral.usartPort->RXDATA),
+                                                           NULL,
+                                                           1U);
     rx_descriptor.xfer.doneIfs = 0U;
 
-    tx_descriptor[0] = (LDMA_Descriptor_t)LDMA_DESCRIPTOR_LINKREL_M2P_BYTE(
-        &default_tx_value, &(sl_spidrv_handle_data.peripheral.usartPort->TXDATA), 1, 1);
+    tx_descriptor[0] =
+        (LDMA_Descriptor_t)LDMA_DESCRIPTOR_LINKREL_M2P_BYTE(&default_tx_value,
+                                                            &(sl_spidrv_handle_data.peripheral.usartPort->TXDATA),
+                                                            1,
+                                                            1);
     tx_descriptor[0].xfer.doneIfs = 0U;
 
-    tx_descriptor[1] = (LDMA_Descriptor_t)LDMA_DESCRIPTOR_SINGLE_M2P_BYTE(
-        &default_tx_value, &(sl_spidrv_handle_data.peripheral.usartPort->TXDATA), MAX_DMA_DESCRIPTOR_TRANSFER_COUNT);
+    tx_descriptor[1] =
+        (LDMA_Descriptor_t)LDMA_DESCRIPTOR_SINGLE_M2P_BYTE(&default_tx_value,
+                                                           &(sl_spidrv_handle_data.peripheral.usartPort->TXDATA),
+                                                           MAX_DMA_DESCRIPTOR_TRANSFER_COUNT);
     tx_descriptor[1].xfer.srcInc  = ldmaCtrlSrcIncNone;
     tx_descriptor[1].xfer.doneIfs = 0U;
 
@@ -374,8 +381,9 @@ otError otPlatSpiSlavePrepareTransaction(uint8_t *aOutputBuf,
         rx_descriptor.xfer.xferCnt = aInputBufLen - 1U;
         rx_descriptor.xfer.dstAddr = (uint32_t)aInputBuf;
 
-        LDMA_StartTransfer(
-            rx_dma_channel_number, (LDMA_TransferCfg_t *)&rx_dma_transfer_config, (LDMA_Descriptor_t *)&rx_descriptor);
+        LDMA_StartTransfer(rx_dma_channel_number,
+                           (LDMA_TransferCfg_t *)&rx_dma_transfer_config,
+                           (LDMA_Descriptor_t *)&rx_descriptor);
     }
 
     if (aOutputBuf != NULL)

@@ -1091,8 +1091,9 @@ static RAIL_Handle_t efr32RailInit(efr32CommonConfig *aCommonConfig)
 static void efr32RailConfigLoad(efr32BandConfig *aBandConfig, int8_t aTxPower)
 {
     RAIL_Status_t        status;
-    RAIL_TxPowerConfig_t txPowerConfig = {
-        SL_RAIL_UTIL_PA_SELECTION_2P4GHZ, SL_RAIL_UTIL_PA_VOLTAGE_MV, SL_RAIL_UTIL_PA_RAMP_TIME_US};
+    RAIL_TxPowerConfig_t txPowerConfig = {SL_RAIL_UTIL_PA_SELECTION_2P4GHZ,
+                                          SL_RAIL_UTIL_PA_VOLTAGE_MV,
+                                          SL_RAIL_UTIL_PA_RAMP_TIME_US};
 
     if (aBandConfig->mChannelConfig != NULL)
     {
@@ -1784,8 +1785,12 @@ void txCurrentPacket(void)
                                                          .mode       = RAIL_TIME_ABSOLUTE,
                                                          .txDuringRx = RAIL_SCHEDULED_TX_DURING_RX_POSTPONE_TX};
 
-            status = RAIL_StartScheduledCcaCsmaTx(
-                gRailHandle, sTxFrame->mChannel, txOptions, &scheduleTxOptions, &csmaConfig, &txSchedulerInfo);
+            status = RAIL_StartScheduledCcaCsmaTx(gRailHandle,
+                                                  sTxFrame->mChannel,
+                                                  txOptions,
+                                                  &scheduleTxOptions,
+                                                  &csmaConfig,
+                                                  &txSchedulerInfo);
             if (status == RAIL_STATUS_NO_ERROR)
             {
 #if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
