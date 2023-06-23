@@ -28,6 +28,12 @@
 
 name: Docker
 
+env:
+  DOCKER_IMAGE: siliconlabsinc/ot-efr32-dev
+  DOCKER_FILE: Dockerfile
+  DOCKER_PLATFORMS: linux/amd64
+  VERSION: ${{ github.sha }}
+
 on:
   push:
     branches-ignore:
@@ -47,6 +53,7 @@ jobs:
   buildx:
     name: buildx
     runs-on: ubuntu-22.04
+
     steps:
     - name: Harden Runner
       uses: step-security/harden-runner@128a63446a954579617e875aaab7d2978154e969 # v2.4.0
@@ -57,23 +64,28 @@ jobs:
       with:
         submodules: true
 
+    - name: Create LFS file hash list
+      run: git -C third_party/silabs/gecko_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+
+    - name: Restore gecko_sdk LFS cache
+      uses: actions/cache@v3
+      id: lfs-cache
+      with:
+          path: .git/modules/third_party/silabs/gecko_sdk/lfs
+          key: lfs-${{ hashFiles('.lfs-assets-id') }}
+
+    - name: Git LFS Pull
+      run: git -C third_party/silabs/gecko_sdk lfs pull
+
     - name: Prepare
       id: prepare
       run: |
-        DOCKER_IMAGE=siliconlabsinc/ot-efr32-dev
-        DOCKER_FILE=Dockerfile
-        DOCKER_PLATFORMS=linux/amd64
-        VERSION=latest
-
         TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
 
         echo "docker_image=${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
         echo "version=${VERSION}" >> $GITHUB_OUTPUT
         echo "buildx_args=--platform ${DOCKER_PLATFORMS} \
-          --build-arg OT_GIT_REF=${{ github.sha }} \
-          --build-arg VERSION=${VERSION} \
           --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-          --build-arg VCS_REF=${GITHUB_SHA::8} \
           ${TAGS} --file ${DOCKER_FILE} ." >> $GITHUB_OUTPUT
 
     - name: Set up Docker Buildx
@@ -82,6 +94,11 @@ jobs:
     - name: Docker Buildx (build)
       run: |
         docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
+
+    - name: Test build inside container
+      run: |
+        docker buildx build --load --output "type=docker" ${{ steps.prepare.outputs.buildx_args }}
+        docker run -v ${{ github.workspace }}:/ot-efr32/ --rm ${DOCKER_IMAGE}:${VERSION} script/build brd4186c
 
     - name: Login to DockerHub
       if: success() && github.repository == 'SiliconLabs/ot-efr32' && github.event_name != 'pull_request'
@@ -93,7 +110,7 @@ jobs:
     - name: Docker Buildx (push)
       if: success() && github.repository == 'SiliconLabs/ot-efr32' && github.event_name != 'pull_request'
       run: |
-        docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
+        docker buildx build --output "type=image,push=true" --tag ${DOCKER_IMAGE}:latest ${{ steps.prepare.outputs.buildx_args }}
 
     - name: Inspect Image
       if: always() && github.repository == 'SiliconLabs/ot-efr32' && github.event_name != 'pull_request'
