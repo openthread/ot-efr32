@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -37,28 +37,142 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#include "platform-efr32.h"
-#include "rail_ieee802154.h"
 #include <openthread-core-config.h>
+#include <utils/code_utils.h>
 #include <openthread/cli.h>
-#include <openthread/config.h>
-#include <openthread/logging.h>
 #include <openthread/platform/alarm-milli.h>
 #include <openthread/platform/diag.h>
 #include <openthread/platform/radio.h>
 #include "common/code_utils.hpp"
+#include "common/logging.hpp"
 
-#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-#include "coexistence-802154.h"
-#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
+#include "diag.h"
+#include "platform-band.h"
+#include "platform-efr32.h"
+#include "rail_ieee802154.h"
+
+#include "sl_status.h"
 
 #if OPENTHREAD_CONFIG_DIAG_ENABLE
 
-/**
- * Diagnostics mode variables.
- *
- */
+#ifdef SL_COMPONENT_CATALOG_PRESENT
+#include "sl_component_catalog.h"
+#endif // SL_COMPONENT_CATALOG_PRESENT
+
+#ifdef SL_CATALOG_RAIL_UTIL_ANT_DIV_PRESENT
+#include "sl_rail_util_ant_div.h"
+#endif
+
+struct PlatformDiagCommand
+{
+    const char *mName;
+    otError (*mCommand)(otInstance *aInstance, uint8_t aArgsLength, char *aArgs[], char *aOutput, size_t aOutputMaxLen);
+};
+
+// Diagnostics mode variables.
 static bool sDiagMode = false;
+
+// *****************************************************************************
+// Helper functions
+// *****************************************************************************
+static void appendErrorResult(otError aError, char *aOutput, size_t aOutputMaxLen)
+{
+    if (aError != OT_ERROR_NONE)
+    {
+        snprintf(aOutput, aOutputMaxLen, "failed\r\nstatus %#x\r\n", aError);
+    }
+}
+
+// *****************************************************************************
+// CLI functions
+// *****************************************************************************
+static otError processAddressMatch(otInstance *aInstance,
+                                   uint8_t     aArgsLength,
+                                   char       *aArgs[],
+                                   char       *aOutput,
+                                   size_t      aOutputMaxLen)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    otError error = OT_ERROR_INVALID_ARGS;
+
+    VerifyOrExit(otPlatDiagModeGet(), error = OT_ERROR_INVALID_STATE);
+    VerifyOrExit(aArgsLength > 0, error = OT_ERROR_INVALID_ARGS);
+
+    if (strcmp(aArgs[0], "enable") == 0)
+    {
+        error = otPlatDiagRadioAddressMatch(true);
+    }
+    else if (strcmp(aArgs[0], "disable") == 0)
+    {
+        error = otPlatDiagRadioAddressMatch(false);
+    }
+
+exit:
+    appendErrorResult(error, aOutput, aOutputMaxLen);
+    return error;
+}
+
+static otError processAutoAck(otInstance *aInstance,
+                              uint8_t     aArgsLength,
+                              char       *aArgs[],
+                              char       *aOutput,
+                              size_t      aOutputMaxLen)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    otError error = OT_ERROR_INVALID_ARGS;
+
+    VerifyOrExit(otPlatDiagModeGet(), error = OT_ERROR_INVALID_STATE);
+    VerifyOrExit(aArgsLength > 0, error = OT_ERROR_INVALID_ARGS);
+
+    if (strcmp(aArgs[0], "enable") == 0)
+    {
+        error = otPlatDiagRadioAutoAck(true);
+    }
+    else if (strcmp(aArgs[0], "disable") == 0)
+    {
+        error = otPlatDiagRadioAutoAck(false);
+    }
+
+exit:
+    appendErrorResult(error, aOutput, aOutputMaxLen);
+    return error;
+}
+
+// *****************************************************************************
+// Add more platform specific diagnostic's CLI features here.
+// *****************************************************************************
+const struct PlatformDiagCommand sCommands[] = {
+    {"addr-match", &processAddressMatch},
+    {"auto-ack", &processAutoAck},
+};
+
+otError otPlatDiagProcess(otInstance *aInstance,
+                          uint8_t     aArgsLength,
+                          char       *aArgs[],
+                          char       *aOutput,
+                          size_t      aOutputMaxLen)
+{
+    otError error = OT_ERROR_INVALID_COMMAND;
+    size_t  i;
+
+    for (i = 0; i < otARRAY_LENGTH(sCommands); i++)
+    {
+        if (strcmp(aArgs[0], sCommands[i].mName) == 0)
+        {
+            error = sCommands[i].mCommand(aInstance, aArgsLength - 1, aArgsLength > 1 ? &aArgs[1] : NULL, aOutput,
+                                          aOutputMaxLen);
+            break;
+        }
+    }
+
+    return error;
+}
+
+// *****************************************************************************
+// Implement platform specific diagnostic's APIs.
+// *****************************************************************************
 
 void otPlatDiagModeSet(bool aMode)
 {
@@ -68,6 +182,109 @@ void otPlatDiagModeSet(bool aMode)
 bool otPlatDiagModeGet()
 {
     return sDiagMode;
+}
+
+static RAIL_Status_t startTxStream(RAIL_StreamMode_t aMode)
+{
+    uint16_t      txChannel;
+    RAIL_Status_t status;
+
+    SuccessOrExit(status = RAIL_GetChannel(gRailHandle, &txChannel));
+
+#ifdef SL_CATALOG_RAIL_UTIL_ANT_DIV_PRESENT
+    RAIL_TxOptions_t txOptions = RAIL_TX_OPTIONS_DEFAULT;
+    // Translate Tx antenna diversity mode into RAIL Tx Antenna options:
+    // If enabled, use the currently-selected antenna, otherwise leave
+    // both options 0 so Tx antenna tracks Rx antenna.
+    if (sl_rail_util_ant_div_get_tx_antenna_mode() != SL_RAIL_UTIL_ANTENNA_MODE_DISABLED)
+    {
+        txOptions |= ((sl_rail_util_ant_div_get_tx_antenna_selected() == SL_RAIL_UTIL_ANTENNA_SELECT_ANTENNA1)
+                          ? RAIL_TX_OPTION_ANTENNA0
+                          : RAIL_TX_OPTION_ANTENNA1);
+    }
+
+    status = RAIL_StartTxStreamAlt(gRailHandle, txChannel, aMode, txOptions);
+#else  // !SL_CATALOG_RAIL_UTIL_ANT_DIV_PRESENT
+    status = RAIL_StartTxStream(gRailHandle, txChannel, aMode);
+#endif // SL_CATALOG_RAIL_UTIL_ANT_DIV_PRESENT
+
+exit:
+    return status;
+}
+
+static RAIL_Status_t stopTxStream(void)
+{
+    RAIL_Status_t        status;
+    uint16_t             currentChannel;
+    RAIL_SchedulerInfo_t rxSchedulerInfo = {
+        .priority = RADIO_SCHEDULER_BACKGROUND_RX_PRIORITY,
+    };
+
+    SuccessOrExit(status = RAIL_StopTxStream(gRailHandle));
+    // Since start transmit stream turn off the radio state,
+    // call the RAIL_StartRx to turn on radio
+    IgnoreError(RAIL_GetChannel(gRailHandle, &currentChannel));
+    assert(RAIL_StartRx(gRailHandle, currentChannel, &rxSchedulerInfo) == RAIL_STATUS_NO_ERROR);
+
+exit:
+    return status;
+}
+
+otError otPlatDiagRadioTransmitCarrier(otInstance *aInstance, bool aEnable)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    RAIL_Status_t status;
+
+    if (aEnable)
+    {
+        otLogInfoPlat("Diag CARRIER-WAVE/Tone start");
+        status = startTxStream(RAIL_STREAM_CARRIER_WAVE);
+    }
+    else
+    {
+        otLogInfoPlat("Diag CARRIER-WAVE/Tone stop");
+        status = stopTxStream();
+    }
+    return (status != RAIL_STATUS_NO_ERROR ? OT_ERROR_FAILED : OT_ERROR_NONE);
+}
+
+otError otPlatDiagRadioTransmitStream(otInstance *aInstance, bool aEnable)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    RAIL_Status_t status;
+
+    if (aEnable)
+    {
+        otLogInfoPlat("Diag Stream PN9 start");
+        status = startTxStream(RAIL_STREAM_PN9_STREAM);
+    }
+    else
+    {
+        otLogInfoPlat("Diag Stream stop");
+        status = stopTxStream();
+    }
+    return (status != RAIL_STATUS_NO_ERROR ? OT_ERROR_FAILED : OT_ERROR_NONE);
+}
+
+otError otPlatDiagRadioAddressMatch(bool aEnable)
+{
+    RAIL_Status_t status;
+
+    otLogInfoPlat("Diag address-match %s", aEnable ? "enable" : "disable");
+
+    status = RAIL_IEEE802154_SetPromiscuousMode(gRailHandle, !aEnable);
+    return (status != RAIL_STATUS_NO_ERROR ? OT_ERROR_FAILED : OT_ERROR_NONE);
+}
+
+otError otPlatDiagRadioAutoAck(bool aAutoAckEnabled)
+{
+    otLogInfoPlat("Diag auto-ack %s", aAutoAckEnabled ? "enable" : "disable");
+
+    RAIL_PauseRxAutoAck(gRailHandle, !aAutoAckEnabled);
+
+    return OT_ERROR_NONE;
 }
 
 void otPlatDiagChannelSet(uint8_t aChannel)
@@ -92,219 +309,4 @@ void otPlatDiagAlarmCallback(otInstance *aInstance)
     OT_UNUSED_VARIABLE(aInstance);
 }
 
-otError otPlatDiagTxStreamRandom(void)
-{
-    RAIL_Status_t status;
-    uint16_t      streamChannel;
-
-    RAIL_GetChannel(gRailHandle, &streamChannel);
-
-    otLogInfoPlat("Diag Stream PN9 Process");
-
-    status = RAIL_StartTxStream(gRailHandle, streamChannel, RAIL_STREAM_PN9_STREAM);
-    assert(status == RAIL_STATUS_NO_ERROR);
-
-    return railStatusToOtError(status);
-}
-
-otError otPlatDiagTxStreamTone(void)
-{
-    RAIL_Status_t status;
-    uint16_t      streamChannel;
-
-    RAIL_GetChannel(gRailHandle, &streamChannel);
-
-    otLogInfoPlat("Diag Stream CARRIER-WAVE Process");
-
-    status = RAIL_StartTxStream(gRailHandle, streamChannel, RAIL_STREAM_CARRIER_WAVE);
-    assert(status == RAIL_STATUS_NO_ERROR);
-
-    return railStatusToOtError(status);
-}
-
-otError otPlatDiagTxStreamStop(void)
-{
-    RAIL_Status_t status;
-
-    otLogInfoPlat("Diag Stream STOP Process");
-
-    status = RAIL_StopTxStream(gRailHandle);
-    assert(status == RAIL_STATUS_NO_ERROR);
-
-    return railStatusToOtError(status);
-}
-
-otError otPlatDiagTxStreamAddrMatch(uint8_t enable)
-{
-    RAIL_Status_t status;
-
-    otLogInfoPlat("Diag Stream Disable addressMatch");
-
-    status = RAIL_IEEE802154_SetPromiscuousMode(gRailHandle, !enable);
-    assert(status == RAIL_STATUS_NO_ERROR);
-
-    return railStatusToOtError(status);
-}
-
-otError otPlatDiagTxStreamAutoAck(uint8_t autoAckEnabled)
-{
-    RAIL_Status_t status = RAIL_STATUS_NO_ERROR;
-
-    otLogInfoPlat("Diag Stream Disable autoAck");
-
-    RAIL_PauseRxAutoAck(gRailHandle, !autoAckEnabled);
-
-    return railStatusToOtError(status);
-}
-
-// coex
-otError otPlatDiagCoexSetPriorityPulseWidth(uint8_t pulseWidthUs)
-{
-    OT_UNUSED_VARIABLE(pulseWidthUs);
-    otError error = OT_ERROR_FAILED;
-
-#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    // Actual call on rcp side
-    sl_status_t status = sl_rail_util_coex_set_directional_priority_pulse_width(pulseWidthUs);
-
-    error = (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
-#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-
-    return error;
-}
-
-otError otPlatDiagCoexSetRadioHoldoff(bool enabled)
-{
-    OT_UNUSED_VARIABLE(enabled);
-    otError error = OT_ERROR_FAILED;
-
-#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    // Actual call on rcp side
-    sl_status_t status = sl_rail_util_coex_set_radio_holdoff(enabled);
-
-    error = (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
-#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-
-    return error;
-}
-
-otError otPlatDiagCoexSetRequestPwm(uint8_t ptaReq, void *ptaCb, uint8_t dutyCycle, uint8_t periodHalfMs)
-{
-    OT_UNUSED_VARIABLE(ptaReq);
-    OT_UNUSED_VARIABLE(ptaCb);
-    OT_UNUSED_VARIABLE(dutyCycle);
-    OT_UNUSED_VARIABLE(periodHalfMs);
-    otError error = OT_ERROR_FAILED;
-
-#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    sl_status_t status = sl_rail_util_coex_set_request_pwm(ptaReq, NULL, dutyCycle, periodHalfMs);
-    error              = (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
-#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-
-    return error;
-}
-otError otPlatDiagCoexSetPhySelectTimeout(uint8_t timeoutMs)
-{
-    OT_UNUSED_VARIABLE(timeoutMs);
-    otError error = OT_ERROR_FAILED;
-
-#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    sl_status_t status = sl_rail_util_coex_set_phy_select_timeout(timeoutMs);
-    error              = (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
-#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-
-    return error;
-}
-
-otError otPlatDiagCoexSetOptions(uint32_t options)
-{
-    OT_UNUSED_VARIABLE(options);
-    otError error = OT_ERROR_FAILED;
-
-#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    sl_status_t status = sl_rail_util_coex_set_options(options);
-    error              = (status != SL_STATUS_OK) ? OT_ERROR_FAILED : OT_ERROR_NONE;
-#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-
-    return error;
-}
-
-otError otPlatDiagCoexGetPhySelectTimeout(uint8_t *timeoutMs)
-{
-    OT_UNUSED_VARIABLE(timeoutMs);
-    otError error = OT_ERROR_FAILED;
-
-#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    if (timeoutMs == NULL)
-    {
-        return OT_ERROR_INVALID_ARGS;
-    }
-
-    *timeoutMs = sl_rail_util_coex_get_phy_select_timeout();
-    error      = OT_ERROR_NONE;
-#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-
-    return error;
-}
-
-otError otPlatDiagCoexGetOptions(uint32_t *options)
-{
-    OT_UNUSED_VARIABLE(options);
-    otError error = OT_ERROR_FAILED;
-
-#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    if (options == NULL)
-    {
-        return OT_ERROR_INVALID_ARGS;
-    }
-
-    *options = sl_rail_util_coex_get_options();
-    error    = OT_ERROR_NONE;
-#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-
-    return error;
-}
-
-otError otPlatDiagCoexGetPriorityPulseWidth(uint8_t *pulseWidthUs)
-{
-    OT_UNUSED_VARIABLE(pulseWidthUs);
-    otError error = OT_ERROR_FAILED;
-
-#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    if (pulseWidthUs == NULL)
-    {
-        return OT_ERROR_INVALID_ARGS;
-    }
-
-    *pulseWidthUs = sl_rail_util_coex_get_directional_priority_pulse_width();
-    error         = OT_ERROR_NONE;
-#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-
-    return error;
-}
-
-otError otPlatDiagCoexGetRequestPwmArgs(uint8_t *req, uint8_t *dutyCycle, uint8_t *periodHalfMs)
-{
-    OT_UNUSED_VARIABLE(req);
-    OT_UNUSED_VARIABLE(dutyCycle);
-    OT_UNUSED_VARIABLE(periodHalfMs);
-    otError error = OT_ERROR_NONE;
-
-#ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    if (req == NULL || dutyCycle == NULL || periodHalfMs == NULL)
-    {
-        return OT_ERROR_INVALID_ARGS;
-    }
-
-    const sl_rail_util_coex_pwm_args_t *p = sl_rail_util_coex_get_request_pwm_args();
-    *req                                  = p->req;
-    *dutyCycle                            = p->dutyCycle;
-    *periodHalfMs                         = p->periodHalfMs;
-    error                                 = OT_ERROR_NONE;
-#else
-    error = OT_ERROR_FAILED;
-#endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-
-    return error;
-}
-#endif // #if OPENTHREAD_CONFIG_DIAG_ENABLE
+#endif // OPENTHREAD_CONFIG_DIAG_ENABLE

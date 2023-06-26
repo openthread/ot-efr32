@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -26,26 +26,31 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef OPENTHREAD_CORE_EFR32_CONFIG_CHECK_H_
-#define OPENTHREAD_CORE_EFR32_CONFIG_CHECK_H_
+/**
+ * @file
+ *   This file includes the platform-specific diagnostic's API declarations.
+ *
+ */
+#ifndef DIAG_H_
+#define DIAG_H_
+/**
+ * Enable/disable the address match filtering.
+ *
+ * @param[in]  aEnable   TRUE to Enable or FALSE to disable address match filtering.
+ *
+ * @retval OT_ERROR_NONE         Successfully enabled/disabled, asserts otherwise.
+ *
+ */
+otError otPlatDiagRadioAddressMatch(bool aEnable);
 
-#include "board_config.h"
-#ifndef RADIO_CONFIG_915MHZ_OQPSK_SUPPORT
-#if OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT
-#error "Platform not configured to support configuration option: OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT"
-#endif
-#endif
+/**
+ * Enable/disable the RX auto-ACK functionality.
+ *
+ * @param[in]  aAutoAckEnabled   TRUE to Enable or FALSE to disable the RX auto-ACK functionality.
+ *
+ * @retval OT_ERROR_NONE         Successfully enabled/disabled .
+ *
+ */
+otError otPlatDiagRadioAutoAck(bool aAutoAckEnabled);
 
-#ifndef RADIO_CONFIG_915MHZ_2GFSK_SUPPORT
-#if OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT
-#error "Platform not configured to support configuration option: OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT"
-#endif
-#endif
-
-#if !defined(RADIO_CONFIG_915MHZ_OQPSK_SUPPORT) && !defined(RADIO_CONFIG_SUBGHZ_SUPPORT) \
-    && !defined(RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT)
-#error \
-    "One of the following must be defined: RADIO_CONFIG_915MHZ_OQPSK_SUPPORT, RADIO_CONFIG_SUBGHZ_SUPPORT or RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT"
-#endif
-
-#endif /* OPENTHREAD_CORE_EFR32_CONFIG_CHECK_H_ */
+#endif // DIAG_H_

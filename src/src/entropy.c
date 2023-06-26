@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -56,12 +56,12 @@ void otPlatCryptoRandomDeinit(void)
 
 otError otPlatCryptoRandomGet(uint8_t *aBuffer, uint16_t aSize)
 {
-    otError             error = OT_ERROR_NONE;
-    sl_sec_man_status_t status;
+    otError      error = OT_ERROR_NONE;
+    psa_status_t status;
 
     status = sl_sec_man_get_random(aBuffer, aSize);
 
-    otEXPECT_ACTION((status == SL_SECURITY_MAN_SUCCESS), error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
 exit:
     return error;

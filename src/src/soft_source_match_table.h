@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -26,26 +26,57 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef OPENTHREAD_CORE_EFR32_CONFIG_CHECK_H_
-#define OPENTHREAD_CORE_EFR32_CONFIG_CHECK_H_
+/**
+ * @file
+ * @brief
+ *   This file defines the software source match table interfaces used by
+ *   soft_source_match_table.c.
+ */
 
-#include "board_config.h"
-#ifndef RADIO_CONFIG_915MHZ_OQPSK_SUPPORT
-#if OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT
-#error "Platform not configured to support configuration option: OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT"
-#endif
-#endif
+#ifndef SOFT_SOURCE_MATCH_TABLE_H
+#define SOFT_SOURCE_MATCH_TABLE_H
 
-#ifndef RADIO_CONFIG_915MHZ_2GFSK_SUPPORT
-#if OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT
-#error "Platform not configured to support configuration option: OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT"
-#endif
-#endif
+#include "openthread-core-config.h"
+#include <openthread/platform/radio.h>
 
-#if !defined(RADIO_CONFIG_915MHZ_OQPSK_SUPPORT) && !defined(RADIO_CONFIG_SUBGHZ_SUPPORT) \
-    && !defined(RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT)
-#error \
-    "One of the following must be defined: RADIO_CONFIG_915MHZ_OQPSK_SUPPORT, RADIO_CONFIG_SUBGHZ_SUPPORT or RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT"
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#endif /* OPENTHREAD_CORE_EFR32_CONFIG_CHECK_H_ */
+#ifndef RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM
+#define RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM OPENTHREAD_CONFIG_MLE_MAX_CHILDREN
+#endif
+
+#ifndef RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM
+#define RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM OPENTHREAD_CONFIG_MLE_MAX_CHILDREN
+#endif
+
+#ifndef RADIO_CONFIG_SRC_MATCH_PANID_NUM
+#if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
+#define RADIO_CONFIG_SRC_MATCH_PANID_NUM 3
+#else
+#define RADIO_CONFIG_SRC_MATCH_PANID_NUM 1
+#endif
+#endif
+
+#if RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM || RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM
+void utilsSoftSrcMatchSetPanId(uint8_t iid, uint16_t aPanId);
+#endif // RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM || RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM
+
+#if RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM
+int16_t utilsSoftSrcMatchShortFindEntry(uint8_t iid, uint16_t aShortAddress);
+#endif // RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM
+
+#if RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM
+int16_t utilsSoftSrcMatchExtFindEntry(uint8_t iid, const otExtAddress *aExtAddress);
+#endif // RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM
+
+uint8_t utilsSoftSrcMatchFindIidFromPanId(otPanId panId);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+#endif // SOFT_SOURCE_MATCH_TABLE_H

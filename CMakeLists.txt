@@ -112,6 +112,8 @@ set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls manage
 # NOTE: The "openthread" subdirectory needs to be added after all OT_* variables are defined
 add_subdirectory(openthread)
 
+add_subdirectory(src/src)
+
 # Add any efr32 example projects
 add_subdirectory(examples)
 
