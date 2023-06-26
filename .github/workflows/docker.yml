@@ -108,11 +108,16 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Docker Buildx (push)
-      if: success() && github.repository == 'SiliconLabs/ot-efr32' && github.event_name != 'pull_request'
+      if: |
+        success() &&
+        github.repository == 'SiliconLabs/ot-efr32' &&
+        github.event_name != 'pull_request'
+      run: |
+        docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
+        docker buildx imagetools inspect ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+
+    - name: Docker Buildx (tag as "latest" and push)
+      if: github.ref == 'refs/heads/main'
       run: |
         docker buildx build --output "type=image,push=true" --tag ${DOCKER_IMAGE}:latest ${{ steps.prepare.outputs.buildx_args }}
-
-    - name: Inspect Image
-      if: always() && github.repository == 'SiliconLabs/ot-efr32' && github.event_name != 'pull_request'
-      run: |
-        docker buildx imagetools inspect ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+        docker buildx imagetools inspect ${DOCKER_IMAGE}:latest
