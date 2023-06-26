@@ -30,11 +30,12 @@
 
 from itertools import filterfalse
 from jinja2 import Environment, FileSystemLoader
+from pathlib import Path
 import copy
 import git
 import yaml
 import argparse
-import pathlib
+import os
 
 
 def prepare_path(path: str) -> str:
@@ -137,15 +138,15 @@ parser.add_argument(
     "output_dir", help="the output dir for any generated files")
 args = parser.parse_args()
 
-git_repo = git.Repo(__file__, search_parent_directories=True)
-git_root = git_repo.git.rev_parse("--show-toplevel")
+script_dir = Path(os.path.dirname(os.path.abspath(__file__)))
+repo_root = script_dir.parent
 
 # Define CMakeLists.txt template location
 environment = Environment(loader=FileSystemLoader(
-    f"{git_root}/slc/exporter_templates/platform_library"))
+    f"{repo_root}/slc/exporter_templates/platform_library"))
 platform_lib_template = environment.get_template("CMakeLists.txt.jinja")
 mbedtls_lib_template = environment.get_template("mbedtls.cmake.jinja")
-slc_vars_yaml_dir = pathlib.Path(args.slc_vars_yaml).parent
+slc_vars_yaml_dir = Path(args.slc_vars_yaml).parent
 platform_lib_output_file = slc_vars_yaml_dir / "CMakeLists.txt"
 mbedtls_lib_output_file = slc_vars_yaml_dir / "mbedtls.cmake"
 

@@ -50,7 +50,7 @@ install_packages_apt()
     sudo apt-get update
     sudo apt-get --no-install-recommends install -y \
         coreutils \
-        openjdk-11-jre \
+        openjdk-17-jre \
         python3-setuptools \
         python3-pip \
         git-lfs \

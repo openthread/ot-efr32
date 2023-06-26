@@ -32,3 +32,6 @@ ARG REPO_URL="https://github.com/openthread/ot-efr32"
 WORKDIR /
 RUN rm -rf ${repo_dir} && git clone ${REPO_URL} ${repo_dir}
 WORKDIR ${repo_dir}
+
+ARG BUILD_DATE
+LABEL build_date=${BUILD_DATE}
