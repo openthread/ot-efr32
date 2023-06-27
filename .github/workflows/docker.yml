@@ -29,10 +29,9 @@
 name: Docker
 
 env:
-  DOCKER_IMAGE: siliconlabsinc/ot-efr32-dev
-  DOCKER_FILE: Dockerfile
-  DOCKER_PLATFORMS: linux/amd64
-  VERSION: ${{ github.sha }}
+  TEST_TAG: siliconlabsinc/ot-efr32-dev:test
+  SHA_TAG: siliconlabsinc/ot-efr32-dev:${{ github.sha }}
+  LATEST_TAG: siliconlabsinc/ot-efr32-dev:latest
 
 on:
   push:
@@ -50,10 +49,9 @@ permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
-  buildx:
-    name: buildx
+  docker:
+    name: Build docker image
     runs-on: ubuntu-22.04
-
     steps:
     - name: Harden Runner
       uses: step-security/harden-runner@55d479fb1c5bcad5a4f9099a5d9f37c8857b2845 # v2.4.1
@@ -77,50 +75,50 @@ jobs:
     - name: Git LFS Pull
       run: git -C third_party/silabs/gecko_sdk lfs pull
 
-    - name: Prepare
-      id: prepare
-      run: |
-        TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
-
-        echo "docker_image=${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
-        echo "version=${VERSION}" >> $GITHUB_OUTPUT
-        echo "buildx_args=--platform ${DOCKER_PLATFORMS} \
-          --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-          ${TAGS} --file ${DOCKER_FILE} ." >> $GITHUB_OUTPUT
-
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@ecf95283f03858871ff00b787d79c419715afc34 # v2.7.0
 
-    - name: Docker Buildx (build)
-      run: |
-        docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
+    - name: Build and export to Docker context
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        load: true
+        build-args: |
+          - BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        platforms:
+          linux/amd64
+        tags: |
+          ${{ env.TEST_TAG }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Test build inside container
       run: |
-        docker buildx build --load --output "type=docker" ${{ steps.prepare.outputs.buildx_args }}
-        docker run -v ${{ github.workspace }}:/ot-efr32/ --rm ${DOCKER_IMAGE}:${VERSION} script/build brd4186c
+        docker run -v ${{ github.workspace }}:/ot-efr32/ --rm ${{ env.TEST_TAG }} script/build --skip-silabs-apps brd4151a
 
     - name: Login to DockerHub
-      if: success() && github.repository == 'SiliconLabs/ot-efr32' && github.event_name != 'pull_request'
       uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+      if: |
+        success() &&
+        github.repository == 'SiliconLabs/ot-efr32' &&
+        github.event_name != 'pull_request' &&
+        github.ref == 'refs/heads/main'
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Docker Buildx (push)
+    - name: Build and push
+      uses: docker/build-push-action@v4
       if: |
         success() &&
         github.repository == 'SiliconLabs/ot-efr32' &&
-        github.event_name != 'pull_request'
-      run: |
-        docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
-        docker buildx imagetools inspect ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
-
-    - name: Docker Buildx (tag as "latest" and push)
-      if: |
-        success() &&
-        github.repository == 'SiliconLabs/ot-efr32' &&
+        github.event_name != 'pull_request' &&
         github.ref == 'refs/heads/main'
-      run: |
-        docker buildx build --output "type=image,push=true" --tag ${DOCKER_IMAGE}:latest ${{ steps.prepare.outputs.buildx_args }}
-        docker buildx imagetools inspect ${DOCKER_IMAGE}:latest
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.LATEST_TAG }}
+          ${{ env.SHA_TAG }}
+        platforms:
+          linux/amd64
