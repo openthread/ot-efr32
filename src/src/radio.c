@@ -274,6 +274,8 @@ static efr32RadioCounters sRailDebugCounters;
 extern uint8_t otNcpPlatGetCurCommandIid(void);
 static uint8_t sRailFilterMask = RADIO_BCAST_PANID_FILTER_MASK;
 
+#undef RAIL_IEEE802154_SUPPORTS_RX_CHANNEL_SWITCHING
+
 #if RAIL_IEEE802154_SUPPORTS_RX_CHANNEL_SWITCHING
 
 #define FAST_CHANNEL_SWITCHING_SUPPORT 1
