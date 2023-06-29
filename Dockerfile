@@ -21,11 +21,16 @@ COPY ./requirements.txt .
 # Bootstrap
 RUN ./script/bootstrap packages && rm -rf /var/lib/apt/lists/*
 
+RUN ./script/bootstrap openthread && rm -rf /var/lib/apt/lists/*
+
+# Label the build date before downloading slc to force slc to always be download during a docker build
+ARG BUILD_DATE
+LABEL build_date=${BUILD_DATE}
+
 ENV SLC_INSTALL_DIR=/opt/slc_cli
 RUN mkdir ${SLC_INSTALL_DIR} && \
       ./script/bootstrap silabs
 
-RUN ./script/bootstrap openthread && rm -rf /var/lib/apt/lists/*
 
 # Clone repo for convenience
 ARG REPO_URL="https://github.com/openthread/ot-efr32"
@@ -33,5 +38,3 @@ WORKDIR /
 RUN rm -rf ${repo_dir} && git clone ${REPO_URL} ${repo_dir}
 WORKDIR ${repo_dir}
 
-ARG BUILD_DATE
-LABEL build_date=${BUILD_DATE}
