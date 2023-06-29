@@ -41,9 +41,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   arm-gcc:
-    name: arm-gcc-${{ matrix.gcc_ver }}-${{ matrix.os }}
+    name: arm-gcc-${{ matrix.gcc_ver }}
+    runs-on: ubuntu-22.04
+    container:
+      image: siliconlabsinc/ot-efr32-dev:latest
     strategy:
       fail-fast: false
       matrix:
@@ -51,20 +53,16 @@ jobs:
           - gcc_ver: 6
             gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/6-2017q2/gcc-arm-none-eabi-6-2017-q2-update-linux.tar.bz2
             gcc_extract_dir: gcc-arm-none-eabi-6-2017-q2-update
-            os: ubuntu-22.04
           - gcc_ver: 7
             gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
             gcc_extract_dir: gcc-arm-none-eabi-7-2018-q2-update
-            os: ubuntu-22.04
           - gcc_ver: 9
             gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
             gcc_extract_dir: gcc-arm-none-eabi-9-2019-q4-major
-            os: ubuntu-22.04
           - gcc_ver: 10.3
             gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
             gcc_extract_dir: gcc-arm-none-eabi-10.3-2021.10
-            os: ubuntu-22.04
-    runs-on: ${{ matrix.os }}
+
     steps:
     - uses: actions/checkout@v3
       with:
@@ -83,20 +81,17 @@ jobs:
     - name: Git LFS Pull
       run: git -C third_party/silabs/gecko_sdk lfs pull
 
-    - uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin' # See 'Supported distributions' for available options
-        java-version: '17'
     - name: Bootstrap
       run: |
-        script/bootstrap
         cd /tmp
         wget --tries 4 --no-check-certificate --quiet ${{ matrix.gcc_download_url }} -O gcc-arm.tar.bz2
         tar xjf gcc-arm.tar.bz2
+
     - name: Build
       run: |
         export PATH=/tmp/${{ matrix.gcc_extract_dir }}/bin:$PATH
         script/test
+
     - name: Gather SLC generated files
       if: failure()
       run: |
@@ -108,6 +103,7 @@ jobs:
             mkdir -p "artifact/${board}"
             mv "build/${board}/slc" "artifact/${board}"
         done
+
     - uses: actions/upload-artifact@v3
       if: failure()
       with:
