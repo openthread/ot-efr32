@@ -152,7 +152,7 @@ OT_TOOL_WEAK void efr32UartProcess(void)
     // do nothing
 }
 
-inline otError railStatusToOtError(RAIL_Status_t status)
+otError railStatusToOtError(RAIL_Status_t status)
 {
     switch (status)
     {
