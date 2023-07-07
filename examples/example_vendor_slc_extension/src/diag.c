@@ -107,7 +107,10 @@ otError otPlatDiagProcess(otInstance *aInstance,
     {
         if (strcmp(aArgs[0], sCommands[i].mName) == 0)
         {
-            error = sCommands[i].mCommand(aInstance, aArgsLength - 1, aArgsLength > 1 ? &aArgs[1] : NULL, aOutput,
+            error = sCommands[i].mCommand(aInstance,
+                                          aArgsLength - 1,
+                                          aArgsLength > 1 ? &aArgs[1] : NULL,
+                                          aOutput,
                                           aOutputMaxLen);
             break;
         }

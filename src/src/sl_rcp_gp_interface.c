@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -160,8 +160,12 @@ bool sl_gp_intf_is_gp_pkt(otRadioFrame *aFrame, bool isRxFrame)
 
     uint8_t fc = *gpFrameStartIndex;
 
-    otLogDebgPlat("GP RCP INTF : (%s) PL Index = %d Channel = %d Length = %d FC = %0X", isRxFrame ? "Rx" : "Tx",
-                  (gpFrameStartIndex - aFrame->mPsdu), aFrame->mChannel, aFrame->mLength, fc);
+    otLogDebgPlat("GP RCP INTF : (%s) PL Index = %d Channel = %d Length = %d FC = %0X",
+                  isRxFrame ? "Rx" : "Tx",
+                  (gpFrameStartIndex - aFrame->mPsdu),
+                  aFrame->mChannel,
+                  aFrame->mLength,
+                  fc);
 
     // The basic Identification of a GPDF Frame : The minimum GPDF length need to be 10 in this case for any direction
     // with network layer FC containing the Protocol Version field as 3.
@@ -192,10 +196,11 @@ bool sl_gp_intf_is_gp_pkt(otRadioFrame *aFrame, bool isRxFrame)
                               isRxFrame ? "Rx" : "Tx");
             }
         }
-        else if (GP_NWK_FRAME_TYPE_DATA_WITH_EXTD_FC(
-                     fc) // Data frame with EXT FC present, extract the App Id, SrcId, direction and command Id
-                 && aFrame->mLength
-                        >= GP_MIN_DATA_FRAME_LENGTH) // Minimum Data frame length with extended header and address
+        else if (
+            // Data frame with EXT FC present, extract the App Id, SrcId, direction and command Id
+            GP_NWK_FRAME_TYPE_DATA_WITH_EXTD_FC(fc) &&
+            // Minimum Data frame length with extended header and address
+            aFrame->mLength >= GP_MIN_DATA_FRAME_LENGTH)
         {
             uint8_t extFc = *(gpFrameStartIndex + GP_EXND_FC_INDEX);
 
@@ -241,7 +246,8 @@ bool sl_gp_intf_is_gp_pkt(otRadioFrame *aFrame, bool isRxFrame)
                         otMacAddress aDstAddress;
                         otMacFrameGetDstAddr(aTxFrame, &aDstAddress);
                         otMacFrameGetSrcAddr(aFrame, &aSrcAddress);
-                        if (!memcmp(&(aDstAddress.mAddress.mExtAddress), &(aSrcAddress.mAddress.mExtAddress),
+                        if (!memcmp(&(aDstAddress.mAddress.mExtAddress),
+                                    &(aSrcAddress.mAddress.mExtAddress),
                                     sizeof(otExtAddress))
                             && (gpFrameStartIndex[GP_APP_EP_INDEX_WITH_APP_MODE_1]
                                 == (aTxFrame->mPsdu)[BUFFERED_PSDU_GP_APP_EP_INDEX_WITH_APP_MODE_1]))

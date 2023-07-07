@@ -196,9 +196,13 @@ otError otPlatCryptoImportKey(otCryptoKeyRef      *aKeyId,
         keySize     = SL_OPENTHREAD_ECDSA_PRIVATE_KEY_SIZE;
     }
 
-    status =
-        sl_sec_man_import_key(aKeyId, getPsaKeyType(aKeyType), getPsaAlgorithm(aKeyAlgorithm),
-                              getPsaKeyUsage(aKeyUsage), getPsaKeyPersistence(aKeyPersistence), keyToImport, keySize);
+    status = sl_sec_man_import_key(aKeyId,
+                                   getPsaKeyType(aKeyType),
+                                   getPsaAlgorithm(aKeyAlgorithm),
+                                   getPsaKeyUsage(aKeyUsage),
+                                   getPsaKeyPersistence(aKeyPersistence),
+                                   keyToImport,
+                                   keySize);
 
     otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
@@ -467,9 +471,12 @@ otError otPlatCryptoEcdsaGenerateAndImportKey(otCryptoKeyRef aKeyRef)
     size_t       aKeyLength = 256;
     psa_status_t status;
 
-    status = sl_sec_man_generate_key(
-        &aKeyRef, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), PSA_ALG_ECDSA(PSA_ALG_ANY_HASH),
-        (PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH), PSA_KEY_LIFETIME_PERSISTENT, aKeyLength);
+    status = sl_sec_man_generate_key(&aKeyRef,
+                                     PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1),
+                                     PSA_ALG_ECDSA(PSA_ALG_ANY_HASH),
+                                     (PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH),
+                                     PSA_KEY_LIFETIME_PERSISTENT,
+                                     aKeyLength);
 
     otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
@@ -508,8 +515,14 @@ otError otPlatCryptoEcdsaSignUsingKeyRef(otCryptoKeyRef                aKeyRef,
 
     otEXPECT_ACTION(((aHash != NULL) && (aSignature != NULL)), error = OT_ERROR_INVALID_ARGS);
 
-    status = sl_sec_man_sign(aKeyRef, PSA_ALG_ECDSA(PSA_ALG_SHA_256), aHash->m8, sizeof(aHash->m8), aSignature->m8,
-                             sizeof(aSignature->m8), &aSignatureLength, aIsHash);
+    status = sl_sec_man_sign(aKeyRef,
+                             PSA_ALG_ECDSA(PSA_ALG_SHA_256),
+                             aHash->m8,
+                             sizeof(aHash->m8),
+                             aSignature->m8,
+                             sizeof(aSignature->m8),
+                             &aSignatureLength,
+                             aIsHash);
 
     otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
@@ -528,8 +541,13 @@ otError otPlatCryptoEcdsaVerifyUsingKeyRef(otCryptoKeyRef                    aKe
     otEXPECT_ACTION(((aHash != NULL) && (aSignature != NULL)), error = OT_ERROR_INVALID_ARGS);
 
     // Verify the signature.
-    status = sl_sec_man_verify(aKeyRef, PSA_ALG_ECDSA(PSA_ALG_SHA_256), aHash->m8, sizeof(aHash->m8), aSignature->m8,
-                               sizeof(aSignature->m8), aIsHash);
+    status = sl_sec_man_verify(aKeyRef,
+                               PSA_ALG_ECDSA(PSA_ALG_SHA_256),
+                               aHash->m8,
+                               sizeof(aHash->m8),
+                               aSignature->m8,
+                               sizeof(aSignature->m8),
+                               aIsHash);
 
     otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 

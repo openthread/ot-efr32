@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,9 @@
  *
  */
 
-#include "openthread-system.h"
 #include <assert.h>
 #include <openthread-core-config.h>
+#include <openthread-system.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <openthread/platform/alarm-micro.h>
@@ -130,7 +130,11 @@ void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
     }
     else
     {
-        status = sl_sleeptimer_start_timer(&sl_handle, sl_sleeptimer_ms_to_tick(remaining), AlarmCallback, NULL, 0,
+        status = sl_sleeptimer_start_timer(&sl_handle,
+                                           sl_sleeptimer_ms_to_tick(remaining),
+                                           AlarmCallback,
+                                           NULL,
+                                           0,
                                            SL_SLEEPTIMER_NO_HIGH_PRECISION_HF_CLOCKS_REQUIRED_FLAG);
         assert(status == SL_STATUS_OK);
     }

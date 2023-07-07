@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,9 @@
  *
  */
 
-#include "openthread-system.h"
 #include <assert.h>
 #include <openthread-core-config.h>
+#include <openthread-system.h>
 #include <openthread/link.h>
 #include <openthread/platform/alarm-micro.h>
 #include <openthread/platform/alarm-milli.h>
@@ -273,6 +273,8 @@ static efr32RadioCounters sRailDebugCounters;
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
 extern uint8_t otNcpPlatGetCurCommandIid(void);
 static uint8_t sRailFilterMask = RADIO_BCAST_PANID_FILTER_MASK;
+
+#undef RAIL_IEEE802154_SUPPORTS_RX_CHANNEL_SWITCHING
 
 #if RAIL_IEEE802154_SUPPORTS_RX_CHANNEL_SWITCHING
 
@@ -542,7 +544,7 @@ static inline uint8_t getIidFromFilterMask(uint8_t mask)
     // 8 - INDEX 2       - IID(3)
     //
     // The packet should either be directed to one of the PANs or Bcast.
-    //(mask & (mask -1) is a simplistic way of testing if the mask is a power of 2.
+    // (mask & (mask -1) is a simplistic way of testing if the mask is a power of 2.
     otEXPECT_ACTION(((mask != 0) && (mask & (mask - 1)) == 0), iid = 0);
 
     while (mask)
@@ -578,9 +580,13 @@ static bool isFilterMaskValid(uint8_t mask)
      * Case 3: We dont have either the destination addressing feild or destination PanId
      *         in the received packet to determine if the dest address and dest pan match.
      */
-    if (((mask & RADIO_BCAST_PANID_FILTER_MASK) || (mask & RADIO_BCAST_ADDR_FILTER_MASK)) || // Case 1
-        ((mask & 0x0F) == (mask >> 4)) ||                                                    // Case 2
-        (((mask & 0x0F) == 0) || ((mask >> 4) == 0)))                                        // Case 3
+    if (
+        // Case 1
+        ((mask & RADIO_BCAST_PANID_FILTER_MASK) || (mask & RADIO_BCAST_ADDR_FILTER_MASK)) ||
+        // Case 2
+        ((mask & 0x0F) == (mask >> 4)) ||
+        // Case 3
+        (((mask & 0x0F) == 0) || ((mask >> 4) == 0)))
     {
         valid = true;
     }
@@ -726,7 +732,9 @@ static otError radioProcessTransmitSecurity(otRadioFrame *aFrame, uint8_t iid)
     size_t           aKeyLen;
 
     otEXPECT_ACTION(otPlatCryptoExportKey(sMacKeys[iid].keys[keyToUse].mKeyMaterial.mKeyRef,
-                                          aesKey.mKeyMaterial.mKey.m8, sizeof(aesKey.mKeyMaterial.mKey.m8), &aKeyLen)
+                                          aesKey.mKeyMaterial.mKey.m8,
+                                          sizeof(aesKey.mKeyMaterial.mKey.m8),
+                                          &aKeyLen)
                         == OT_ERROR_NONE,
                     error = OT_ERROR_SECURITY);
 
@@ -1085,7 +1093,8 @@ static RAIL_Handle_t efr32RailInit(efr32CommonConfig *aCommonConfig)
 static void efr32RailConfigLoad(efr32BandConfig *aBandConfig, int8_t aTxPower)
 {
     RAIL_Status_t        status;
-    RAIL_TxPowerConfig_t txPowerConfig = {SL_RAIL_UTIL_PA_SELECTION_2P4GHZ, SL_RAIL_UTIL_PA_VOLTAGE_MV,
+    RAIL_TxPowerConfig_t txPowerConfig = {SL_RAIL_UTIL_PA_SELECTION_2P4GHZ,
+                                          SL_RAIL_UTIL_PA_VOLTAGE_MV,
                                           SL_RAIL_UTIL_PA_RAMP_TIME_US};
 
     if (aBandConfig->mChannelConfig != NULL)
@@ -1117,7 +1126,8 @@ static void efr32RailConfigLoad(efr32BandConfig *aBandConfig, int8_t aTxPower)
     // 802.15.4E support (only on platforms that support it, so error checking is disabled)
     // Note: This has to be called after RAIL_IEEE802154_Config2p4GHzRadio due to a bug where this call
     // can overwrite options set below.
-    RAIL_IEEE802154_ConfigEOptions(gRailHandle, (RAIL_IEEE802154_E_OPTION_GB868 | RAIL_IEEE802154_E_OPTION_ENH_ACK),
+    RAIL_IEEE802154_ConfigEOptions(gRailHandle,
+                                   (RAIL_IEEE802154_E_OPTION_GB868 | RAIL_IEEE802154_E_OPTION_ENH_ACK),
                                    (RAIL_IEEE802154_E_OPTION_GB868 | RAIL_IEEE802154_E_OPTION_ENH_ACK));
 #endif // (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 
@@ -1390,8 +1400,16 @@ void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aA
         sExtAddress[panIndex].m8[i] = aAddress->m8[sizeof(*aAddress) - 1 - i];
     }
 
-    otLogInfoPlat("ExtAddr=%X%X%X%X%X%X%X%X index=%u", aAddress->m8[7], aAddress->m8[6], aAddress->m8[5],
-                  aAddress->m8[4], aAddress->m8[3], aAddress->m8[2], aAddress->m8[1], aAddress->m8[0], panIndex);
+    otLogInfoPlat("ExtAddr=%X%X%X%X%X%X%X%X index=%u",
+                  aAddress->m8[7],
+                  aAddress->m8[6],
+                  aAddress->m8[5],
+                  aAddress->m8[4],
+                  aAddress->m8[3],
+                  aAddress->m8[2],
+                  aAddress->m8[1],
+                  aAddress->m8[0],
+                  panIndex);
 
     status = RAIL_IEEE802154_SetLongAddress(gRailHandle, (uint8_t *)aAddress->m8, panIndex);
     assert(status == RAIL_STATUS_NO_ERROR);
@@ -1769,8 +1787,12 @@ void txCurrentPacket(void)
                                                          .mode       = RAIL_TIME_ABSOLUTE,
                                                          .txDuringRx = RAIL_SCHEDULED_TX_DURING_RX_POSTPONE_TX};
 
-            status = RAIL_StartScheduledCcaCsmaTx(gRailHandle, sTxFrame->mChannel, txOptions, &scheduleTxOptions,
-                                                  &csmaConfig, &txSchedulerInfo);
+            status = RAIL_StartScheduledCcaCsmaTx(gRailHandle,
+                                                  sTxFrame->mChannel,
+                                                  txOptions,
+                                                  &scheduleTxOptions,
+                                                  &csmaConfig,
+                                                  &txSchedulerInfo);
             if (status == RAIL_STATUS_NO_ERROR)
             {
 #if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
@@ -2179,8 +2201,11 @@ static bool writeIeee802154EnhancedAck(RAIL_Handle_t        aRailHandle,
 
     otEXPECT((packetInfoForEnhAck != NULL) && (initialPktReadBytes != NULL) && (receivedPsdu != NULL));
 
-    *initialPktReadBytes = readInitialPacketData(packetInfoForEnhAck, EARLY_FRAME_PENDING_EXPECTED_BYTES,
-                                                 (PHY_HEADER_SIZE + 2), receivedPsdu, FINAL_PACKET_LENGTH_WITH_IE);
+    *initialPktReadBytes = readInitialPacketData(packetInfoForEnhAck,
+                                                 EARLY_FRAME_PENDING_EXPECTED_BYTES,
+                                                 (PHY_HEADER_SIZE + 2),
+                                                 receivedPsdu,
+                                                 FINAL_PACKET_LENGTH_WITH_IE);
 
     uint8_t iid = INVALID_VALUE;
 
@@ -3289,11 +3314,20 @@ void efr32AntennaConfigInit(void)
 
 static void changeDynamicEvents(void)
 {
-    const RAIL_Events_t eventMask = RAIL_EVENTS_NONE | RAIL_EVENT_RX_SYNC1_DETECT | RAIL_EVENT_RX_SYNC2_DETECT
-                                    | RAIL_EVENT_RX_FRAME_ERROR | RAIL_EVENT_RX_FIFO_OVERFLOW
-                                    | RAIL_EVENT_RX_ADDRESS_FILTERED | RAIL_EVENT_RX_PACKET_ABORTED
-                                    | RAIL_EVENT_RX_FILTER_PASSED | RAIL_EVENT_TX_CHANNEL_CLEAR
-                                    | RAIL_EVENT_TX_CCA_RETRY | RAIL_EVENT_TX_START_CCA | RAIL_EVENT_SIGNAL_DETECTED;
+    /* clang-format off */
+    const RAIL_Events_t eventMask = RAIL_EVENTS_NONE
+                                    | RAIL_EVENT_RX_SYNC1_DETECT
+                                    | RAIL_EVENT_RX_SYNC2_DETECT
+                                    | RAIL_EVENT_RX_FRAME_ERROR
+                                    | RAIL_EVENT_RX_FIFO_OVERFLOW
+                                    | RAIL_EVENT_RX_ADDRESS_FILTERED
+                                    | RAIL_EVENT_RX_PACKET_ABORTED
+                                    | RAIL_EVENT_RX_FILTER_PASSED
+                                    | RAIL_EVENT_TX_CHANNEL_CLEAR
+                                    | RAIL_EVENT_TX_CCA_RETRY
+                                    | RAIL_EVENT_TX_START_CCA
+                                    | RAIL_EVENT_SIGNAL_DETECTED;
+    /* clang-format on */
     RAIL_Events_t eventValues = RAIL_EVENTS_NONE;
 
     if (phyStackEventIsEnabled())
@@ -3350,7 +3384,8 @@ static void emRadioEnablePta(bool enable)
     // When PTA is enabled, we want to negate PTA_REQ as soon as an incoming
     // frame is aborted, e.g. due to filtering.  To do that we must turn off
     // the TRACKABFRAME feature that's normally on to benefit sniffing on PTI.
-    assert(RAIL_ConfigRxOptions(gRailHandle, RAIL_RX_OPTION_TRACK_ABORTED_FRAMES,
+    assert(RAIL_ConfigRxOptions(gRailHandle,
+                                RAIL_RX_OPTION_TRACK_ABORTED_FRAMES,
                                 (enable ? RAIL_RX_OPTIONS_NONE : RAIL_RX_OPTION_TRACK_ABORTED_FRAMES))
            == RAIL_STATUS_NO_ERROR);
 }

@@ -108,8 +108,11 @@ static void printShortEntryTable(uint8_t iid)
     otLogDebgPlat("================================|============|===========");
     for (int16_t i = 0; i < RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM; i++)
     {
-        otLogDebgPlat("ShortEntry[panIndex=%d][entry=%d] | %d          | 0x%04x", panIndex, i,
-                      srcMatchShortEntry[panIndex][i].allocated, srcMatchShortEntry[panIndex][i].checksum);
+        otLogDebgPlat("ShortEntry[panIndex=%d][entry=%d] | %d          | 0x%04x",
+                      panIndex,
+                      i,
+                      srcMatchShortEntry[panIndex][i].allocated,
+                      srcMatchShortEntry[panIndex][i].checksum);
     }
     otLogDebgPlat("================================|============|===========");
 }
@@ -274,8 +277,11 @@ static void printExtEntryTable(uint8_t iid)
     otLogDebgPlat("==============================|============|===========");
     for (int16_t i = 0; i < RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM; i++)
     {
-        otLogDebgPlat("ExtEntry[panIndex=%d][entry=%d] | %d          | 0x%04x", panIndex, i,
-                      srcMatchExtEntry[panIndex][i].allocated, srcMatchExtEntry[panIndex][i].checksum);
+        otLogDebgPlat("ExtEntry[panIndex=%d][entry=%d] | %d          | 0x%04x",
+                      panIndex,
+                      i,
+                      srcMatchExtEntry[panIndex][i].allocated,
+                      srcMatchExtEntry[panIndex][i].checksum);
     }
     otLogDebgPlat("==============================|============|===========");
 }

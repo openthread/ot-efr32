@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -152,7 +152,7 @@ OT_TOOL_WEAK void efr32UartProcess(void)
     // do nothing
 }
 
-inline otError railStatusToOtError(RAIL_Status_t status)
+otError railStatusToOtError(RAIL_Status_t status)
 {
     switch (status)
     {

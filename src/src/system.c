@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -35,8 +35,8 @@
 #include <assert.h>
 #include <string.h>
 
-#include "openthread-system.h"
 #include <openthread-core-config.h>
+#include <openthread-system.h>
 #include "utils/uart.h"
 
 #include "common/logging.hpp"

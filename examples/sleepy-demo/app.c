@@ -38,7 +38,7 @@
 #include <openthread/thread.h>
 
 #include "app.h"
-#include "openthread-system.h"
+#include <openthread-system.h>
 
 #include "sl_component_catalog.h"
 
