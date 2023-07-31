@@ -50,8 +50,8 @@
 #define MULTICAST_ADDR "ff03::1"
 #define MULTICAST_PORT 123
 #define RECV_PORT 234
-#define MTD_MESSAGE "mtd button"
 #define FTD_MESSAGE "ftd button"
+#define MTD_MESSAGE "mtd button"
 
 // Forward declarations
 otInstance *otGetInstance(void);
