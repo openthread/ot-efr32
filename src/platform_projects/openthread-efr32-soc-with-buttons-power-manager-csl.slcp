@@ -1,7 +1,8 @@
-project_name: openthread-efr32-soc
+
+project_name: openthread-efr32-soc-with-buttons-power-manager-csl
 label: ot-efr32
 package: OpenThread
-description: This platform project is used to generate a CMake library for EFR32 SoCs
+description: This platform project is used to generate a CMake library for EFR32 SoCs with Buttons, Power Manager, and CSL enabled
 category: OpenThread Examples
 quality: production
 
@@ -12,7 +13,20 @@ component:
   - id: uartdrv_usart
     instance:
       - vcom
+  - id: simple_button
+    instance:
+      - btn0
+      - btn1
   - id: rail_util_pti
+  - id: power_manager
+
+template_contribution:
+  - name: ot_init
+    value: sl_ot_create_instance
+    priority: 0
+  - name: ot_init
+    value: sl_ot_cli_init
+    priority: 20
 
 configuration:
   - name: SL_BOARD_ENABLE_VCOM
@@ -35,3 +49,7 @@ configuration:
     condition: [freertos]
   - name: SL_STACK_SIZE
     value: 4608
+
+define:
+  - name: OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
+    value: 1

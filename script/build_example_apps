@@ -108,6 +108,24 @@ generate()
             "${generation_dir}" \
             "${board}"
         echo "${generation_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
+    elif [[ ${cmake_library} == "openthread-efr32-soc-with-buttons-power-manager-csl" ]]; then
+        set +x
+        echo "========================================================================================================="
+        echo "Generate openthread-efr32-soc-with-buttons-power-manager-csl and openthread-efr32-soc-with-buttons-power-manager-csl-mbedtls libs"
+        echo "========================================================================================================="
+        set -x
+
+        generation_dir="${slc_generated_projects_dir}/soc-with-buttons-power-manager-csl"
+        slcp="${repo_dir}/src/platform_projects/openthread-efr32-soc-with-buttons-power-manager-csl.slcp"
+
+        "${repo_dir}/script/generate" \
+            "${slcp}" \
+            "${generation_dir}" \
+            "${board}"
+        echo "${generation_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
+    else
+        echo "ERROR: Unrecognized cmake_library: ${cmake_library}"
+        exit 4
     fi
 }
 
@@ -165,7 +183,7 @@ main()
                 ;;
             h)
                 echo "${usage}" >&2
-                exit 2
+                exit 0
                 ;;
         esac
     done
@@ -205,12 +223,22 @@ main()
     export OT_CMAKE_BUILD_DIR="$repo_dir/build/${board}"
 
     build_example_app sleepy-demo-ftd openthread-efr32-soc-with-buttons \
-        -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
+        -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}" -DEFR32_APP_SLEEPY_DEMO_FTD=ON
     build_example_app sleepy-demo-mtd openthread-efr32-soc-with-buttons-power-manager \
-        -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
+        -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}" -DEFR32_APP_SLEEPY_DEMO_MTD=ON
+    build_example_app sleepy-demo-ssed openthread-efr32-soc-with-buttons-power-manager-csl \
+        -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}" -DEFR32_APP_SLEEPY_DEMO_SSED=ON
 
-    ls -alh "${OT_CMAKE_BUILD_DIR}"/examples/sleepy-demo-ftd/bin/* \
-        "${OT_CMAKE_BUILD_DIR}"/examples/sleepy-demo-mtd/bin/*
+    apps=(
+        sleepy-demo-ftd
+        sleepy-demo-mtd
+        sleepy-demo-ssed
+    )
+    for app in "${apps[@]}"; do
+        if [ -d "${OT_CMAKE_BUILD_DIR}"/examples/"${app}" ]; then
+            ls -alh "${OT_CMAKE_BUILD_DIR}"/examples/"${app}"/bin/*
+        fi
+    done
 }
 
 main "$@"
