@@ -414,6 +414,46 @@
 #endif
 
 /**
+ * @def SL_OPENTHREAD_CSL_TX_UNCERTAINTY
+ *
+ * Uncertainty of scheduling a CSL transmission, in ±10 us units.
+ *
+ * Note: This value was carefully configured to meet Thread certification
+ * requirements for Silicon Labs devices.
+ *
+ */
+#ifndef SL_OPENTHREAD_CSL_TX_UNCERTAINTY
+#define SL_OPENTHREAD_CSL_TX_UNCERTAINTY 175
+#endif
+
+/**
+ * @def SL_OPENTHREAD_HFXO_ACCURACY
+ *
+ * XTAL accuracy in units of ± ppm. Also used for calculations during CSL operations.
+ *
+ * According to EFR datasheets, HFXO is ± 40 ppm.
+ *
+ * @note Platforms may optimize this value based on operational conditions (i.e.: temperature).
+ *
+ */
+#ifndef SL_OPENTHREAD_HFXO_ACCURACY
+#define SL_OPENTHREAD_HFXO_ACCURACY 80
+#endif
+
+/**
+ * @def SL_OPENTHREAD_LFXO_ACCURACY
+ *
+ * XTAL accuracy in units of ± ppm. Also used for calculations during CSL operations.
+ *
+ * According to EFR datasheets, LFXO (at least for MG12) is -8 to +40 ppm.
+ *
+ * @note Platforms may optimize this value based on operational conditions (i.e.: temperature).
+ */
+#ifndef SL_OPENTHREAD_LFXO_ACCURACY
+#define SL_OPENTHREAD_LFXO_ACCURACY 48
+#endif
+
+/**
  * @def SL_OPENTHREAD_RADIO_CCA_MODE
  *
  * Defines the CCA mode to be used by the platform.

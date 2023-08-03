@@ -36,7 +36,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "radio_vendor.h"
+#include "radio_extension.h"
 
 #ifdef SL_COMPONENT_CATALOG_PRESENT
 #include "sl_component_catalog.h"
@@ -70,7 +70,7 @@
 #include "common/code_utils.hpp"
 
 #ifdef SL_CATALOG_OPENTHREAD_ANT_DIV_PRESENT
-otError otPlatRadioVendorGetTxAntennaMode(uint8_t *aMode)
+otError otPlatRadioExtensionGetTxAntennaMode(uint8_t *aMode)
 {
     otError error = OT_ERROR_NONE;
 
@@ -86,7 +86,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorSetTxAntennaMode(uint8_t aMode)
+otError otPlatRadioExtensionSetTxAntennaMode(uint8_t aMode)
 {
     otError error = OT_ERROR_NONE;
 
@@ -102,7 +102,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorGetRxAntennaMode(uint8_t *aMode)
+otError otPlatRadioExtensionGetRxAntennaMode(uint8_t *aMode)
 {
     otError error = OT_ERROR_NONE;
 
@@ -118,7 +118,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorSetRxAntennaMode(uint8_t aMode)
+otError otPlatRadioExtensionSetRxAntennaMode(uint8_t aMode)
 {
     otError error = OT_ERROR_NONE;
 
@@ -134,7 +134,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorGetActivePhy(uint8_t *aActivePhy)
+otError otPlatRadioExtensionGetActivePhy(uint8_t *aActivePhy)
 {
     otError error = OT_ERROR_NONE;
 
@@ -153,7 +153,7 @@ exit:
 
 #ifdef SL_CATALOG_OPENTHREAD_COEX_PRESENT
 
-otError otPlatRadioVendorGetDpState(uint8_t *aDpPulse)
+otError otPlatRadioExtensionGetDpState(uint8_t *aDpPulse)
 {
     otError error = OT_ERROR_NONE;
 
@@ -169,7 +169,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorSetDpState(uint8_t aDpPulse)
+otError otPlatRadioExtensionSetDpState(uint8_t aDpPulse)
 {
     otError error = OT_ERROR_NONE;
 
@@ -185,7 +185,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorGetGpioInputOverride(uint8_t aGpioIndex, bool *aEnabled)
+otError otPlatRadioExtensionGetGpioInputOverride(uint8_t aGpioIndex, bool *aEnabled)
 {
     otError error = OT_ERROR_NONE;
 
@@ -203,7 +203,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorSetGpioInputOverride(uint8_t aGpioIndex, bool aEnabled)
+otError otPlatRadioExtensionSetGpioInputOverride(uint8_t aGpioIndex, bool aEnabled)
 {
     otError error = OT_ERROR_NONE;
 
@@ -222,7 +222,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorGetActiveRadio(uint8_t *aActivePhy)
+otError otPlatRadioExtensionGetActiveRadio(uint8_t *aActivePhy)
 {
     otError error = OT_ERROR_NONE;
 
@@ -238,7 +238,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorGetPhySelectTimeout(uint8_t *aTimeout)
+otError otPlatRadioExtensionGetPhySelectTimeout(uint8_t *aTimeout)
 {
     otError error = OT_ERROR_NONE;
 
@@ -254,7 +254,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorSetPhySelectTimeout(uint8_t aTimeout)
+otError otPlatRadioExtensionSetPhySelectTimeout(uint8_t aTimeout)
 {
     otError error = OT_ERROR_NONE;
 
@@ -270,7 +270,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorGetCoexOptions(uint32_t *aPtaOptions)
+otError otPlatRadioExtensionGetCoexOptions(uint32_t *aPtaOptions)
 {
     otError error = OT_ERROR_NONE;
 
@@ -286,7 +286,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorSetCoexOptions(uint32_t aPtaOptions)
+otError otPlatRadioExtensionSetCoexOptions(uint32_t aPtaOptions)
 {
     otError error = OT_ERROR_NONE;
 
@@ -303,7 +303,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorGetCoexConstantOptions(uint32_t *aPtaOptions)
+otError otPlatRadioExtensionGetCoexConstantOptions(uint32_t *aPtaOptions)
 {
     otError error = OT_ERROR_NONE;
 
@@ -319,7 +319,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorIsCoexEnabled(bool *aPtaState)
+otError otPlatRadioExtensionIsCoexEnabled(bool *aPtaState)
 {
     otError error = OT_ERROR_NONE;
 
@@ -335,7 +335,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorSetCoexEnable(bool aPtaState)
+otError otPlatRadioExtensionSetCoexEnable(bool aPtaState)
 {
     otError error = OT_ERROR_NONE;
 
@@ -351,23 +351,23 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorGetRequestPwmArgs(uint8_t *aPwmComposite, uint8_t *aPwmPulseDc, uint8_t *aPwmPeriodHalfMs)
+otError otPlatRadioExtensionGetRequestPwmArgs(uint8_t *aPwmReq, uint8_t *aPwmDutyCycle, uint8_t *aPwmPeriodHalfMs)
 {
     otError error = OT_ERROR_NONE;
 
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
     const sl_rail_util_coex_pwm_args_t *p;
-    VerifyOrExit(aPwmComposite != NULL, error = OT_ERROR_INVALID_ARGS);
-    VerifyOrExit(aPwmPulseDc != NULL, error = OT_ERROR_INVALID_ARGS);
+    VerifyOrExit(aPwmReq != NULL, error = OT_ERROR_INVALID_ARGS);
+    VerifyOrExit(aPwmDutyCycle != NULL, error = OT_ERROR_INVALID_ARGS);
     VerifyOrExit(aPwmPeriodHalfMs != NULL, error = OT_ERROR_INVALID_ARGS);
     p = sl_rail_util_coex_get_request_pwm_args();
     VerifyOrExit(p != NULL, error = OT_ERROR_FAILED);
-    *aPwmComposite    = p->req;
-    *aPwmPulseDc      = p->dutyCycle;
+    *aPwmReq          = p->req;
+    *aPwmDutyCycle    = p->dutyCycle;
     *aPwmPeriodHalfMs = p->periodHalfMs;
 #else
-    OT_UNUSED_VARIABLE(aPwmComposite);
-    OT_UNUSED_VARIABLE(aPwmPulseDc);
+    OT_UNUSED_VARIABLE(aPwmReq);
+    OT_UNUSED_VARIABLE(aPwmDutyCycle);
     OT_UNUSED_VARIABLE(aPwmPeriodHalfMs);
     ExitNow(error = OT_ERROR_NOT_IMPLEMENTED);
 #endif
@@ -376,16 +376,16 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorSetRequestPwmArgs(uint8_t aPwmComposite, uint8_t aPwmPulseDc, uint8_t aPwmPeriodHalfMs)
+otError otPlatRadioExtensionSetRequestPwmArgs(uint8_t aPwmReq, uint8_t aPwmDutyCycle, uint8_t aPwmPeriodHalfMs)
 {
     otError error = OT_ERROR_NONE;
 
 #ifdef SL_CATALOG_RAIL_UTIL_COEX_PRESENT
-    sl_status_t status = sl_rail_util_coex_set_request_pwm(aPwmComposite, NULL, aPwmPulseDc, aPwmPeriodHalfMs);
+    sl_status_t status = sl_rail_util_coex_set_request_pwm(aPwmReq, NULL, aPwmDutyCycle, aPwmPeriodHalfMs);
     VerifyOrExit(status == SL_STATUS_OK, error = OT_ERROR_FAILED);
 #else
-    OT_UNUSED_VARIABLE(aPwmComposite);
-    OT_UNUSED_VARIABLE(aPwmPulseDc);
+    OT_UNUSED_VARIABLE(aPwmReq);
+    OT_UNUSED_VARIABLE(aPwmDutyCycle);
     OT_UNUSED_VARIABLE(aPwmPeriodHalfMs);
     ExitNow(error = OT_ERROR_NOT_IMPLEMENTED);
 #endif
@@ -395,11 +395,11 @@ exit:
 }
 
 #if defined(SL_CATALOG_RAIL_UTIL_COEX_PRESENT) && SL_OPENTHREAD_COEX_COUNTER_ENABLE
-extern void efr32RadioGetCoexCounters(uint32_t (*aCoexCounters)[SL_RAIL_UTIL_COEX_EVENT_COUNT]);
-extern void efr32RadioClearCoexCounters(void);
+extern uint32_t efr32RadioCoexCounters[SL_RAIL_UTIL_COEX_EVENT_COUNT];
+extern void     efr32RadioClearCoexCounters(void);
 #endif
 
-otError otPlatRadioVendorClearCoexCounters(void)
+otError otPlatRadioExtensionClearCoexCounters(void)
 {
     otError error = OT_ERROR_NONE;
 
@@ -412,15 +412,24 @@ otError otPlatRadioVendorClearCoexCounters(void)
     return error;
 }
 
-otError otPlatRadioVendorGetCoexCounters(uint8_t aNumEntries, uint32_t aCoexCounters[])
+otError otPlatRadioExtensionGetCoexCounters(uint8_t aNumEntries, uint32_t aCoexCounters[])
 {
     otError error = OT_ERROR_NONE;
 
 #if defined(SL_CATALOG_RAIL_UTIL_COEX_PRESENT) && SL_OPENTHREAD_COEX_COUNTER_ENABLE
-    VerifyOrExit(aNumEntries == OT_PLAT_RADIO_VENDOR_COEX_EVENT_COUNT, error = OT_ERROR_INVALID_ARGS);
+    VerifyOrExit(aNumEntries == OT_PLAT_RADIO_EXTENSION_COEX_EVENT_COUNT, error = OT_ERROR_INVALID_ARGS);
     VerifyOrExit(aCoexCounters != NULL, error = OT_ERROR_INVALID_ARGS);
-    _Static_assert((uint8_t)OT_PLAT_RADIO_VENDOR_COEX_EVENT_COUNT == (uint8_t)SL_RAIL_UTIL_COEX_EVENT_COUNT);
-    efr32RadioGetCoexCounters((uint32_t(*)[SL_RAIL_UTIL_COEX_EVENT_COUNT])aCoexCounters);
+    _Static_assert((uint8_t)OT_PLAT_RADIO_EXTENSION_COEX_EVENT_COUNT == (uint8_t)SL_RAIL_UTIL_COEX_EVENT_COUNT,
+                   "Coex counter mismatch.  OT_PLAT_RADIO_EXTENSION_COEX_EVENT_COUNT != SL_RAIL_UTIL_COEX_EVENT_COUNT");
+#define COPY_COEX_COUNTER(counter)                                \
+    aCoexCounters[OT_PLAT_RADIO_EXTENSION_COEX_EVENT_##counter] = \
+        efr32RadioCoexCounters[SL_RAIL_UTIL_COEX_EVENT_##counter]
+    COPY_COEX_COUNTER(LO_PRI_REQUESTED);
+    COPY_COEX_COUNTER(HI_PRI_REQUESTED);
+    COPY_COEX_COUNTER(LO_PRI_DENIED);
+    COPY_COEX_COUNTER(HI_PRI_DENIED);
+    COPY_COEX_COUNTER(LO_PRI_TX_ABORTED);
+    COPY_COEX_COUNTER(HI_PRI_TX_ABORTED);
 #else
     OT_UNUSED_VARIABLE(aNumEntries);
     OT_UNUSED_VARIABLE(aCoexCounters);
@@ -431,7 +440,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorSetRadioHoldoff(bool aEnabled)
+otError otPlatRadioExtensionSetRadioHoldoff(bool aEnabled)
 {
     otError error = OT_ERROR_NONE;
 
@@ -452,7 +461,7 @@ exit:
 extern RAIL_IEEE802154_PtiRadioConfig_t efr32GetPtiRadioConfig(void);
 extern RAIL_Status_t                    efr32RadioSetCcaMode(uint8_t aMode);
 
-otError otPlatRadioVendorGetPtiRadioConfig(uint16_t *radioConfig)
+otError otPlatRadioExtensionGetPtiRadioConfig(uint16_t *radioConfig)
 {
     otError error = OT_ERROR_NONE;
 
@@ -463,7 +472,7 @@ exit:
     return error;
 }
 
-otError otPlatRadioVendorSetCcaMode(uint8_t aMode)
+otError otPlatRadioExtensionSetCcaMode(uint8_t aMode)
 {
     otError error = OT_ERROR_NONE;
 
@@ -475,3 +484,40 @@ exit:
     return error;
 }
 #endif // SL_CATALOG_OPENTHREAD_TEST_CLI_PRESENT
+
+#ifdef SL_CATALOG_OPENTHREAD_EFR32_EXT_PRESENT
+extern otError efr32GetRadioCounters(efr32RadioCounters *aRadioCounters);
+extern otError efr32ClearRadioCounters(void);
+
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+extern efr32RadioCounters railDebugCounters;
+#endif
+
+otError otPlatRadioExtensionGetRadioCounters(efr32RadioCounters *aRadioCounters)
+{
+    otError error = OT_ERROR_NONE;
+
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+    VerifyOrExit(aRadioCounters != NULL, error = OT_ERROR_INVALID_ARGS);
+    *aRadioCounters = railDebugCounters;
+#else
+    error = OT_ERROR_NOT_IMPLEMENTED;
+#endif
+
+exit:
+    return error;
+}
+
+otError otPlatRadioExtensionClearRadioCounters(void)
+{
+    otError error = OT_ERROR_NONE;
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+    efr32ClearRadioCounters();
+#else
+    error = OT_ERROR_NOT_IMPLEMENTED;
+#endif
+
+    return error;
+}
+
+#endif // SL_CATALOG_OPENTHREAD_EFR32_EXT_PRESENT
