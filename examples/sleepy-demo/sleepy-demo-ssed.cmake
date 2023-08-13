@@ -26,14 +26,23 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-# ==============================================================================
-# sleepy-demo
-# ==============================================================================
-option(EFR32_APP_SLEEPY_DEMO_FTD "enable sleepy-demo-ftd app" OFF)
-option(EFR32_APP_SLEEPY_DEMO_MTD "enable sleepy-demo-mtd app" OFF)
-option(EFR32_APP_SLEEPY_DEMO_SSED "enable sleepy-demo-ssed app" OFF)
+add_executable(sleepy-demo-ssed
+    ${PROJECT_SOURCE_DIR}/openthread/examples/apps/cli/cli_uart.cpp
+    main.c
+    app.c
+    app.h
+    sleepy-ssed.c
+)
 
-if(EFR32_APP_SLEEPY_DEMO_FTD OR EFR32_APP_SLEEPY_DEMO_MTD OR EFR32_APP_SLEEPY_DEMO_SSED)
-    add_subdirectory(sleepy-demo)
-endif()
+target_link_libraries(sleepy-demo-ssed PRIVATE
+    openthread-cli-mtd
+    ${OT_PLATFORM_LIB}
+    openthread-mtd
+    ${OT_PLATFORM_LIB}
+    ${OT_MBEDTLS}
+    -Wl,-Map=sleepy-demo-ssed.map
+    ot-config
+)
 
+install(TARGETS sleepy-demo-ssed
+    DESTINATION bin)

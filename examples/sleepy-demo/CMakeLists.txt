@@ -26,10 +26,14 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-if(OT_FTD)
+if(EFR32_APP_SLEEPY_DEMO_FTD)
     include(sleepy-demo-ftd.cmake)
 endif()
 
-if(OT_MTD)
+if(EFR32_APP_SLEEPY_DEMO_MTD)
     include(sleepy-demo-mtd.cmake)
+endif()
+
+if(EFR32_APP_SLEEPY_DEMO_SSED)
+    include(sleepy-demo-ssed.cmake)
 endif()
