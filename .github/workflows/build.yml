@@ -64,7 +64,7 @@ jobs:
             gcc_extract_dir: gcc-arm-none-eabi-10.3-2021.10
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
 
