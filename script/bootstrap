@@ -74,6 +74,7 @@ install_packages_brew()
     brew install \
         coreutils \
         openjdk@11 \
+        grep \
         wget
 }
 
