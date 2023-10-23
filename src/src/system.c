@@ -47,6 +47,13 @@
 #include "rail.h"
 #include "sl_mpu.h"
 #include "sl_sleeptimer.h"
+#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
+#include "sl_malloc.h"
+#include "openthread/heap.h"
+#endif
+
+#include "platform-efr32.h"
+#include "sl_openthread.h"
 
 #if defined(SL_COMPONENT_CATALOG_PRESENT)
 #include "sl_component_catalog.h"
@@ -67,14 +74,6 @@
 #if defined(SL_CATALOG_OT_RCP_GP_INTERFACE_PRESENT)
 #include "sl_rcp_gp_interface.h"
 #endif // SL_CATALOG_OT_RCP_GP_INTERFACE_PRESENT
-
-#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
-#include "sl_malloc.h"
-#include "openthread/heap.h"
-#endif
-
-#include "platform-efr32.h"
-#include "sl_openthread.h"
 
 #define USE_EFR32_LOG (OPENTHREAD_CONFIG_LOG_OUTPUT == OPENTHREAD_CONFIG_LOG_OUTPUT_PLATFORM_DEFINED)
 
