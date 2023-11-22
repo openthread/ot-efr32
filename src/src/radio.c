@@ -407,6 +407,8 @@ static const RAIL_IEEE802154_Config_t sRailIeee802154Config = {
 #define SHR_SIZE 5 // 4 bytes of preamble, 1 byte sync-word
 #endif
 
+#define SHR_DURATION_US 160 // Duration of SHR in us.
+
 // Misc
 static volatile uint32_t miscRadioState = 0;
 static bool              emPendingData  = false;
@@ -1634,7 +1636,8 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aFrame)
             sTxFrame->mInfo.mTxInfo.mTxDelay         = 3000; // Chosen after internal certification testing
         }
 #endif
-        updateIeInfoTxFrame(sTxFrame->mInfo.mTxInfo.mTxDelayBaseTime + sTxFrame->mInfo.mTxInfo.mTxDelay + 160);
+        updateIeInfoTxFrame(sTxFrame->mInfo.mTxInfo.mTxDelayBaseTime + sTxFrame->mInfo.mTxInfo.mTxDelay
+                            + SHR_DURATION_US);
         // Note - we need to call this outside of txCurrentPacket as for Series 2,
         // this results in calling the SE interface from a critical section which is not permitted.
 
@@ -1824,7 +1827,7 @@ void txCurrentPacket(void)
         //
 #if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
         RAIL_ScheduleTxConfig_t scheduleTxOptions = {.when = sTxFrame->mInfo.mTxInfo.mTxDelayBaseTime
-                                                             + sTxFrame->mInfo.mTxInfo.mTxDelay,
+                                                             + sTxFrame->mInfo.mTxInfo.mTxDelay - SHR_DURATION_US,
                                                      .mode       = RAIL_TIME_ABSOLUTE,
                                                      .txDuringRx = RAIL_SCHEDULED_TX_DURING_RX_POSTPONE_TX};
 
@@ -3032,8 +3035,9 @@ static bool validatePacketTimestamp(RAIL_RxPacketDetails_t *pPacketDetails, uint
     // Get the timestamp when the SFD was received
     otEXPECT_ACTION(pPacketDetails->timeReceived.timePosition != RAIL_PACKET_TIME_INVALID, rxTimestampValid = false);
 
-    // + 1 for the 1-byte PHY header
-    pPacketDetails->timeReceived.totalPacketBytes = packetLength + 1;
+    // + PHY HEADER SIZE for PHY header
+    // We would not need this if PHR is not included and we want the MHR
+    pPacketDetails->timeReceived.totalPacketBytes = packetLength + PHY_HEADER_SIZE;
 
     otEXPECT_ACTION((RAIL_GetRxTimeSyncWordEndAlt(gRailHandle, pPacketDetails) == RAIL_STATUS_NO_ERROR),
                     rxTimestampValid = false);
