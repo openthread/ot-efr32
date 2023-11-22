@@ -39,9 +39,9 @@
 #include "em_core.h"
 #include "platform-efr32.h"
 #include "sl_component_catalog.h"
-#include <assert.h>
 #include <openthread-core-config.h>
 #include <openthread/tasklet.h>
+#include "common/debug.hpp"
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"

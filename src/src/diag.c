@@ -43,6 +43,7 @@
 #include <openthread/platform/diag.h>
 #include <openthread/platform/radio.h>
 #include "common/code_utils.hpp"
+#include "common/debug.hpp"
 #include "common/logging.hpp"
 
 #include "diag.h"
@@ -232,7 +233,9 @@ static RAIL_Status_t stopTxStream(void)
     // Since start transmit stream turn off the radio state,
     // call the RAIL_StartRx to turn on radio
     IgnoreError(RAIL_GetChannel(gRailHandle, &currentChannel));
-    assert(RAIL_StartRx(gRailHandle, currentChannel, &rxSchedulerInfo) == RAIL_STATUS_NO_ERROR);
+
+    status = RAIL_StartRx(gRailHandle, currentChannel, &rxSchedulerInfo);
+    OT_ASSERT(status == RAIL_STATUS_NO_ERROR);
 
 exit:
     return status;

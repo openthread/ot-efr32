@@ -32,8 +32,8 @@
  *   This file includes the platform-specific initializers.
  */
 
-#include <assert.h>
 #include <string.h>
+#include "common/debug.hpp"
 
 #include <openthread-core-config.h>
 #include <openthread-system.h>
