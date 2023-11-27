@@ -37,9 +37,9 @@
 #include "sl_packet_utils.h"
 #include "sl_rcp_gp_interface_config.h"
 #include "sl_status.h"
-#include <assert.h>
 #include <string.h>
 #include <openthread/platform/time.h>
+#include "common/debug.hpp"
 #include "common/logging.hpp"
 #include "utils/mac_frame.h"
 

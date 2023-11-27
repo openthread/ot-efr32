@@ -36,9 +36,9 @@
 
 #include "soft_source_match_table.h"
 
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include "common/debug.hpp"
 
 #include <openthread/logging.h>
 
@@ -52,7 +52,7 @@ extern uint8_t        otNcpPlatGetCurCommandIid(void);
 static inline uint8_t getPanIndex(uint8_t iid)
 {
     // Assert if iid=0 (broadcast iid)
-    assert(iid != 0);
+    OT_ASSERT(iid != 0);
     return iid - 1;
 }
 #else // !OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE

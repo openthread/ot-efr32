@@ -32,7 +32,6 @@
  *
  */
 
-#include <assert.h>
 #include <openthread-core-config.h>
 #include <openthread-system.h>
 #include <stdbool.h>
@@ -40,6 +39,7 @@
 #include <openthread/platform/alarm-micro.h>
 #include <openthread/platform/alarm-milli.h>
 #include <openthread/platform/diag.h>
+#include "common/debug.hpp"
 #include "common/logging.hpp"
 
 #include "platform-efr32.h"
@@ -89,7 +89,7 @@ uint32_t otPlatAlarmMilliGetNow(void)
 
     ticks  = sl_sleeptimer_get_tick_count64();
     status = sl_sleeptimer_tick64_to_ms(ticks, &now);
-    assert(status == SL_STATUS_OK);
+    OT_ASSERT(status == SL_STATUS_OK);
     return (uint32_t)now;
 }
 
@@ -131,7 +131,7 @@ void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
                                            NULL,
                                            0,
                                            SL_SLEEPTIMER_NO_HIGH_PRECISION_HF_CLOCKS_REQUIRED_FLAG);
-        assert(status == SL_STATUS_OK);
+        OT_ASSERT(status == SL_STATUS_OK);
     }
 }
 
@@ -261,7 +261,7 @@ void otPlatAlarmMicroStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
     else
     {
         status = RAIL_SetMultiTimer(&rail_timer, remaining, RAIL_TIME_DELAY, radioTimerExpired, NULL);
-        assert(status == RAIL_STATUS_NO_ERROR);
+        OT_ASSERT(status == RAIL_STATUS_NO_ERROR);
     }
 }
 
