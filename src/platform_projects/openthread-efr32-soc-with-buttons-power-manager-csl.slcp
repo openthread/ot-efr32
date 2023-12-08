@@ -7,6 +7,8 @@ category: OpenThread Examples
 quality: production
 
 component:
+  - id: crypto_pbkdf2_generate_key
+    from: ot-efr32
   - id: ot_platform_abstraction_core
   - id: ot_psa_crypto
   - id: ot_thirdparty
@@ -53,3 +55,10 @@ configuration:
 define:
   - name: OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
     value: 1
+
+sdk:
+  id: gecko_sdk
+  version: 4.3.2
+sdk_extension:
+  - id: ot-efr32
+    version: 0.0.1

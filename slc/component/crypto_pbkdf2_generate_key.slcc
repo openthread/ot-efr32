@@ -1,0 +1,10 @@
+id: crypto_pbkdf2_generate_key
+label: Crypto PBKDF2 Key Generation
+package: OpenThread
+category: OpenThread
+quality: production
+description: Generates a PBKDF2 key using mbedtls
+provides:
+  - name: crypto_pbkdf2_generate_key
+source:
+  - path: src/src/crypto.cpp
