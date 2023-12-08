@@ -9,6 +9,7 @@ quality: production
 component:
   - id: ot_platform_abstraction_core
   - id: ot_psa_crypto
+    from: ot-efr32
   - id: ot_thirdparty
   - id: uartdrv_usart
     instance:
@@ -48,3 +49,10 @@ configuration:
     condition: [freertos]
   - name: SL_STACK_SIZE
     value: 4608
+
+sdk:
+  id: gecko_sdk
+  version: 4.3.2
+sdk_extension:
+  - id: ot-efr32
+    version: 0.0.1

@@ -555,4 +555,81 @@ exit:
     return error;
 }
 
+otError otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
+                                      uint16_t       aPasswordLen,
+                                      const uint8_t *aSalt,
+                                      uint16_t       aSaltLen,
+                                      uint32_t       aIterationCounter,
+                                      uint16_t       aKeyLen,
+                                      uint8_t       *aKey)
+{
+    psa_status_t status;
+    size_t       outSize;
+    psa_key_id_t passwordKeyId = 0;
+    psa_key_id_t saltKeyId     = 0;
+    psa_key_id_t keyId         = 0;
+
+    // Algorithm is PBKDF2-AES-CMAC-PRF-128
+    psa_algorithm_t algo = PSA_ALG_PBKDF2_AES_CMAC_PRF_128;
+
+    // Initialize key derivation
+    psa_key_derivation_operation_t operation = psa_key_derivation_operation_init();
+    status                                   = psa_key_derivation_setup(&operation, algo);
+    assert(status == PSA_SUCCESS);
+
+    // Set capacity
+    status = psa_key_derivation_set_capacity(&operation, aKeyLen);
+    assert(status == PSA_SUCCESS);
+
+    // Set iteration count as cost
+    status = psa_key_derivation_input_integer(&operation, PSA_KEY_DERIVATION_INPUT_COST, aIterationCounter);
+    assert(status == PSA_SUCCESS);
+
+    // Create salt as a key
+    psa_key_attributes_t saltKeyAttr = psa_key_attributes_init();
+    psa_set_key_usage_flags(&saltKeyAttr, PSA_KEY_USAGE_DERIVE);
+    psa_set_key_type(&saltKeyAttr, PSA_KEY_TYPE_RAW_DATA);
+    psa_set_key_algorithm(&saltKeyAttr, algo);
+    assert(status == PSA_SUCCESS);
+
+    status = psa_import_key(&saltKeyAttr, aSalt, aSaltLen, &saltKeyId);
+    assert(status == PSA_SUCCESS);
+
+    // Provide salt
+    status = psa_key_derivation_input_key(&operation, PSA_KEY_DERIVATION_INPUT_SALT, saltKeyId);
+    assert(status == PSA_SUCCESS);
+
+    // Create key for password (key)
+    psa_key_attributes_t passwordKeyAttr = psa_key_attributes_init();
+    psa_set_key_usage_flags(&passwordKeyAttr, PSA_KEY_USAGE_DERIVE);
+    psa_set_key_type(&passwordKeyAttr, PSA_KEY_TYPE_PASSWORD);
+    psa_set_key_algorithm(&passwordKeyAttr, algo);
+
+    status = psa_import_key(&passwordKeyAttr, aPassword, aPasswordLen, &passwordKeyId);
+    assert(status == PSA_SUCCESS);
+
+    // Provide password (key)
+    status = psa_key_derivation_input_key(&operation, PSA_KEY_DERIVATION_INPUT_PASSWORD, passwordKeyId);
+    assert(status == PSA_SUCCESS);
+
+    // Configure output as a key
+    psa_key_attributes_t keyAttrResult = psa_key_attributes_init();
+    psa_set_key_bits(&keyAttrResult, (8 * aKeyLen));
+    psa_set_key_usage_flags(&keyAttrResult, PSA_KEY_USAGE_EXPORT);
+    psa_set_key_type(&keyAttrResult, PSA_KEY_TYPE_RAW_DATA);
+    psa_set_key_algorithm(&keyAttrResult, PSA_ALG_CTR);
+
+    status = psa_key_derivation_output_key(&keyAttrResult, &operation, &keyId);
+    assert(status == PSA_SUCCESS);
+
+    // Export output key
+    status = psa_export_key(keyId, aKey, aKeyLen, &outSize);
+    assert(status == PSA_SUCCESS);
+
+    // Release keys used
+    psa_destroy_key(keyId);
+    psa_destroy_key(saltKeyId);
+    psa_destroy_key(passwordKeyId);
+}
+
 #endif // OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE
