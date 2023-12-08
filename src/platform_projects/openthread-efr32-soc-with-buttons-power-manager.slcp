@@ -9,7 +9,7 @@ quality: production
 component:
   - id: ot_platform_abstraction_core
   - id: ot_psa_crypto
-  - id: ot_thirdparty
+  - id: ot_mbedtls
   - id: uartdrv_usart
     instance:
       - vcom

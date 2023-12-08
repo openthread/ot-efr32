@@ -32,6 +32,7 @@
  *
  */
 
+#include <assert.h>
 #include <openthread-core-config.h>
 #include <openthread-system.h>
 #include <openthread/link.h>
@@ -40,8 +41,8 @@
 #include <openthread/platform/diag.h>
 #include <openthread/platform/radio.h>
 #include <openthread/platform/time.h>
-#include "common/debug.hpp"
 
+#include "common/debug.hpp"
 #include "common/logging.hpp"
 #include "utils/code_utils.h"
 #include "utils/link_metrics.h"
@@ -158,16 +159,28 @@
 
 #define RADIO_BCAST_IID (0)
 #define RADIO_GET_FILTER_MASK(iid) (1 << (iid))
+#define RADIO_PANID_FILTER_SHIFT (0)
+#define RADIO_ADDR_FILTER_SHIFT (4)
 
 #define RADIO_BCAST_PANID_FILTER_MASK RADIO_GET_FILTER_MASK(0)
 #define RADIO_INDEX0_PANID_FILTER_MASK RADIO_GET_FILTER_MASK(1)
 #define RADIO_INDEX1_PANID_FILTER_MASK RADIO_GET_FILTER_MASK(2)
 #define RADIO_INDEX2_PANID_FILTER_MASK RADIO_GET_FILTER_MASK(3)
 
-#define RADIO_BCAST_ADDR_FILTER_MASK (RADIO_BCAST_PANID_FILTER_MASK << 4)
-#define RADIO_INDEX0_ADDR_FILTER_MASK (RADIO_INDEX0_PANID_FILTER_MASK << 4)
-#define RADIO_INDEX1_ADDR_FILTER_MASK (RADIO_INDEX1_PANID_FILTER_MASK << 4)
-#define RADIO_INDEX2_ADDR_FILTER_MASK (RADIO_INDEX2_PANID_FILTER_MASK << 4)
+#define RADIO_GET_PANID_FILTER_MASK(filter)                                                             \
+    (filter                                                                                             \
+     & (RADIO_BCAST_PANID_FILTER_MASK | RADIO_INDEX0_PANID_FILTER_MASK | RADIO_INDEX1_PANID_FILTER_MASK \
+        | RADIO_INDEX2_PANID_FILTER_MASK))
+
+#define RADIO_BCAST_ADDR_FILTER_MASK (RADIO_GET_FILTER_MASK(0) << RADIO_ADDR_FILTER_SHIFT)
+#define RADIO_INDEX0_ADDR_FILTER_MASK (RADIO_GET_FILTER_MASK(1) << RADIO_ADDR_FILTER_SHIFT)
+#define RADIO_INDEX1_ADDR_FILTER_MASK (RADIO_GET_FILTER_MASK(2) << RADIO_ADDR_FILTER_SHIFT)
+#define RADIO_INDEX2_ADDR_FILTER_MASK (RADIO_GET_FILTER_MASK(3) << RADIO_ADDR_FILTER_SHIFT)
+
+#define RADIO_GET_ADDR_FILTER_MASK(filter)                                                           \
+    (filter                                                                                          \
+     & (RADIO_BCAST_ADDR_FILTER_MASK | RADIO_INDEX0_ADDR_FILTER_MASK | RADIO_INDEX1_ADDR_FILTER_MASK \
+        | RADIO_INDEX2_ADDR_FILTER_MASK))
 
 #define RADIO_BCAST_PANID (0xFFFF)
 #define INVALID_VALUE (0xFF)
@@ -205,20 +218,23 @@ typedef enum
     ENERGY_SCAN_MODE_ASYNC
 } energyScanMode;
 
-typedef enum
+typedef struct
 {
-    BUFFER_IS_FREE,
-    BUFFER_PACKET_STORED,
-    BUFFER_PACKET_IN_PROCESSING
-} bufferState;
+    uint8_t  length;
+    uint8_t  channel;
+    uint8_t  lqi;
+    int8_t   rssi;
+    uint8_t  iid;
+    uint32_t timestamp;
+} rxPacketDetails;
 
 typedef struct
 {
-    volatile bufferState state;
-    uint8_t              ackKeyId;
-    volatile uint32_t    ackFrameCounter;
-    uint8_t              sReceivePsdu[IEEE802154_MAX_LENGTH];
+    rxPacketDetails packetInfo;
+    uint8_t         psdu[IEEE802154_MAX_LENGTH];
 } rxBuffer;
+
+typedef uint8_t rxBufferIndex_t;
 
 static volatile energyScanStatus sEnergyScanStatus;
 static volatile int8_t           sEnergyScanResultDbm;
@@ -257,10 +273,9 @@ static bool sIsSrcMatchEnabled = false;
 // Receive
 static rxBuffer     sReceivePacket[SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT];
 static uint8_t      sReceiveAckPsdu[IEEE802154_MAX_LENGTH];
-static otRadioFrame sReceiveFrame[SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT];
+static otRadioFrame sReceiveFrame;
 static otRadioFrame sReceiveAckFrame;
 static otError      sReceiveError;
-static uint8_t      sReceiveBufferInUse = 0;
 
 // Transmit
 static otRadioFrame  sTransmitFrame;
@@ -268,7 +283,6 @@ static uint8_t       sTransmitPsdu[IEEE802154_MAX_LENGTH];
 static otRadioFrame *sTxFrame  = NULL;
 static uint8_t       sLastLqi  = 0;
 static int8_t        sLastRssi = 0;
-static uint8_t       sRxChannel[RADIO_INTERFACE_COUNT];
 static otExtAddress  sExtAddress[RADIO_EXT_ADDR_COUNT];
 
 static int8_t sMaxChannelPower[RADIO_INTERFACE_COUNT][SL_MAX_CHANNELS_SUPPORTED];
@@ -297,6 +311,9 @@ static int8_t sCcaThresholdDbm = CCA_THRESHOLD_DEFAULT;
 
 #if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
 efr32RadioCounters railDebugCounters;
+
+// Create an alias for readability of RX debug tracking
+#define rxDebugStep (railDebugCounters.mRadioDebugData.m8[RX_DEBUG_COUNTER0])
 #endif
 
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
@@ -322,7 +339,7 @@ static bool isMultiChannel(void)
             {
                 firstChannel = sChannelSwitchingCfg.channels[i];
             }
-            else
+            else if (firstChannel != sChannelSwitchingCfg.channels[i])
             {
                 return true;
             }
@@ -464,7 +481,6 @@ static void sli_get_default_and_max_powers_across_iids(int8_t  *defaultTxPower,
             // We have already validated that sDefaultTxPower holds a valid value.
             *defaultTxPower = (*defaultTxPower == SL_INVALID_TX_POWER) ? sDefaultTxPower[iid]
                                                                        : SL_MAX(*defaultTxPower, sDefaultTxPower[iid]);
-            ;
         }
     }
 }
@@ -508,6 +524,67 @@ static int8_t sli_get_max_tx_power_across_iids(void)
     return (selectedTxPower == SL_INVALID_TX_POWER) ? OPENTHREAD_CONFIG_DEFAULT_TRANSMIT_POWER : selectedTxPower;
 }
 
+//------------------------------------------------------------------------------
+// RX Buffer management
+
+static volatile bool sRxBufferFull = false; // Used to distinguish full vs empty circular buffer state
+
+static inline bool isRxBufferFull(void)
+{
+    return sRxBufferFull;
+}
+
+#if SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT > 1
+
+#define CIRCULAR_BUFFER_INCR(index) ((index) = ((index) + 1) % (SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT))
+
+static volatile rxBufferIndex_t sRxBufferHead = 0; // Index of available buffer for use by producer callback
+static rxBufferIndex_t          sRxBufferTail = 0; // Index of next buffer to consume by processing loop
+
+static inline bool isRxBufferEmpty(void)
+{
+    CORE_DECLARE_IRQ_STATE;
+    CORE_ENTER_ATOMIC();
+    bool isEmpty = ((sRxBufferHead == sRxBufferTail) && (!isRxBufferFull()));
+    CORE_EXIT_ATOMIC();
+    return isEmpty;
+}
+
+/* Return index of next available buffer, or return the buffer count if no buffers are available */
+static inline rxBufferIndex_t getFreeBufferIndex(void)
+{
+    return (isRxBufferFull()) ? SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT : sRxBufferHead;
+}
+
+/* Return index of next buffer to process, or return the buffer count if no buffers can be processed */
+static inline rxBufferIndex_t getStoredBufferIndex(void)
+{
+    return (isRxBufferEmpty()) ? SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT : sRxBufferTail;
+}
+
+/* Helper function to determine if a buffer is marked as ready to process */
+static inline bool canProcessNextRxBuffer(void)
+{
+    return (!isRxBufferEmpty());
+}
+
+/* Marks the state of the next available buffer as ready to process */
+static inline void reserveNextRxBuffer(void)
+{
+    CIRCULAR_BUFFER_INCR(sRxBufferHead);
+    sRxBufferFull = (sRxBufferHead == sRxBufferTail);
+}
+
+/* Updates the buffer at the provided index as available after being processed */
+static inline void releaseCurrentRxBuffer(void)
+{
+    CORE_DECLARE_IRQ_STATE;
+    CORE_ENTER_ATOMIC();
+    CIRCULAR_BUFFER_INCR(sRxBufferTail);
+    sRxBufferFull = false;
+    CORE_EXIT_ATOMIC();
+}
+#endif
 #if RADIO_CONFIG_ENABLE_CUSTOM_EUI_SUPPORT
 /*
  * This API reads the UserData page on the given EFR device.
@@ -589,12 +666,13 @@ static bool isFilterMaskValid(uint8_t mask)
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
 
     /* Packet will be considered as a valid packet in 3 cases:
-     * Case 1: If the packet was directed towards bcast address or bcase panid
+     * Case 1: If the packet was directed towards bcast address or bcast panid
      *
-     * Case 2: If the packet was directed to right address corresponding to the panid
-     *         (If Address filter and pan filter in the received packet match).
+     * Case 2: If the packet was directed to one of our valid address/PANID combos
+     *         (Compare all non-bcast PANID filters against their corresponding
+     *          address filters for same IID and see if any match)
      *
-     * Case 3: We dont have either the destination addressing feild or destination PanId
+     * Case 3: We don't have either the destination addressing field or destination PanId
      *         in the received packet to determine if the dest address and dest pan match.
      */
     if (
@@ -646,8 +724,10 @@ enum
 
 typedef struct securityMaterial
 {
+    uint8_t          ackKeyId;
     uint8_t          keyId;
     uint32_t         macFrameCounter;
+    uint32_t         ackFrameCounter;
     otMacKeyMaterial keys[MAC_KEY_COUNT];
 } securityMaterial;
 
@@ -752,12 +832,9 @@ static otError radioProcessTransmitSecurity(otRadioFrame *aFrame, uint8_t iid)
     {
         if (otMacFrameIsAck(aFrame))
         {
-            otEXPECT_ACTION(sReceivePacket[sReceiveBufferInUse].state == BUFFER_IS_FREE, error = OT_ERROR_FAILED);
             // Store ack frame counter and ack key ID for receive frame
-            // TODO: What's a better solution?  (With flags like
-            // frame pending or enh-secure, we have used reserved bits)
-            sReceivePacket[sReceiveBufferInUse].ackKeyId        = keyId;
-            sReceivePacket[sReceiveBufferInUse].ackFrameCounter = sMacKeys[iid].macFrameCounter;
+            sMacKeys[iid].ackKeyId        = keyId;
+            sMacKeys[iid].ackFrameCounter = sMacKeys[iid].macFrameCounter;
         }
 
         otMacFrameSetKeyId(aFrame, keyId);
@@ -846,7 +923,8 @@ static bool validatePacketTimestamp(RAIL_RxPacketDetails_t *pPacketDetails, uint
 static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
                                  bool                    securedOutgoingEnhancedAck,
                                  bool                    framePendingSetInOutgoingAck,
-                                 uint8_t                 iid);
+                                 uint8_t                 iid,
+                                 uint8_t                 aReceiveBufferInUse);
 
 static otError skipRxPacketLengthBytes(RAIL_RxPacketInfo_t *pPacketInfo);
 
@@ -1015,7 +1093,8 @@ static otError radioScheduleRx(uint8_t aChannel, uint32_t aStart, uint32_t aDura
                                      .endMode                 = RAIL_TIME_DELAY,
                                      .rxTransitionEndSchedule = 1, // This lets us idle after a scheduled-rx
                                      .hardWindowEnd = 0}; // This lets us receive a packet near a window-end-event
-    status                        = RAIL_ScheduleRx(gRailHandle, aChannel, &rxCfg, &bgRxSchedulerInfo);
+
+    status = RAIL_ScheduleRx(gRailHandle, aChannel, &rxCfg, &bgRxSchedulerInfo);
     otEXPECT_ACTION(status == RAIL_STATUS_NO_ERROR, error = OT_ERROR_FAILED);
 
     (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_RX_LISTEN, 0U);
@@ -1229,17 +1308,13 @@ void efr32RadioInit(void)
 
     memset(&sReceivePacket, 0x00, sizeof(sReceivePacket));
 
-    for (int index = 0; index < SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT; index++)
-    {
-        sReceiveFrame[index].mLength = 0;
-        sReceiveFrame[index].mPsdu   = (uint8_t *)&sReceivePacket[index].sReceivePsdu[0];
-    }
+    sReceiveFrame.mLength = 0;
+    sReceiveFrame.mPsdu   = NULL;
 
     sReceiveAckFrame.mLength = 0;
     sReceiveAckFrame.mPsdu   = sReceiveAckPsdu;
     sTransmitFrame.mLength   = 0;
     sTransmitFrame.mPsdu     = sTransmitPsdu;
-    sReceiveBufferInUse      = 0;
 
 #if OPENTHREAD_CONFIG_MAC_HEADER_IE_SUPPORT
     sTransmitFrame.mInfo.mTxInfo.mIeInfo = &sTransmitIeInfo;
@@ -1494,7 +1569,7 @@ otError otPlatRadioSleep(otInstance *aInstance)
     OT_UNUSED_VARIABLE(aInstance);
     otError error = OT_ERROR_NONE;
 
-    otEXPECT_ACTION(getInternalFlag(ONGOING_TX_FLAGS) == 0, error = OT_ERROR_INVALID_STATE);
+    otEXPECT_ACTION(!getInternalFlag(ONGOING_TX_FLAGS), error = OT_ERROR_BUSY);
 
     otLogInfoPlat("State=OT_RADIO_STATE_SLEEP");
     setInternalFlag(FLAG_SCHEDULED_RX_PENDING, false);
@@ -1509,12 +1584,10 @@ otError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
     otError          error = OT_ERROR_NONE;
     RAIL_Status_t    status;
     efr32BandConfig *config;
-    uint8_t          iid = otNcpPlatGetCurCommandIid();
     int8_t           txPower;
 
     OT_UNUSED_VARIABLE(aInstance);
-
-    otEXPECT_ACTION((getInternalFlag(FLAG_ONGOING_TX_DATA) == 0) && sEnergyScanStatus != ENERGY_SCAN_STATUS_IN_PROGRESS,
+    otEXPECT_ACTION(!getInternalFlag(FLAG_ONGOING_TX_DATA) && sEnergyScanStatus != ENERGY_SCAN_STATUS_IN_PROGRESS,
                     error = OT_ERROR_INVALID_STATE);
 
 #if FAST_CHANNEL_SWITCHING_SUPPORT
@@ -1542,9 +1615,8 @@ otError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
     otEXPECT_ACTION(status == RAIL_STATUS_NO_ERROR, error = OT_ERROR_FAILED);
     setInternalFlag(FLAG_SCHEDULED_RX_PENDING, false);
 
-    sRxChannel[iid]                             = aChannel;
-    sReceiveFrame[sReceiveBufferInUse].mChannel = aChannel;
-    sReceiveAckFrame.mChannel                   = aChannel;
+    sReceiveFrame.mChannel    = aChannel;
+    sReceiveAckFrame.mChannel = aChannel;
 
 exit:
     return error;
@@ -1556,7 +1628,6 @@ otError otPlatRadioReceiveAt(otInstance *aInstance, uint8_t aChannel, uint32_t a
     otError          error = OT_ERROR_NONE;
     RAIL_Status_t    status;
     efr32BandConfig *config;
-    uint8_t          iid     = otNcpPlatGetCurCommandIid();
     int8_t           txPower = sli_get_max_tx_power_across_iids();
 
     OT_UNUSED_VARIABLE(aInstance);
@@ -1579,9 +1650,8 @@ otError otPlatRadioReceiveAt(otInstance *aInstance, uint8_t aChannel, uint32_t a
     otEXPECT_ACTION(status == RAIL_STATUS_NO_ERROR, error = OT_ERROR_FAILED);
     setInternalFlag(FLAG_SCHEDULED_RX_PENDING, true);
 
-    sRxChannel[iid]                             = aChannel;
-    sReceiveFrame[sReceiveBufferInUse].mChannel = aChannel;
-    sReceiveAckFrame.mChannel                   = aChannel;
+    sReceiveFrame.mChannel    = aChannel;
+    sReceiveAckFrame.mChannel = aChannel;
 
 exit:
     return error;
@@ -1643,11 +1713,8 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aFrame)
                             + SHR_DURATION_US);
         // Note - we need to call this outside of txCurrentPacket as for Series 2,
         // this results in calling the SE interface from a critical section which is not permitted.
-
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
         radioProcessTransmitSecurity(sTxFrame, sTxFrame->mIid);
-#else
-        radioProcessTransmitSecurity(sTxFrame, 0);
 #endif
 #endif // OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
 
@@ -1882,11 +1949,11 @@ int8_t otPlatRadioGetRssi(otInstance *aInstance)
     otError  error;
     uint32_t start;
     int8_t   rssi     = OT_RADIO_RSSI_INVALID;
-    uint8_t  aChannel = sRxChannel[otNcpPlatGetCurCommandIid()];
+    uint8_t  aChannel = sReceiveFrame.mChannel;
 
     OT_UNUSED_VARIABLE(aInstance);
 
-    otEXPECT(getInternalFlag(FLAG_ONGOING_TX_DATA) == 0);
+    otEXPECT(!getInternalFlag(FLAG_ONGOING_TX_DATA));
 
 #if FAST_CHANNEL_SWITCHING_SUPPORT
     uint8_t index = getPanIndexFromIid(otNcpPlatGetCurCommandIid());
@@ -1985,7 +2052,7 @@ otError otPlatRadioSetTransmitPower(otInstance *aInstance, int8_t aPower)
 }
 
 // Required for RCP error recovery
-// See src/lib/spinel/radio_spinel_impl.hpp::RestoreProperties()
+// See src/lib/spinel/radio_spinel.cpp::RestoreProperties()
 otError otPlatRadioSetChannelMaxTransmitPower(otInstance *aInstance, uint8_t aChannel, int8_t aMaxPower)
 {
     otError error = OT_ERROR_NONE;
@@ -2505,20 +2572,23 @@ static void packetReceivedCallback(RAIL_RxPacketHandle_t packetHandle)
 {
     RAIL_RxPacketInfo_t    packetInfo;
     RAIL_RxPacketDetails_t packetDetails;
-    uint16_t               length;
+    uint16_t               length            = 0;
     bool                   framePendingInAck = false;
-    bool                   rxCorrupted       = false;
+    bool                   dropPacket        = false;
     uint8_t                iid               = 0;
     uint8_t               *psdu              = sReceiveAckFrame.mPsdu;
+#if SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT > 1
+    rxBufferIndex_t receiveBufferInUse = SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT;
+#endif
 
     packetHandle = RAIL_GetRxPacketInfo(gRailHandle, packetHandle, &packetInfo);
     otEXPECT_ACTION(
         (packetHandle != RAIL_RX_PACKET_HANDLE_INVALID && packetInfo.packetStatus == RAIL_RX_PACKET_READY_SUCCESS),
-        rxCorrupted = true);
+        dropPacket = true);
 
-    otEXPECT_ACTION(validatePacketDetails(packetHandle, &packetDetails, &packetInfo, &length), rxCorrupted = true);
+    otEXPECT_ACTION(validatePacketDetails(packetHandle, &packetDetails, &packetInfo, &length), dropPacket = true);
 
-    otEXPECT_ACTION((skipRxPacketLengthBytes(&packetInfo)) == OT_ERROR_NONE, rxCorrupted = true);
+    otEXPECT_ACTION((skipRxPacketLengthBytes(&packetInfo)) == OT_ERROR_NONE, dropPacket = true);
 
     uint8_t macFcf =
         ((packetInfo.firstPortionBytes == 0) ? packetInfo.lastPortionData[0] : packetInfo.firstPortionData[0]);
@@ -2526,34 +2596,38 @@ static void packetReceivedCallback(RAIL_RxPacketHandle_t packetHandle)
     iid = getIidFromFilterMask(packetInfo.filterMask);
 
 #if SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT > 1
-    psdu = (packetDetails.isAck) ? sReceiveAckFrame.mPsdu : sReceivePacket[sReceiveBufferInUse].sReceivePsdu;
+    if (!packetDetails.isAck)
+    {
+        receiveBufferInUse = getFreeBufferIndex();
+        otEXPECT_ACTION(receiveBufferInUse < SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT, dropPacket = true);
+        psdu = sReceivePacket[receiveBufferInUse].psdu;
+    }
 #endif
-
-    // read packet
-    RAIL_CopyRxPacket(psdu, &packetInfo);
 
     if (packetDetails.isAck)
     {
         otEXPECT_ACTION(
             (length >= IEEE802154_MIN_LENGTH && (macFcf & IEEE802154_FRAME_TYPE_MASK) == IEEE802154_FRAME_TYPE_ACK),
-            rxCorrupted = true);
+            dropPacket = true);
+
+        // read packet
+        RAIL_CopyRxPacket(psdu, &packetInfo);
 
 #if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
         railDebugCounters.mRailEventAcksReceived++;
 #endif
         sReceiveAckFrame.mLength = length;
 
-        // Releasing the ACK frames here, ensures that the main thread (processNextRxPacket)
+        // Releasing the ACK frames here, ensures that the main thread (processRxPackets)
         // is not wasting cycles, releasing the ACK frames from the Rx FIFO queue.
         RAIL_ReleaseRxPacket(gRailHandle, packetHandle);
 
         (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_RX_ENDED, (uint32_t)isReceivingFrame());
 
-        if (txWaitingForAck()
-            && (sReceiveAckFrame.mPsdu[IEEE802154_DSN_OFFSET] == sTransmitFrame.mPsdu[IEEE802154_DSN_OFFSET]))
+        if (txWaitingForAck() && (psdu[IEEE802154_DSN_OFFSET] == sTransmitFrame.mPsdu[IEEE802154_DSN_OFFSET]))
         {
-            otEXPECT_ACTION(validatePacketTimestamp(&packetDetails, length), rxCorrupted = true);
-            updateRxFrameDetails(&packetDetails, false, false, iid);
+            otEXPECT_ACTION(validatePacketTimestamp(&packetDetails, length), dropPacket = true);
+            updateRxFrameDetails(&packetDetails, false, false, iid, INVALID_VALUE);
 
             // Processing the ACK frame in ISR context avoids the Tx state to be messed up,
             // in case the Rx FIFO queue gets wiped out in a DMP situation.
@@ -2577,26 +2651,22 @@ static void packetReceivedCallback(RAIL_RxPacketHandle_t packetHandle)
     }
     else
     {
-        otEXPECT_ACTION(sPromiscuous || (length >= IEEE802154_MIN_DATA_LENGTH), rxCorrupted = true);
-        otEXPECT_ACTION(sReceivePacket[sReceiveBufferInUse].state == BUFFER_IS_FREE, rxCorrupted = true);
+        otEXPECT_ACTION(sPromiscuous || (length >= IEEE802154_MIN_DATA_LENGTH), dropPacket = true);
 
 #if SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT > 1
-        sReceiveFrame[sReceiveBufferInUse].mLength  = length;
-        sReceiveFrame[sReceiveBufferInUse].mChannel = packetDetails.channel;
-
-        // Check the reserved bits in the MAC header, then clear them.
-        // If we sent an enhanced ACK, check if it was secured.
-        bool securedOutgoingEnhancedAck = ((*psdu & IEEE802154_SECURED_OUTGOING_ENHANCED_ACK) != 0);
-        *psdu &= ~IEEE802154_SECURED_OUTGOING_ENHANCED_ACK;
-
-        // Check whether frame pendinng bit was set in the outgoing ACK.
-        bool framePendingSetInOutgoingAck = ((*psdu & IEEE802154_FRAME_PENDING_SET_IN_OUTGOING_ACK) != 0);
-        *psdu &= ~IEEE802154_FRAME_PENDING_SET_IN_OUTGOING_ACK;
-
+        // read packet
+        RAIL_CopyRxPacket(psdu, &packetInfo);
         RAIL_ReleaseRxPacket(gRailHandle, packetHandle);
 
-        otEXPECT(validatePacketTimestamp(&packetDetails, length));
-        updateRxFrameDetails(&packetDetails, securedOutgoingEnhancedAck, framePendingSetInOutgoingAck, iid);
+        otEXPECT_ACTION(validatePacketTimestamp(&packetDetails, length), dropPacket = true);
+
+        reserveNextRxBuffer();
+        sReceivePacket[receiveBufferInUse].packetInfo.length    = length;
+        sReceivePacket[receiveBufferInUse].packetInfo.channel   = packetDetails.channel;
+        sReceivePacket[receiveBufferInUse].packetInfo.rssi      = packetDetails.rssi;
+        sReceivePacket[receiveBufferInUse].packetInfo.lqi       = packetDetails.lqi;
+        sReceivePacket[receiveBufferInUse].packetInfo.timestamp = packetDetails.timeReceived.packetTime;
+        sReceivePacket[receiveBufferInUse].packetInfo.iid       = iid;
 
 #if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
         railDebugCounters.mRailPlatRadioReceiveProcessedCount++;
@@ -2624,22 +2694,12 @@ static void packetReceivedCallback(RAIL_RxPacketHandle_t packetHandle)
         }
     }
 exit:
-    if (rxCorrupted)
+    if (dropPacket)
     {
         // Release the corrupted packet that won't be processed further
         (void)RAIL_ReleaseRxPacket(gRailHandle, packetHandle);
         (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_RX_CORRUPTED, (uint32_t)isReceivingFrame());
     }
-#if SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT > 1
-    else
-    {
-        if (!packetDetails.isAck)
-        {
-            sReceivePacket[sReceiveBufferInUse].state = BUFFER_PACKET_STORED;
-            sReceiveBufferInUse                       = (sReceiveBufferInUse + 1) % SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT;
-        }
-    }
-#endif
 }
 
 static void packetSentCallback(bool isAck)
@@ -2991,8 +3051,15 @@ static void RAILCb_Generic(RAIL_Handle_t aRailHandle, RAIL_Events_t aEvents)
         railDebugCounters.mRailPlatRadioEnergyScanDoneCbCount++;
 #endif
     }
-
-    otSysEventSignalPending();
+    // scheduled and unscheduled config events happen very often,
+    // especially in a DMP situation where there is an active BLE connection.
+    // Waking up the OT RTOS task on every one of these occurrences causes
+    // a lower priority CLI task to starve and makes it appear like a code lockup
+    // There is no reason to wake the OT task for these events!
+    if (!(aEvents & RAIL_EVENT_CONFIG_SCHEDULED) && !(aEvents & RAIL_EVENT_CONFIG_UNSCHEDULED))
+    {
+        otSysEventSignalPending();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -3003,12 +3070,22 @@ static bool validatePacketDetails(RAIL_RxPacketHandle_t   packetHandle,
                                   RAIL_RxPacketInfo_t    *pPacketInfo,
                                   uint16_t               *packetLength)
 {
-    bool pktValid = true;
+    bool          pktValid = true;
+    RAIL_Status_t rStatus;
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+    rxDebugStep = 0;
+#endif
 
-    otEXPECT_ACTION((RAIL_GetRxPacketDetailsAlt(gRailHandle, packetHandle, pPacketDetails) == RAIL_STATUS_NO_ERROR),
-                    pktValid = false);
+    rStatus = RAIL_GetRxPacketDetailsAlt(gRailHandle, packetHandle, pPacketDetails);
+    otEXPECT_ACTION(rStatus == RAIL_STATUS_NO_ERROR, pktValid = false);
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+    rxDebugStep++;
+#endif
 
     otEXPECT_ACTION(isFilterMaskValid(pPacketInfo->filterMask), pktValid = false);
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+    rxDebugStep++;
+#endif
 
     // RAIL's packetBytes includes the (1 or 2 byte) PHY header but not the 2-byte CRC.
     // We want *packetLength to match the PHY header length so we add 2 for CRC
@@ -3025,11 +3102,30 @@ static bool validatePacketDetails(RAIL_RxPacketHandle_t   packetHandle,
             ((pPacketInfo->firstPortionBytes > 1) ? pPacketInfo->firstPortionData[1] : pPacketInfo->lastPortionData[0]);
         otEXPECT_ACTION(*packetLength == (uint16_t)(__RBIT(lengthByte) >> 24), pktValid = false);
     }
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+    rxDebugStep++;
+#endif
 
     // check the length validity of recv packet; RAIL should take care of this.
     otEXPECT_ACTION((*packetLength >= IEEE802154_MIN_LENGTH && *packetLength <= IEEE802154_MAX_LENGTH),
                     pktValid = false);
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+    rxDebugStep++;
+#endif
+
 exit:
+#if (OPENTHREAD_CONFIG_LOG_LEVEL == OT_LOG_LEVEL_DEBG)
+    if (!pktValid)
+    {
+        otLogDebgPlat("RX Pkt Invalid: rStatus=0x%X, filterMask=0x%2X, pktLen=%i",
+                      rStatus,
+                      pPacketInfo->filterMask,
+                      *packetLength);
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+        otLogDebgPlat("RX debug step=%i", rxDebugStep);
+#endif
+    }
+#endif
     return pktValid;
 }
 
@@ -3053,58 +3149,66 @@ exit:
 static void updateRxFrameDetails(RAIL_RxPacketDetails_t *pPacketDetails,
                                  bool                    securedOutgoingEnhancedAck,
                                  bool                    framePendingSetInOutgoingAck,
-                                 uint8_t                 iid)
+                                 uint8_t                 iid,
+                                 uint8_t                 aReceiveBufferInUse)
 {
-    OT_UNUSED_VARIABLE(iid);
-    OT_ASSERT(pPacketDetails != NULL);
-
     // Current time > sync-receive timestamp
     // Therefore lower 32 bits of current time should always be greater than lower 32 bits
     // of sync-rx timestamp unless there is a overflow.  In such cases, we do not want to
     // take overflow into consideration for sync-rx timestamp.
-    uint64_t railUsTimeNow    = otPlatTimeGet();
-    uint32_t railUsTimerWraps = railUsTimeNow >> 32;
+    uint64_t    railUsTimeNow    = otPlatTimeGet();
+    uint32_t    railUsTimerWraps = railUsTimeNow >> 32;
+    RAIL_Time_t timestamp        = (pPacketDetails != NULL ? pPacketDetails->timeReceived.packetTime
+                                                           : sReceivePacket[aReceiveBufferInUse].packetInfo.timestamp);
 
     // Address multiple overflows, such as what would happen if the current time overflows
     // from 0x00000001FFFFFFFF to 0x0000000200000000 (leave the higher 32 bits as 0)
-    if ((railUsTimeNow & 0xFFFFFFFF) <= pPacketDetails->timeReceived.packetTime)
+    if ((railUsTimeNow & 0xFFFFFFFF) <= timestamp)
     {
         railUsTimerWraps--;
     }
 
-    if (pPacketDetails->isAck)
+    if (pPacketDetails != NULL && pPacketDetails->isAck)
     {
-        sReceiveAckFrame.mInfo.mRxInfo.mRssi = pPacketDetails->rssi;
-        sReceiveAckFrame.mInfo.mRxInfo.mLqi  = pPacketDetails->lqi;
-        sReceiveAckFrame.mInfo.mRxInfo.mTimestamp =
-            pPacketDetails->timeReceived.packetTime + ((uint64_t)railUsTimerWraps << 32);
-// TODO: Maybe remove #if ?
+        sReceiveAckFrame.mInfo.mRxInfo.mRssi      = pPacketDetails->rssi;
+        sReceiveAckFrame.mInfo.mRxInfo.mLqi       = pPacketDetails->lqi;
+        sReceiveAckFrame.mInfo.mRxInfo.mTimestamp = timestamp + ((uint64_t)railUsTimerWraps << 32);
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
         sReceiveAckFrame.mIid = iid;
 #endif
     }
     else
     {
-        sReceiveFrame[sReceiveBufferInUse].mInfo.mRxInfo.mRssi = pPacketDetails->rssi;
-        sReceiveFrame[sReceiveBufferInUse].mInfo.mRxInfo.mLqi  = pPacketDetails->lqi;
-        sReceiveFrame[sReceiveBufferInUse].mInfo.mRxInfo.mTimestamp =
-            pPacketDetails->timeReceived.packetTime + ((uint64_t)railUsTimerWraps << 32);
-        // Set this flag only when the packet is really acknowledged with a secured enhanced ACK.
-        sReceiveFrame[sReceiveBufferInUse].mInfo.mRxInfo.mAckedWithSecEnhAck = securedOutgoingEnhancedAck;
-        // Set this flag only when the packet is really acknowledged with frame pending set.
-        sReceiveFrame[sReceiveBufferInUse].mInfo.mRxInfo.mAckedWithFramePending = framePendingSetInOutgoingAck;
-#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
-        sReceiveFrame[sReceiveBufferInUse].mIid = iid;
-#endif
+        if (pPacketDetails != NULL)
+        {
+            sReceiveFrame.mInfo.mRxInfo.mRssi = pPacketDetails->rssi;
+            sLastRssi                         = pPacketDetails->rssi;
 
-        sLastLqi  = pPacketDetails->lqi;
-        sLastRssi = pPacketDetails->rssi;
+            sReceiveFrame.mInfo.mRxInfo.mLqi = pPacketDetails->lqi;
+            sLastLqi                         = pPacketDetails->lqi;
+        }
+        else
+        {
+            sReceiveFrame.mInfo.mRxInfo.mRssi = sReceivePacket[aReceiveBufferInUse].packetInfo.rssi;
+            sLastRssi                         = sReceivePacket[aReceiveBufferInUse].packetInfo.rssi;
+
+            sReceiveFrame.mInfo.mRxInfo.mLqi = sReceivePacket[aReceiveBufferInUse].packetInfo.lqi;
+            sLastLqi                         = sReceivePacket[aReceiveBufferInUse].packetInfo.rssi;
+        }
+
+        sReceiveFrame.mInfo.mRxInfo.mTimestamp = timestamp + ((uint64_t)railUsTimerWraps << 32);
+        // Set this flag only when the packet is really acknowledged with a secured enhanced ACK.
+        sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck = securedOutgoingEnhancedAck;
+        // Set this flag only when the packet is really acknowledged with frame pending set.
+        sReceiveFrame.mInfo.mRxInfo.mAckedWithFramePending = framePendingSetInOutgoingAck;
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
+        sReceiveFrame.mIid = iid;
+#endif
 
 #if OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
         // Use stored values for these
-        sReceiveFrame[sReceiveBufferInUse].mInfo.mRxInfo.mAckKeyId = sReceivePacket[sReceiveBufferInUse].ackKeyId;
-        sReceiveFrame[sReceiveBufferInUse].mInfo.mRxInfo.mAckFrameCounter =
-            sReceivePacket[sReceiveBufferInUse].ackFrameCounter;
+        sReceiveFrame.mInfo.mRxInfo.mAckKeyId        = sMacKeys[iid].ackKeyId;
+        sReceiveFrame.mInfo.mRxInfo.mAckFrameCounter = sMacKeys[iid].ackFrameCounter;
 #endif
     }
 }
@@ -3133,7 +3237,7 @@ exit:
     return error;
 }
 
-static bool prepareRxPacketforCb(uint8_t index)
+static bool prepareNextRxPacketforCb(void)
 {
 #if SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT == 1
     RAIL_RxPacketHandle_t  packetHandle = RAIL_RX_PACKET_HANDLE_INVALID;
@@ -3143,9 +3247,13 @@ static bool prepareRxPacketforCb(uint8_t index)
     uint16_t               length;
     bool                   rxProcessDone = false;
     uint8_t                iid           = 0;
+    rxBufferIndex_t        index         = 0;
 
     CORE_DECLARE_IRQ_STATE;
     CORE_ENTER_ATOMIC();
+
+    // Initialise the mPsdu to free buffer
+    sReceiveFrame.mPsdu = sReceivePacket[index].psdu;
 
     packetHandle = RAIL_GetRxPacketInfo(gRailHandle, RAIL_RX_PACKET_HANDLE_OLDEST_COMPLETE, &packetInfo);
     otEXPECT_ACTION(
@@ -3163,11 +3271,11 @@ static bool prepareRxPacketforCb(uint8_t index)
     otEXPECT(sPromiscuous || (!packetDetails.isAck && (length >= IEEE802154_MIN_DATA_LENGTH)));
 
     // read packet
-    RAIL_CopyRxPacket(sReceiveFrame[index].mPsdu, &packetInfo);
-    sReceiveFrame[index].mLength = length;
+    RAIL_CopyRxPacket(sReceiveFrame.mPsdu, &packetInfo);
+    sReceiveFrame.mLength = length;
 
-    uint8_t *macFcfPointer        = sReceiveFrame[index].mPsdu;
-    sReceiveFrame[index].mChannel = packetDetails.channel;
+    uint8_t *macFcfPointer = sReceiveFrame.mPsdu;
+    sReceiveFrame.mChannel = packetDetails.channel;
 
     // Check the reserved bits in the MAC header, then clear them.
 
@@ -3186,7 +3294,7 @@ static bool prepareRxPacketforCb(uint8_t index)
     }
 
     otEXPECT(validatePacketTimestamp(&packetDetails, length));
-    updateRxFrameDetails(&packetDetails, securedOutgoingEnhancedAck, framePendingSetInOutgoingAck, iid);
+    updateRxFrameDetails(&packetDetails, securedOutgoingEnhancedAck, framePendingSetInOutgoingAck, iid, 0);
     rxProcessDone = true;
 
 #if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
@@ -3200,7 +3308,28 @@ exit:
     }
     CORE_EXIT_ATOMIC();
 #else
-    bool rxProcessDone = (sReceivePacket[index].state == BUFFER_PACKET_STORED);
+    bool            rxProcessDone = true;
+    rxBufferIndex_t index         = getStoredBufferIndex();
+    uint8_t        *psdu          = sReceivePacket[index].psdu;
+
+    // Check the reserved bits in the MAC header, then clear them.
+    // If we sent an enhanced ACK, check if it was secured.
+    bool securedOutgoingEnhancedAck = ((*psdu & IEEE802154_SECURED_OUTGOING_ENHANCED_ACK) != 0);
+    *psdu &= ~IEEE802154_SECURED_OUTGOING_ENHANCED_ACK;
+
+    // Check whether frame pendinng bit was set in the outgoing ACK.
+    bool framePendingSetInOutgoingAck = ((*psdu & IEEE802154_FRAME_PENDING_SET_IN_OUTGOING_ACK) != 0);
+    *psdu &= ~IEEE802154_FRAME_PENDING_SET_IN_OUTGOING_ACK;
+
+    sReceiveFrame.mChannel = sReceivePacket[index].packetInfo.channel;
+    sReceiveFrame.mLength  = sReceivePacket[index].packetInfo.length;
+    sReceiveFrame.mPsdu    = sReceivePacket[index].psdu;
+
+    updateRxFrameDetails(NULL,
+                         securedOutgoingEnhancedAck,
+                         framePendingSetInOutgoingAck,
+                         sReceivePacket[index].packetInfo.iid,
+                         index);
 #endif
 
     return rxProcessDone;
@@ -3208,45 +3337,45 @@ exit:
 
 static void processNextRxPacket(otInstance *aInstance)
 {
-    int index = 0;
-
-#if SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT > 1
-    index = (sReceiveBufferInUse + 1) % SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT;
-#endif
-
-    do
+    if (prepareNextRxPacketforCb())
     {
-        if (prepareRxPacketforCb(index))
-        {
-            sReceiveError = OT_ERROR_NONE;
+        sReceiveError = OT_ERROR_NONE;
 
 #if OPENTHREAD_CONFIG_DIAG_ENABLE
-            if (otPlatDiagModeGet())
-            {
-                otPlatDiagRadioReceiveDone(aInstance, &sReceiveFrame[index], sReceiveError);
-            }
-            else
-#endif
-            {
-#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1 && (defined SL_CATALOG_OT_RCP_GP_INTERFACE_PRESENT)
-                (void)sl_gp_intf_is_gp_pkt(&sReceiveFrame[index], true);
-#endif
-                otLogInfoPlat("Received %d bytes", sReceiveFrame[index].mLength);
-                sReceivePacket[index].state = BUFFER_PACKET_IN_PROCESSING;
-                otPlatRadioReceiveDone(aInstance, &sReceiveFrame[index], sReceiveError);
-#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
-                railDebugCounters.mRailPlatRadioReceiveDoneCbCount++;
-#endif
-            }
-
-            sReceivePacket[index].state = BUFFER_IS_FREE;
-
-            otSysEventSignalPending();
+        if (otPlatDiagModeGet())
+        {
+            otPlatDiagRadioReceiveDone(aInstance, &sReceiveFrame, sReceiveError);
         }
-#if SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT > 1
-        index = ((index + 1) % SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT);
+        else
 #endif
-    } while (index != sReceiveBufferInUse);
+        {
+#if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1 && (defined SL_CATALOG_OT_RCP_GP_INTERFACE_PRESENT)
+            (void)sl_gp_intf_is_gp_pkt(&sReceiveFrame, true);
+#endif
+            otPlatRadioReceiveDone(aInstance, &sReceiveFrame, sReceiveError);
+#if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
+            railDebugCounters.mRailPlatRadioReceiveDoneCbCount++;
+#endif
+        }
+
+#if SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT > 1
+        releaseCurrentRxBuffer();
+#endif
+
+        otSysEventSignalPending();
+    }
+}
+
+static void processRxPackets(otInstance *aInstance)
+{
+#if SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT > 1
+    while (canProcessNextRxBuffer())
+    {
+        processNextRxPacket(aInstance);
+    }
+#else
+    processNextRxPacket(aInstance);
+#endif
 }
 
 static void processTxComplete(otInstance *aInstance)
@@ -3315,7 +3444,7 @@ void efr32RadioProcess(otInstance *aInstance)
 
     // We should process the received packet first. Adding it at the end of this function,
     // will delay the stack notification until the next call to efr32RadioProcess()
-    processNextRxPacket(aInstance);
+    processRxPackets(aInstance);
     processTxComplete(aInstance);
 
     if (sEnergyScanMode == ENERGY_SCAN_MODE_ASYNC && sEnergyScanStatus == ENERGY_SCAN_STATUS_COMPLETED)
@@ -3350,13 +3479,12 @@ otError setRadioState(otRadioState state)
     otError error = OT_ERROR_NONE;
 
     // Defer idling the radio if we have an ongoing TX task
-    otEXPECT_ACTION((!getInternalFlag(ONGOING_TX_FLAGS)), error = OT_ERROR_FAILED);
+    otEXPECT_ACTION(!getInternalFlag(ONGOING_TX_FLAGS), error = OT_ERROR_FAILED);
 
     switch (state)
     {
     case OT_RADIO_STATE_RECEIVE:
-        otEXPECT_ACTION(radioSetRx(sReceiveFrame[sReceiveBufferInUse].mChannel) == OT_ERROR_NONE,
-                        error = OT_ERROR_FAILED);
+        otEXPECT_ACTION(radioSetRx(sReceiveFrame.mChannel) == OT_ERROR_NONE, error = OT_ERROR_FAILED);
         break;
     case OT_RADIO_STATE_SLEEP:
         radioSetIdle();
@@ -3555,7 +3683,8 @@ static void setCcaThreshold(void)
         {
             thresholddBm = RAIL_RSSI_INVALID_DBM;
         }
-        OT_ASSERT(RAIL_SetCcaThreshold(gRailHandle, thresholddBm) == RAIL_STATUS_NO_ERROR);
+        RAIL_Status_t status = RAIL_SetCcaThreshold(gRailHandle, thresholddBm);
+        OT_ASSERT(status == RAIL_STATUS_NO_ERROR);
     }
     CORE_EXIT_ATOMIC();
 }

@@ -154,6 +154,12 @@ void efr32LogInit(void);
 void efr32LogDeinit(void);
 
 /**
+ * Print reset info.
+ *
+ */
+void efr32PrintResetInfo(void);
+
+/**
  * Set 802.15.4 CCA mode
  *
  * A call to this function should be made after RAIL has been

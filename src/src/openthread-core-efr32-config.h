@@ -58,6 +58,16 @@
 #include "em_device.h"
 
 /**
+ * @def OPENTHREAD_CONFIG_PLATFORM_BOOTLOADER_MODE_ENABLE
+ *
+ * Allow triggering a platform reset to bootloader mode, if supported.
+ *
+ */
+#if defined(SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT)
+#define OPENTHREAD_CONFIG_PLATFORM_BOOTLOADER_MODE_ENABLE 1
+#endif
+
+/**
  * @def OPENTHREAD_CONFIG_PLATFORM_MAC_KEYS_EXPORTABLE_ENABLE
  *
  * Calling crypto functions in interrupt context when another operation is running
@@ -180,6 +190,24 @@
  */
 #ifndef OPENTHREAD_CONFIG_UPTIME_ENABLE
 #define OPENTHREAD_CONFIG_UPTIME_ENABLE OPENTHREAD_FTD
+#endif
+
+/**
+ * @def OPENTHREAD_CONFIG_CHILD_SUPERVISION_CHECK_TIMEOUT
+ *
+ * The default supervision check timeout interval (in seconds) used by a device in child state. Set to zero to disable
+ * the supervision check process on the child.
+ *
+ * The check timeout interval can be changed using `otChildSupervisionSetCheckTimeout()`.
+ *
+ * If the sleepy child does not hear from its parent within the specified timeout interval, it initiates the re-attach
+ * process (MLE Child Update Request/Response exchange with its parent).
+ *
+ * Setting to zero by default as this is an optional feature that can lead to unexpected detach behavior.
+ *
+ */
+#ifndef OPENTHREAD_CONFIG_CHILD_SUPERVISION_CHECK_TIMEOUT
+#define OPENTHREAD_CONFIG_CHILD_SUPERVISION_CHECK_TIMEOUT 0
 #endif
 
 /**
