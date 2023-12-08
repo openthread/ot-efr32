@@ -6,6 +6,8 @@ category: OpenThread Examples
 quality: production
 
 component:
+  - id: ot_platform_abstraction_source
+    from: ot-efr32
   - id: ot_platform_abstraction_core
   - id: ot_thirdparty
   - id: ot_ncp_spidrv
@@ -20,3 +22,10 @@ define:
     value: 1
   - name: OPENTHREAD_RADIO
     value: 1
+
+sdk:
+  id: gecko_sdk
+  version: 4.3.2
+sdk_extension:
+  - id: ot-efr32
+    version: 0.0.1
