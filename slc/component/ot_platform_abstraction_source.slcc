@@ -1,0 +1,57 @@
+id: ot_platform_abstraction_source
+label: Platform Abstraction (Source)
+package: OpenThread
+category: OpenThread
+quality: production
+description: This component provides the source files for the platform abstraction layer between the OpenThread stack and Silicon Labs platform
+provides:
+  - name: ot_platform_abstraction_source
+  - name: ot_platform_abstraction_implementation
+requires:
+  - name: security_manager
+ui_hints:
+  visibility: never
+include:
+  - path: openthread/examples/platforms/utils
+    file_list:
+      - path: code_utils.h
+      - path: link_metrics.h
+      - path: logging_rtt.h
+      - path: mac_frame.h
+      - path: settings.h
+  - path: src/src
+    file_list:
+      - path: ieee802154mac.h
+      - path: ieee802154-packet-utils.hpp
+      - path: platform-band.h
+      - path: rail_config.h
+      - path: sl_packet_utils.h
+      - path: sl_openthread.h
+      - path: diag.h
+      - path: soft_source_match_table.h
+  - path: third_party/silabs/gecko_sdk/protocol/openthread/platform-abstraction/include
+    file_list:
+      - path: radio_counters.h
+      - path: radio_extension.h
+source:
+      - path: openthread/examples/platforms/utils/debug_uart.c
+      - path: openthread/examples/platforms/utils/link_metrics.cpp
+      - path: openthread/examples/platforms/utils/logging_rtt.c
+      - path: openthread/examples/platforms/utils/mac_frame.cpp
+      - path: openthread/examples/platforms/utils/settings_ram.c
+      - path: src/src/soft_source_match_table.c
+      - path: src/src/alarm.c
+      - path: src/src/diag.c
+      - path: src/src/entropy.c
+      - path: src/src/flash.c
+      - path: src/src/logging.c
+        unless: ["matter_integration"]
+      - path: src/src/memory.c
+        unless: ["matter_integration"]
+      - path: src/src/misc.c
+      - path: src/src/crypto.c
+      - path: src/src/ieee802154-packet-utils.cpp
+      - path: src/src/radio.c
+      - path: src/src/radio_extension.c
+      - path: src/src/startup-gcc.c
+      - path: src/src/system.c
