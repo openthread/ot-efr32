@@ -649,14 +649,15 @@ exit:
     return error;
 }
 
-void otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
-                                   uint16_t       aPasswordLen,
-                                   const uint8_t *aSalt,
-                                   uint16_t       aSaltLen,
-                                   uint32_t       aIterationCounter,
-                                   uint16_t       aKeyLen,
-                                   uint8_t       *aKey)
+otError otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
+                                      uint16_t       aPasswordLen,
+                                      const uint8_t *aSalt,
+                                      uint16_t       aSaltLen,
+                                      uint32_t       aIterationCounter,
+                                      uint16_t       aKeyLen,
+                                      uint8_t       *aKey)
 {
+    otError      error = OT_ERROR_NONE;
     psa_status_t status;
     size_t       outSize;
     psa_key_id_t passwordKeyId = 0;
@@ -669,29 +670,29 @@ void otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
     // Initialize key derivation
     psa_key_derivation_operation_t operation = psa_key_derivation_operation_init();
     status                                   = psa_key_derivation_setup(&operation, algo);
-    OT_ASSERT(status == PSA_SUCCESS);
+    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
 
     // Set capacity
     status = psa_key_derivation_set_capacity(&operation, aKeyLen);
-    OT_ASSERT(status == PSA_SUCCESS);
+    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
 
     // Set iteration count as cost
     status = psa_key_derivation_input_integer(&operation, PSA_KEY_DERIVATION_INPUT_COST, aIterationCounter);
-    OT_ASSERT(status == PSA_SUCCESS);
+    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
 
     // Create salt as a key
     psa_key_attributes_t saltKeyAttr = psa_key_attributes_init();
     psa_set_key_usage_flags(&saltKeyAttr, PSA_KEY_USAGE_DERIVE);
     psa_set_key_type(&saltKeyAttr, PSA_KEY_TYPE_RAW_DATA);
     psa_set_key_algorithm(&saltKeyAttr, algo);
-    OT_ASSERT(status == PSA_SUCCESS);
+    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
 
     status = psa_import_key(&saltKeyAttr, aSalt, aSaltLen, &saltKeyId);
-    OT_ASSERT(status == PSA_SUCCESS);
+    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
 
     // Provide salt
     status = psa_key_derivation_input_key(&operation, PSA_KEY_DERIVATION_INPUT_SALT, saltKeyId);
-    OT_ASSERT(status == PSA_SUCCESS);
+    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
 
     // Create key for password (key)
     psa_key_attributes_t passwordKeyAttr = psa_key_attributes_init();
@@ -700,11 +701,11 @@ void otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
     psa_set_key_algorithm(&passwordKeyAttr, algo);
 
     status = psa_import_key(&passwordKeyAttr, aPassword, aPasswordLen, &passwordKeyId);
-    OT_ASSERT(status == PSA_SUCCESS);
+    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
 
     // Provide password (key)
     status = psa_key_derivation_input_key(&operation, PSA_KEY_DERIVATION_INPUT_PASSWORD, passwordKeyId);
-    OT_ASSERT(status == PSA_SUCCESS);
+    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
 
     // Configure output as a key
     psa_key_attributes_t keyAttrResult = psa_key_attributes_init();
@@ -714,16 +715,19 @@ void otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
     psa_set_key_algorithm(&keyAttrResult, PSA_ALG_CTR);
 
     status = psa_key_derivation_output_key(&keyAttrResult, &operation, &keyId);
-    OT_ASSERT(status == PSA_SUCCESS);
+    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
 
     // Export output key
     status = psa_export_key(keyId, aKey, aKeyLen, &outSize);
-    OT_ASSERT(status == PSA_SUCCESS);
+    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
 
     // Release keys used
     psa_destroy_key(keyId);
     psa_destroy_key(saltKeyId);
     psa_destroy_key(passwordKeyId);
+
+exit:
+    return error;
 }
 
 #endif // OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE
