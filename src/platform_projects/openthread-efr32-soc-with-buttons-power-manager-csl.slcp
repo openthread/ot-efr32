@@ -10,6 +10,8 @@ component:
   - id: ot_platform_abstraction_core
   - id: ot_psa_crypto
   - id: ot_mbedtls
+  - id: ot_stack_features_config
+    from: ot-efr32
   - id: uartdrv_usart
     instance:
       - vcom
@@ -53,3 +55,7 @@ configuration:
 define:
   - name: OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
     value: 1
+
+sdk_extension:
+  - id: ot-efr32
+    version: 0.0.1

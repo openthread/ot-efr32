@@ -36,6 +36,8 @@ quality: production
 component:
   - id: ot_platform_abstraction_core
   - id: ot_mbedtls
+  - id: ot_stack_features_config
+    from: ot-efr32
   - id: ot_ncp_spidrv
   - id: rail_util_pti
 
