@@ -31,10 +31,24 @@
  *   This file implements the OpenThread platform abstraction for miscellaneous behaviors.
  */
 
+#include <openthread-core-config.h>
 #include <openthread/platform/misc.h>
+
+#if defined(SL_COMPONENT_CATALOG_PRESENT)
+#include "sl_component_catalog.h"
+#endif
+
+#if defined(SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT)
+#include "btl_interface.h"
+#endif
 
 #include "em_rmu.h"
 #include "platform-efr32.h"
+
+#if defined(SL_CATALOG_OT_CRASH_HANDLER_PRESENT)
+#include "crash_handler.h"
+#include <openthread/logging.h>
+#endif
 
 static uint32_t sResetCause;
 
@@ -52,6 +66,17 @@ void otPlatReset(otInstance *aInstance)
     OT_UNUSED_VARIABLE(aInstance);
     NVIC_SystemReset();
 }
+
+#if defined(SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT)
+#if OPENTHREAD_CONFIG_PLATFORM_BOOTLOADER_MODE_ENABLE
+otError otPlatResetToBootloader(otInstance *aInstance)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+    bootloader_rebootAndInstall();
+    return OT_ERROR_NONE;
+}
+#endif
+#endif
 
 otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
 {
@@ -124,6 +149,24 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
 #endif
     return reason;
 }
+
+#if defined(SL_CATALOG_OT_CRASH_HANDLER_PRESENT)
+void efr32PrintResetInfo(void)
+{
+    otLogCritPlat("Reset info: 0x%x (%s)", halGetResetInfo(), halGetResetString());
+
+    otLogCritPlat("Extended Reset info: 0x%2X (%s)", halGetExtendedResetInfo(), halGetExtendedResetString());
+
+    if (halResetWasCrash())
+    {
+        // We pass port 0 here though this parameter is unused in the legacy HAL
+        // version of the diagnostic code.
+        halPrintCrashSummary(0);
+        halPrintCrashDetails(0);
+        halPrintCrashData(0);
+    }
+}
+#endif // SL_CATALOG_OT_CRASH_HANDLER_PRESENT
 
 void otPlatWakeHost(void)
 {

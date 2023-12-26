@@ -37,15 +37,36 @@
 
 #include "sleep.h"
 #include "em_core.h"
+#include "em_gpio.h"
 #include "platform-efr32.h"
 #include "sl_component_catalog.h"
+#include <assert.h>
 #include <openthread-core-config.h>
 #include <openthread/tasklet.h>
-#include "common/debug.hpp"
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
+
+// Define generic VCOM TX port-pin definitions to use either the USART or the EUSART pins.
+// These pins need to be disabled to minimize power consumption.
+#ifdef SL_CATALOG_UARTDRV_USART_PRESENT
+#include "sl_uartdrv_usart_vcom_config.h"
+#define VCOM_TX_PORT SL_UARTDRV_USART_VCOM_TX_PORT
+#define VCOM_TX_PIN SL_UARTDRV_USART_VCOM_TX_PIN
+#elif defined(SL_CATALOG_UARTDRV_EUSART_PRESENT)
+#include "sl_uartdrv_eusart_vcom_config.h"
+#define VCOM_TX_PORT SL_UARTDRV_EUSART_VCOM_TX_PORT
+#define VCOM_TX_PIN SL_UARTDRV_EUSART_VCOM_TX_PIN
+#elif defined(SL_CATALOG_UARTDRV_LEUART_PRESENT)
+#include "sl_uartdrv_leuart_vcom_config.h"
+#define VCOM_TX_PORT SL_UARTDRV_LEUART_VCOM_TX_PORT
+#define VCOM_TX_PIN SL_UARTDRV_LEUART_VCOM_TX_PIN
+#elif defined(SL_CATALOG_CPC_DRIVER_UART_PRESENT)
+#include "sl_cpc_drv_uart_config.h"
+#define VCOM_TX_PORT SL_CPC_DRV_UART_VCOM_TX_PORT
+#define VCOM_TX_PIN SL_CPC_DRV_UART_VCOM_TX_PIN
+#endif
 
 // Power manager transition events of interest.
 /* clang-format off */
@@ -173,16 +194,23 @@ bool sl_ot_is_ok_to_sleep(void)
 
 static void energy_mode_transition_callback(sl_power_manager_em_t from, sl_power_manager_em_t to)
 {
+#if defined(_SILICON_LABS_32B_SERIES_2) && defined(VCOM_TX_PORT)
+    static GPIO_Mode_TypeDef vcom_tx_pin_state = gpioModePushPull;
+
     if (from == SL_POWER_MANAGER_EM2)
     {
         // Leaving EM2
-        // emberStackPowerUp(); // TO DO: Do we need to take care of any state?
+        // Reset the USART Tx pin
+        GPIO_PinModeSet(VCOM_TX_PORT, VCOM_TX_PIN, vcom_tx_pin_state, 1);
     }
     else if (to == SL_POWER_MANAGER_EM2)
     {
         // Going to EM2
-        // emberStackPowerDown(); // TO DO: Do we need to take care of any state?
+        // Sleep the USART Tx pin on series 2 devices to save energy
+        vcom_tx_pin_state = GPIO_PinModeGet(VCOM_TX_PORT, VCOM_TX_PIN);
+        GPIO_PinModeSet(VCOM_TX_PORT, VCOM_TX_PIN, gpioModeDisabled, 1);
     }
+#endif
 }
 
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT && !SL_CATALOG_KERNEL_PRESENT

@@ -39,6 +39,7 @@
 #include "sl_packet_utils.h"
 #include "sli_protocol_crypto.h"
 
+#include <assert.h>
 #include "common/code_utils.hpp"
 #include "common/debug.hpp"
 #include "crypto/aes_ccm.hpp"

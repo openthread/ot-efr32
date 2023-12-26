@@ -36,12 +36,12 @@
 
 #include "soft_source_match_table.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "common/debug.hpp"
 
 #include <openthread/logging.h>
-
+#include "common/debug.hpp"
 #include "utils/code_utils.h"
 
 // Print entire source match tables when

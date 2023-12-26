@@ -50,18 +50,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - gcc_ver: 6
-            gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/6-2017q2/gcc-arm-none-eabi-6-2017-q2-update-linux.tar.bz2
-            gcc_extract_dir: gcc-arm-none-eabi-6-2017-q2-update
-          - gcc_ver: 7
-            gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
-            gcc_extract_dir: gcc-arm-none-eabi-7-2018-q2-update
-          - gcc_ver: 9
-            gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
-            gcc_extract_dir: gcc-arm-none-eabi-9-2019-q4-major
-          - gcc_ver: 10.3
-            gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
-            gcc_extract_dir: gcc-arm-none-eabi-10.3-2021.10
+          - gcc_ver: 12.2.Rel1
+            gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi.tar.xz
+            gcc_extract_dir: arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi
+          - gcc_ver: 12.3.Rel1
+            gcc_download_url: https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi.tar.xz
+            gcc_extract_dir: arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi
 
     steps:
     - uses: actions/checkout@v4
@@ -83,13 +77,12 @@ jobs:
 
     - name: Bootstrap
       run: |
-        cd /tmp
-        wget --tries 4 --no-check-certificate --quiet ${{ matrix.gcc_download_url }} -O gcc-arm.tar.bz2
-        tar xjf gcc-arm.tar.bz2
+        script/bootstrap packages
+        script/bootstrap arm_toolchain ${{ matrix.gcc_download_url }} ${{ matrix.gcc_extract_dir }}
 
     - name: Build
       run: |
-        export PATH=/tmp/${{ matrix.gcc_extract_dir }}/bin:$PATH
+        export PATH=${HOME}/.local/${{ matrix.gcc_extract_dir }}/bin:$PATH
         script/test
 
     - name: Gather SLC generated files
@@ -107,5 +100,5 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: failure()
       with:
-        name: build-${{ matrix.gcc_ver }}-${{ matrix.os }}
+        name: build-${{ matrix.gcc_ver }}
         path: artifact

@@ -55,7 +55,8 @@ install_packages_apt()
         python3-pip \
         git-lfs \
         unzip \
-        wget
+        wget \
+        xz-utils
 }
 
 install_packages_opkg()
@@ -118,6 +119,38 @@ do_bootstrap_silabs()
     echo "Bootstrapping silabs"
     "${repo_dir}"/script/bootstrap_silabs
 }
+
+install_arm_toolchain()
+{
+    local url=${1-"https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi.tar.xz"}
+    local extract_dir=${2-"arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi"}
+
+    local toolchain_dir="${HOME}/.local"
+
+    # Check if the toolchain is already present at the desired location
+    if command -v "${toolchain_dir}/${extract_dir}/bin/arm-none-eabi-gcc"; then
+        echo "'arm-none-eabi-gcc' found. Skipping GNU ARM Embedded toolchain install"
+        "${toolchain_dir}"/"${extract_dir}"/bin/arm-none-eabi-gcc --version
+        return
+    fi
+
+    echo 'Installing GNU ARM Embedded Toolchain...'
+
+    # Download
+    local tarball=gcc-arm.tar.xz
+    mkdir -p "${toolchain_dir}/${extract_dir}"
+    wget --tries 4 --no-check-certificate --quiet "${url}" -O "${toolchain_dir}/${tarball}"
+
+    # Extract
+    tar xf "${toolchain_dir}/${tarball}" --directory "${toolchain_dir}/${extract_dir}" --strip-components=1
+
+    # Link
+    sudo ln -s -f "${toolchain_dir}"/"${extract_dir}"/bin/* /usr/local/bin/
+
+    # Cleanup
+    rm -rf "${toolchain_dir:?}/${tarball:?}"
+}
+
 main()
 {
     if [ $# == 0 ]; then
@@ -126,6 +159,9 @@ main()
         do_bootstrap_silabs
     elif [ "$1" == 'packages' ]; then
         install_packages
+    elif [ "$1" == 'arm_toolchain' ]; then
+        shift 1
+        install_arm_toolchain "$@"
     elif [ "$1" == 'openthread' ]; then
         do_bootstrap_openthread
     elif [ "$1" == 'python' ]; then

@@ -53,7 +53,6 @@
 #define RADIO_TIMING_CSMA_OVERHEAD_US 500
 #define RADIO_TIMING_DEFAULT_BYTETIME_US 32   // only used if RAIL_GetBitRate returns 0
 #define RADIO_TIMING_DEFAULT_SYMBOLTIME_US 16 // only used if RAIL_GetSymbolRate returns 0
-
 typedef struct efr32CommonConfig
 {
     RAIL_Config_t mRailConfig;

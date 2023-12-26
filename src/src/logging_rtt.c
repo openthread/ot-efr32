@@ -27,8 +27,8 @@
  */
 
 /**
- * @file logging.c
- * Platform abstraction for the logging
+ * @file logging_rtt.c
+ *  This file implements the OpenThread platform abstraction for logging using RTT interface.
  *
  */
 

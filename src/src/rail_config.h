@@ -33,8 +33,6 @@
 #include "rail_types.h"
 #include <stdint.h>
 
-#define RADIO_CONFIG_XTAL_FREQUENCY 38400000UL
-
 #if RADIO_CONFIG_SUBGHZ_SUPPORT
 extern const RAIL_ChannelConfig_t *channelConfigs[];
 #endif
