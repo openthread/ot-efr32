@@ -279,10 +279,10 @@ main()
     for t in "${OT_CMAKE_NINJA_TARGET[@]}"; do [[ $t =~ .*rcp.* ]] && rcp_targets+=("$t") || soc_targets+=("$t"); done
 
     # Build ot-rcp targets
-    if contains "ot-rcp-uart" "${rcp_targets[@]}"; then
+    if contains "ot-rcp-uart" "${rcp_targets[@]-}"; then
         build_rcp_uart -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
     fi
-    if contains "ot-rcp-spi" "${rcp_targets[@]}"; then
+    if contains "ot-rcp-spi" "${rcp_targets[@]-}"; then
         build_rcp_spi -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
     fi
     # Build soc targets
