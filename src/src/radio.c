@@ -1715,6 +1715,8 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aFrame)
         // this results in calling the SE interface from a critical section which is not permitted.
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
         radioProcessTransmitSecurity(sTxFrame, sTxFrame->mIid);
+#else
+        radioProcessTransmitSecurity(sTxFrame, 0);
 #endif
 #endif // OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
 
