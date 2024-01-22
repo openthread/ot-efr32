@@ -66,7 +66,7 @@ jobs:
       run: git -C third_party/silabs/gecko_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
 
     - name: Restore gecko_sdk LFS cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: lfs-cache
       with:
           path: .git/modules/third_party/silabs/gecko_sdk/lfs
