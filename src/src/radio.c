@@ -678,10 +678,16 @@ static bool isFilterMaskValid(uint8_t mask)
     if (
         // Case 1
         ((mask & RADIO_BCAST_PANID_FILTER_MASK) || (mask & RADIO_BCAST_ADDR_FILTER_MASK)) ||
-        // Case 2
-        ((mask & 0x0F) == (mask >> 4)) ||
+        // Case 2 - Find any non-broadcast PAN ID match and get ready to compare it
+        ((((mask & (RADIO_INDEX0_PANID_FILTER_MASK | RADIO_INDEX1_PANID_FILTER_MASK | RADIO_INDEX2_PANID_FILTER_MASK))
+           >> RADIO_PANID_FILTER_SHIFT)
+          &
+          // To see if it coincides with any address matches for same IID
+          (RADIO_GET_ADDR_FILTER_MASK(mask) >> RADIO_ADDR_FILTER_SHIFT))
+         != 0)
+        ||
         // Case 3
-        (((mask & 0x0F) == 0) || ((mask >> 4) == 0)))
+        (((RADIO_GET_PANID_FILTER_MASK(mask)) == 0) || ((RADIO_GET_ADDR_FILTER_MASK(mask)) == 0)))
     {
         valid = true;
     }
@@ -1715,6 +1721,8 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aFrame)
         // this results in calling the SE interface from a critical section which is not permitted.
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1
         radioProcessTransmitSecurity(sTxFrame, sTxFrame->mIid);
+#else
+        radioProcessTransmitSecurity(sTxFrame, 0);
 #endif
 #endif // OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2
 
