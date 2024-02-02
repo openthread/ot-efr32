@@ -88,18 +88,11 @@ target_include_directories({{PROJECT_NAME}} PRIVATE
 # ==============================================================================
 target_sources({{PROJECT_NAME}} PRIVATE
 {%- for source in NON_MBEDTLS_SOURCES %}
-    {%- if source.endswith('.c') or source.endswith('.cpp') or source.endswith('.h') or source.endswith('.hpp') %}
+    {%- if source.endswith('.c') or source.endswith('.cpp') or source.endswith('.h') or source.endswith('.hpp') or source.endswith('.s') or source.endswith('.S') %}
     {{source}}
     {%- endif %}
 {%- endfor %}
 )
-
-{%- for source in NON_MBEDTLS_SOURCES %}
-    {%- if source.endswith('.s') or source.endswith('.S') %}
-target_sources({{PROJECT_NAME}} PRIVATE {{source}})
-set_property(SOURCE {{source}} PROPERTY LANGUAGE C)
-    {%- endif %}
-{%- endfor %}
 
 # ==============================================================================
 # Compile definitions
