@@ -31,7 +31,7 @@
 # CMake project definitions
 # ==============================================================================
 cmake_minimum_required(VERSION 3.16.0)
-project(ot-efr32 VERSION 1.0.0)
+project(ot-efr32 VERSION 1.0.0 LANGUAGES C CXX ASM)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
