@@ -30,7 +30,7 @@
 #
 # The script to check or format source code of OpenThread.
 #
-# Format c/c++, markdown, and shell:
+# Format c/c++, markdown, python, and shell:
 #
 #     script/make-pretty
 #
@@ -42,6 +42,10 @@
 #
 #     script/make-pretty markdown
 #
+# Format python only:
+#
+#     script/make-pretty python
+#
 # Format shell only:
 #
 #     script/make-pretty shell
@@ -50,6 +54,7 @@
 #
 #     script/make-pretty check clang-format
 #     script/make-pretty check markdown
+#     script/make-pretty check python
 #     script/make-pretty check shell
 #
 
@@ -77,6 +82,9 @@ readonly OT_CLANG_SOURCES
 
 OT_MARKDOWN_SOURCES=('*.md')
 readonly OT_MARKDOWN_SOURCES
+
+OT_PYTHON_SOURCES=('*.py')
+readonly OT_PYTHON_SOURCES
 
 OT_SCRIPT_DIR="${repo_dir}"/openthread/script
 readonly OT_SCRIPT_DIR
@@ -129,6 +137,30 @@ do_markdown_check()
     popd
 }
 
+do_python_format()
+{
+    echo -e '========================================'
+    echo -e '     format python'
+    echo -e '========================================'
+
+    pushd "${repo_dir}"
+    git ls-files "${OT_PYTHON_SOURCES[@]}" | grep -v -E "^($(echo "${OT_EXCLUDE_DIRS[@]}" | tr ' ' '|'))" \
+        | xargs -n10 -P"$OT_BUILD_JOBS" python3 -m yapf --verbose --style '{based_on_style: google, column_limit: 119}' -ipr
+    popd
+}
+
+do_python_check()
+{
+    echo -e '========================================'
+    echo -e '     check python'
+    echo -e '========================================'
+
+    pushd "${repo_dir}"
+    git ls-files "${OT_PYTHON_SOURCES[@]}" | grep -v -E "^($(echo "${OT_EXCLUDE_DIRS[@]}" | tr ' ' '|'))" \
+        | xargs -n10 -P"$OT_BUILD_JOBS" python3 -m yapf --verbose --style '{based_on_style: google, column_limit: 119}' -dpr
+    popd
+}
+
 do_shell_format()
 {
     echo -e '========================================'
@@ -160,6 +192,7 @@ do_check()
     if [ $# == 0 ]; then
         do_clang_format_check
         do_markdown_check
+        do_python_check
         do_shell_check
     elif [ "$1" == 'clang' ]; then
         do_clang_format_check
@@ -167,10 +200,12 @@ do_check()
         do_clang_format_check
     elif [ "$1" == 'markdown' ]; then
         do_markdown_check
+    elif [ "$1" == 'python' ]; then
+        do_python_check
     elif [ "$1" == 'shell' ]; then
         do_shell_check
     else
-        echo >&2 "Unsupported check: $1. Supported: clang-format, markdown, shell"
+        echo >&2 "Unsupported check: $1. Supported: clang, markdown, python, shell"
         # 128 for Invalid arguments
         exit 128
     fi
@@ -181,6 +216,7 @@ main()
     if [ $# == 0 ]; then
         do_clang_format
         do_markdown_format
+        do_python_format
         do_shell_format
     elif [ "$1" == 'clang' ]; then
         do_clang_format
@@ -188,13 +224,15 @@ main()
         do_clang_format
     elif [ "$1" == 'markdown' ]; then
         do_markdown_format
+    elif [ "$1" == 'python' ]; then
+        do_python_format
     elif [ "$1" == 'shell' ]; then
         do_shell_format
     elif [ "$1" == 'check' ]; then
         shift
         do_check "$@"
     else
-        echo >&2 "Unsupported action: $1. Supported: clang-format, markdown, shell"
+        echo >&2 "Unsupported action: $1. Supported: clang, markdown, python, shell"
         # 128 for Invalid arguments
         exit 128
     fi
