@@ -75,11 +75,18 @@ install_packages_rpm()
 install_packages_brew()
 {
     echo 'Installing script dependencies...'
-    brew install \
-        coreutils \
-        openjdk@11 \
-        grep \
+
+    brew_packages=(
+        coreutils
+        git
+        git-lfs
+        grep
+        ninja-build
+        openjdk@17
+        unzip
         wget
+    )
+    brew install "${brew_packages[@]}"
 }
 
 install_packages_source()
@@ -109,12 +116,6 @@ install_packages()
     if command -v pip3; then
         install_packages_pip3
     fi
-}
-
-do_bootstrap_openthread()
-{
-    echo "Bootstrapping openthread"
-    "${repo_dir}"/openthread/script/bootstrap
 }
 
 do_bootstrap_silabs()
@@ -175,21 +176,18 @@ main()
 {
     if [ $# == 0 ]; then
         install_packages
-        do_bootstrap_openthread
         do_bootstrap_silabs
     elif [ "$1" == 'packages' ]; then
         install_packages
     elif [ "$1" == 'arm_toolchain' ]; then
         shift 1
         install_arm_toolchain "$@"
-    elif [ "$1" == 'openthread' ]; then
-        do_bootstrap_openthread
     elif [ "$1" == 'python' ]; then
         install_packages_pip3
     elif [ "$1" == 'silabs' ]; then
         do_bootstrap_silabs
     else
-        echo >&2 "Unsupported action: $1. Supported: openthread, silabs"
+        echo >&2 "Unsupported action: $1. Supported: packages, arm_toolchain, python, silabs"
         # 128 for Invalid arguments
         exit 128
     fi

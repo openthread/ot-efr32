@@ -12,7 +12,6 @@ RUN apt-get update && \
       && rm -rf /var/lib/apt/lists/*
 
 # Copy scripts
-COPY ./openthread/script ./openthread/script
 COPY  ./script/bootstrap \
       ./script/bootstrap_silabs \
       ./script/
@@ -20,8 +19,7 @@ COPY ./requirements.txt .
 
 # Bootstrap
 RUN ./script/bootstrap packages && rm -rf /var/lib/apt/lists/*
-
-RUN ./script/bootstrap openthread && rm -rf /var/lib/apt/lists/*
+RUN ./script/bootstrap arm_toolchain
 
 # Label the build date before downloading slc to force slc to always be download during a docker build
 ARG BUILD_DATE
