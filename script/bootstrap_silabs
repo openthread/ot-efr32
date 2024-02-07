@@ -61,6 +61,20 @@ install_slc_cli()
     wget "${zip_url}" -O "${zip_path}"
     unzip -q -o "${zip_path}" -d "$(dirname ${zip_path})" && rm "${zip_path}"
     popd
+
+    # Link if root
+    if [ "$EUID" -eq 0 ]; then
+        ln -s -f "${SLC_INSTALL_DIR}"/slc_cli/slc* /usr/local/bin/
+        ls -alh /usr/local/bin/slc
+    else
+        set +x
+        echo ""
+        echo "The bootstrap script was run without sudo"
+        echo ""
+        echo "Make sure to add '${SLC_INSTALL_DIR}/slc_cli/' to PATH"
+        echo ""
+        set -x
+    fi
 }
 
 main()

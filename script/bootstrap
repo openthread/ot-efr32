@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #  Copyright (c) 2021, The OpenThread Authors.
 #  All rights reserved.
@@ -41,22 +41,25 @@ script_dir="$(realpath "$(dirname "${script_path}")")"
 repo_dir="$(dirname "${script_dir}")"
 
 # ==============================================================================
-
 install_packages_apt()
 {
     echo 'Installing script dependencies...'
 
-    # apt-get update and install dependencies
+    # Install dependencies
     sudo apt-get update
-    sudo apt-get --no-install-recommends install -y \
-        coreutils \
-        openjdk-17-jre \
-        python3-setuptools \
-        python3-pip \
-        git-lfs \
-        unzip \
-        wget \
+    apt_packages=(
+        coreutils
+        git
+        git-lfs
+        openjdk-17-jre
+        ninja-build
+        python3-pip
+        python3-setuptools
+        unzip
+        wget
         xz-utils
+    )
+    sudo apt-get --no-install-recommends install -y "${apt_packages[@]}"
 }
 
 install_packages_opkg()
@@ -125,7 +128,13 @@ install_arm_toolchain()
     local url=${1-"https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi.tar.xz"}
     local extract_dir=${2-"arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi"}
 
-    local toolchain_dir="${HOME}/.local"
+    local toolchain_dir
+    # Link if root
+    if [ "$EUID" -eq 0 ]; then
+        toolchain_dir=/opt
+    else
+        toolchain_dir="${HOME}/.local"
+    fi
 
     # Check if the toolchain is already present at the desired location
     if command -v "${toolchain_dir}/${extract_dir}/bin/arm-none-eabi-gcc"; then
@@ -144,8 +153,19 @@ install_arm_toolchain()
     # Extract
     tar xf "${toolchain_dir}/${tarball}" --directory "${toolchain_dir}/${extract_dir}" --strip-components=1
 
-    # Link
-    sudo ln -s -f "${toolchain_dir}"/"${extract_dir}"/bin/* /usr/local/bin/
+    # Link if root
+    if [ "$EUID" -eq 0 ]; then
+        ln -s -f "${toolchain_dir}"/"${extract_dir}"/bin/* /usr/local/bin/
+        ls -alh /usr/local/bin/arm*
+    else
+        set +x
+        echo ""
+        echo "The bootstrap script was run without sudo"
+        echo ""
+        echo "Make sure to add '${toolchain_dir}/${extract_dir}/bin/' to PATH"
+        echo ""
+        set -x
+    fi
 
     # Cleanup
     rm -rf "${toolchain_dir:?}/${tarball:?}"
