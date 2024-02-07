@@ -94,7 +94,7 @@ jobs:
 
     - name: Test build inside container
       run: |
-        docker run -v ${{ github.workspace }}:/ot-efr32/ --rm ${{ env.TEST_TAG }} script/build --skip-silabs-apps brd4151a
+        docker run -v ${{ github.workspace }}:/ot-efr32/ --user $(id -u) --rm ${{ env.TEST_TAG }} script/build --skip-silabs-apps brd4151a
 
     - name: Login to DockerHub
       uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0

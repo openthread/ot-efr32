@@ -46,6 +46,7 @@ jobs:
     runs-on: ubuntu-22.04
     container:
       image: siliconlabsinc/ot-efr32-dev:latest
+      options: --user 1001
     strategy:
       fail-fast: false
       matrix:
