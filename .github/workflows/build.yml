@@ -76,9 +76,8 @@ jobs:
     - name: Git LFS Pull
       run: git -C third_party/silabs/gecko_sdk lfs pull
 
-    - name: Bootstrap
+    - name: Bootstrap ARM Toolchain
       run: |
-        script/bootstrap packages
         script/bootstrap arm_toolchain ${{ matrix.gcc_download_url }} ${{ matrix.gcc_extract_dir }}
 
     - name: Build
