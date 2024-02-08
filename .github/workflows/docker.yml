@@ -69,6 +69,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
+        file: docker/Dockerfile
         load: true
         build-args: |
           - BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
@@ -78,6 +79,15 @@ jobs:
           ${{ env.TEST_TAG }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
+    - name: Container image sanity checks
+      run: |
+        # Download container-structure-test
+        curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 \
+          && chmod +x container-structure-test-linux-amd64
+
+        # Run tests
+        ./container-structure-test-linux-amd64 test --config docker/test-ot-efr32-dev.yml --image ${{ env.TEST_TAG }}
 
     - name: Create LFS file hash list
       run: git -C third_party/silabs/gecko_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id

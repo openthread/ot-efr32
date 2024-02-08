@@ -1,3 +1,4 @@
 .git
 **/build/
+**/slc_cli/
 third_party/silabs/

@@ -112,10 +112,6 @@ install_packages()
         PM=brew
     fi
     install_packages_$PM
-
-    if command -v pip3; then
-        install_packages_pip3
-    fi
 }
 
 do_bootstrap_silabs()
@@ -176,6 +172,7 @@ main()
 {
     if [ $# == 0 ]; then
         install_packages
+        install_packages_pip3
         do_bootstrap_silabs
     elif [ "$1" == 'packages' ]; then
         install_packages
