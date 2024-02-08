@@ -51,7 +51,7 @@ install_packages_apt()
         coreutils
         git
         git-lfs
-        openjdk-17-jre
+        openjdk-17-jre-headless
         ninja-build
         python3-pip
         python3-setuptools
