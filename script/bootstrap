@@ -172,6 +172,7 @@ main()
 {
     if [ $# == 0 ]; then
         install_packages
+        install_arm_toolchain
         install_packages_pip3
         do_bootstrap_silabs
     elif [ "$1" == 'packages' ]; then
