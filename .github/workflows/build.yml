@@ -46,6 +46,7 @@ jobs:
     runs-on: ubuntu-22.04
     container:
       image: siliconlabsinc/ot-efr32-dev:latest
+      options: --user 1001
     strategy:
       fail-fast: false
       matrix:
@@ -75,9 +76,8 @@ jobs:
     - name: Git LFS Pull
       run: git -C third_party/silabs/gecko_sdk lfs pull
 
-    - name: Bootstrap
+    - name: Bootstrap ARM Toolchain
       run: |
-        script/bootstrap packages
         script/bootstrap arm_toolchain ${{ matrix.gcc_download_url }} ${{ matrix.gcc_extract_dir }}
 
     - name: Build

@@ -12,21 +12,23 @@ RUN apt-get update && \
       && rm -rf /var/lib/apt/lists/*
 
 # Copy scripts
-COPY ./openthread/script ./openthread/script
 COPY  ./script/bootstrap \
-      ./script/bootstrap_silabs \
       ./script/
-COPY ./requirements.txt .
 
-# Bootstrap
+# Install system packages and ARM toolchain
 RUN ./script/bootstrap packages && rm -rf /var/lib/apt/lists/*
+RUN ./script/bootstrap arm_toolchain
 
-RUN ./script/bootstrap openthread && rm -rf /var/lib/apt/lists/*
+# Install Python packages
+COPY ./requirements.txt .
+RUN ./script/bootstrap python
 
-# Label the build date before downloading slc to force slc to always be download during a docker build
+# Label the build date before downloading slc to force slc to always be downloaded during a docker build
 ARG BUILD_DATE
 LABEL build_date=${BUILD_DATE}
 
+COPY  ./script/bootstrap_silabs \
+      ./script/
 ENV SLC_INSTALL_DIR=/opt/slc_cli
 RUN mkdir ${SLC_INSTALL_DIR} && \
       ./script/bootstrap silabs
@@ -37,4 +39,3 @@ ARG REPO_URL="https://github.com/openthread/ot-efr32"
 WORKDIR /
 RUN rm -rf ${repo_dir} && git clone ${REPO_URL} ${repo_dir}
 WORKDIR ${repo_dir}
-

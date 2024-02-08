@@ -1,0 +1,13 @@
+schemaVersion: '2.0.0'
+commandTests:
+  - name: 'Check arm-eabi-none-gcc version'
+    command: "arm-none-eabi-gcc"
+    args: ["--version"]
+    expectedOutput: ["arm-none-eabi-gcc .* 12.[0-9]+.[0-9]+"]
+  - name: 'Check if slc-cli is installed'
+    command: "slc"
+    args: ["--version"]
+  - name: 'Check if git-lfs is installed'
+    command: "git"
+    args: ["lfs", "--version"]
+    expectedOutput: ["^git-lfs/[0-9]+.[0-9]+.[0-9]+"]
