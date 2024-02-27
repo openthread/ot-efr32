@@ -85,7 +85,7 @@ generate()
         set -x
 
         generation_dir="${slc_generated_projects_dir}/soc-with-buttons"
-        slcp="${repo_dir}/src/platform_projects/openthread-efr32-soc-with-buttons.slcp"
+        slcp="${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons.slcp"
 
         "${repo_dir}/script/generate" \
             "${slcp}" \
@@ -101,7 +101,7 @@ generate()
         set -x
 
         generation_dir="${slc_generated_projects_dir}/soc-with-buttons-power-manager"
-        slcp="${repo_dir}/src/platform_projects/openthread-efr32-soc-with-buttons-power-manager.slcp"
+        slcp="${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons-power-manager.slcp"
 
         "${repo_dir}/script/generate" \
             "${slcp}" \
@@ -116,7 +116,7 @@ generate()
         set -x
 
         generation_dir="${slc_generated_projects_dir}/soc-with-buttons-power-manager-csl"
-        slcp="${repo_dir}/src/platform_projects/openthread-efr32-soc-with-buttons-power-manager-csl.slcp"
+        slcp="${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons-power-manager-csl.slcp"
 
         "${repo_dir}/script/generate" \
             "${slcp}" \
