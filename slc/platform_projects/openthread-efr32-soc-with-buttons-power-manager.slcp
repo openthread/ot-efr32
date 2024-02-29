@@ -8,6 +8,7 @@ quality: production
 
 component:
   - id: ot_crash_handler
+    from: ot-efr32
   - id: ot_platform_abstraction_core
   - id: ot_psa_crypto
   - id: ot_mbedtls
