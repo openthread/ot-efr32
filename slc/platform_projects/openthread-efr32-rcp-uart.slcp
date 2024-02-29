@@ -6,9 +6,12 @@ category: OpenThread Examples
 quality: production
 
 component:
+  - id: ot_crash_handler
   - id: ot_platform_abstraction_core
   - id: ot_mbedtls
   - id: ot_stack_features_config
+    from: ot-efr32
+  - id: ot_core_vendor_extension
     from: ot-efr32
   - id: uartdrv_usart
     instance:

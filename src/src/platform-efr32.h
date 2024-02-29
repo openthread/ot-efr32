@@ -35,6 +35,10 @@
 #ifndef PLATFORM_EFR32_H_
 #define PLATFORM_EFR32_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <openthread/instance.h>
 
 #include "em_device.h"
@@ -185,5 +189,9 @@ RAIL_Status_t efr32RadioSetCcaMode(uint8_t aMode);
 bool efr32AllowSleepCallback(void);
 
 otError railStatusToOtError(RAIL_Status_t status);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PLATFORM_EFR32_H_
