@@ -1,18 +1,20 @@
-project_name: openthread-efr32-rcp-uart
+project_name: openthread-efr32-rcp-spi
 label: ot-efr32
 package: OpenThread
-description: This platform project is used to generate a CMake library for EFR32 RCPs which communicate over UART.
+description: This platform project is used to generate a CMake library for EFR32 RCPs which communicate over SPI.
 category: OpenThread Examples
 quality: production
 
 component:
+  - id: ot_crash_handler
+    from: ot-efr32
   - id: ot_platform_abstraction_core
   - id: ot_mbedtls
   - id: ot_stack_features_config
     from: ot-efr32
-  - id: uartdrv_usart
-    instance:
-      - vcom
+  - id: ot_core_vendor_extension
+    from: ot-efr32
+  - id: ot_ncp_spidrv
   - id: rail_util_pti
 
 configuration:
@@ -26,5 +28,5 @@ define:
     value: 1
 
 sdk_extension:
-  - id: ot-efr32
-    version: 0.0.1
+- id: ot-efr32
+  version: 0.0.1
