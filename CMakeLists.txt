@@ -64,21 +64,21 @@ endif()
 # ==============================================================================
 # Set platform libs and allow overriding
 # ==============================================================================
-
 # SoC (mtd/ftd) platform library
 if(NOT OT_PLATFORM_LIB)
     set(OT_PLATFORM_LIB "openthread-efr32-soc" CACHE STRING "default efr32 SoC platform library")
 endif()
 
+# RCP platform library
 if(NOT OT_PLATFORM_LIB_RCP_SPI)
     set(OT_PLATFORM_LIB_RCP_SPI "openthread-efr32-rcp-spi" CACHE STRING "default efr32 RCP platform library")
 endif()
+
 if(NOT OT_PLATFORM_LIB_RCP_UART)
     set(OT_PLATFORM_LIB_RCP_UART "openthread-efr32-rcp-uart" CACHE STRING "default efr32 RCP platform library")
 endif()
-
-# RCP platform library
 unset(OT_PLATFORM_LIB_RCP CACHE)
+
 if(NOT OT_PLATFORM_LIB_RCP)
     if(OT_NCP_SPI)
         set(OT_PLATFORM_LIB_RCP "${OT_PLATFORM_LIB_RCP_SPI}" CACHE STRING "default efr32 RCP platform library")
@@ -92,22 +92,28 @@ set(OT_PLATFORM "external" CACHE STRING "disable example platforms" FORCE)
 # ==============================================================================
 # mbedtls
 # ==============================================================================
-# SoC mbedtls library
+# Specify a default mbedtls library if not provided
 unset(OT_EXTERNAL_MBEDTLS CACHE)
-if(NOT OT_EXTERNAL_MBEDTLS)
-    set(OT_EXTERNAL_MBEDTLS "${OT_PLATFORM_LIB}-mbedtls" CACHE STRING "external mbedtls library")
-endif()
-set(OT_MBEDTLS ${OT_EXTERNAL_MBEDTLS})
-
-# RCP mbedtls library
 unset(OT_MBEDTLS_RCP CACHE)
-if(NOT OT_MBEDTLS_RCP)
-    set(OT_MBEDTLS_RCP "${OT_PLATFORM_LIB_RCP}-mbedtls" CACHE STRING "default efr32 RCP mbedtls library")
+
+if(NOT OT_EXTERNAL_MBEDTLS)
+    if(OT_FTD OR OT_MTD)
+        # SoC mbedtls library
+        set(OT_EXTERNAL_MBEDTLS "${OT_PLATFORM_LIB}-mbedtls" CACHE STRING "external mbedtls library")
+    elseif(OT_RCP)
+        # RCP mbedtls library
+        set(OT_MBEDTLS_RCP "${OT_PLATFORM_LIB_RCP}-mbedtls" CACHE STRING "default efr32 RCP mbedtls library")
+        set(OT_EXTERNAL_MBEDTLS "${OT_MBEDTLS_RCP}" CACHE STRING "external mbedtls library")
+    endif()
 endif()
-set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls management" FORCE)
+
+# If using
+if(OT_EXTERNAL_MBEDTLS)
+    set(OT_BUILTIN_MBEDTLS_MANAGEMENT OFF CACHE BOOL "disable builtin mbedtls management" FORCE)
+endif()
 
 # ==============================================================================
-# mbedtls
+# openthread
 # ==============================================================================
 # NOTE: The "openthread" subdirectory needs to be added after all OT_* variables are defined
 add_subdirectory(openthread)
@@ -125,84 +131,38 @@ target_compile_options(ot-config INTERFACE
 # ==============================================================================
 # Generated platform projects
 # ==============================================================================
-# Default library definition paths
-if(NOT RCP_SPI_DIR)
-    set(RCP_SPI_DIR     "${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp_spi"    CACHE STRING "Path to RCP (SPI) library definition")
-endif()
-if(NOT RCP_UART_DIR)
-    set(RCP_UART_DIR    "${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/rcp_uart"   CACHE STRING "Path to RCP (UART) library definition")
-endif()
-if(NOT SOC_DIR)
-    set(SOC_DIR         "${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/soc"        CACHE STRING "Path to SoC library definition")
-endif()
-
 message("OT_RCP     = ${OT_RCP}")
 message("OT_FTD     = ${OT_FTD}")
 message("OT_MTD     = ${OT_MTD}")
 message("OT_APP_RCP = ${OT_APP_RCP}")
 message("OT_APP_NCP = ${OT_APP_NCP}")
 message("OT_APP_CLI = ${OT_APP_CLI}")
+
+message("===================================================================")
+if(OT_PLATFORM_LIB_DIR)
+    message(STATUS "Using platform library from ${OT_PLATFORM_LIB_DIR}")
+    # Parse the basename of the platform library directory
+    get_filename_component(OT_PLATFORM_LIB_DIR_BASE ${OT_PLATFORM_LIB_DIR} NAME)
+
+    # Add the platform library directory
+    add_subdirectory(${OT_PLATFORM_LIB_DIR} ${PROJECT_BINARY_DIR}/${OT_PLATFORM_LIB_DIR_BASE})
+else()
+    message(FATAL_ERROR "No platform library directory found")
+endif()
+
 message("===================================================================")
 message("Using the following platform library targets:")
-
-if(OT_APP_RCP)
+if(OT_RCP)
     if(OT_NCP_SPI)
         message("-- OT_PLATFORM_LIB_RCP_SPI  = ${OT_PLATFORM_LIB_RCP_SPI}")
     else()
         message("-- OT_PLATFORM_LIB_RCP_UART = ${OT_PLATFORM_LIB_RCP_UART}")
     endif()
     message("-- OT_PLATFORM_LIB_RCP      = ${OT_PLATFORM_LIB_RCP}")
-    message("-- OT_MBEDTLS_RCP           = ${OT_MBEDTLS_RCP}")
-elseif(OT_APP_NCP OR OT_APP_CLI)
+elseif(OT_FTD OR OT_MTD)
     message("-- OT_PLATFORM_LIB          = ${OT_PLATFORM_LIB}")
-    message("-- OT_MBEDTLS               = ${OT_MBEDTLS}")
-else()
-    message("-- OT_PLATFORM_LIB          = ${OT_PLATFORM_LIB}")
-    message("-- OT_MBEDTLS               = ${OT_MBEDTLS}")
 endif()
-
-message("===================================================================")
-message("Using generated SLC projects:")
-if(OT_APP_RCP)
-    if(OT_NCP_SPI)
-        message("-- RCP_SPI_DIR  = ${RCP_SPI_DIR}")
-    else()
-        message("-- RCP_UART_DIR = ${RCP_UART_DIR}")
-    endif()
-elseif(OT_APP_NCP OR OT_APP_CLI)
-    message("-- SOC_DIR      = ${SOC_DIR}")
-endif()
-
-if(OT_APP_RCP)
-    if(OT_NCP_SPI)
-        add_subdirectory(${RCP_SPI_DIR})
-    else()
-        add_subdirectory(${RCP_UART_DIR})
-    endif()
-elseif(OT_APP_NCP OR OT_APP_CLI)
-    add_subdirectory(${SOC_DIR})
-else()
-    file(READ ${PROJECT_SOURCE_DIR}/build/${BOARD_LOWERCASE}/slc/generated_projects.txt slc_generated_projects)
-
-    # Convert file contents into a CMake list (where each element in the list
-    # is one line of the file)
-    #
-    STRING(REGEX REPLACE ";" "\\\\;" slc_generated_projects "${slc_generated_projects}")
-    STRING(REGEX REPLACE "\n" ";" slc_generated_projects "${slc_generated_projects}")
-
-    # Remove trailing empty list entry
-    STRING(REGEX REPLACE ";$" "" slc_generated_projects "${slc_generated_projects}")
-
-    foreach(slc_project IN LISTS slc_generated_projects)
-        message("Checking ${slc_project}")
-        if(EXISTS ${slc_project})
-            message("......... EXISTS")
-            add_subdirectory(${slc_project})
-        else()
-            message("......... NOT EXISTS")
-        endif()
-    endforeach()
-endif()
+message("-- OT_EXTERNAL_MBEDTLS      = ${OT_EXTERNAL_MBEDTLS}")
 message("===================================================================")
 
 
