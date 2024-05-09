@@ -72,91 +72,114 @@ generate()
     if [ "${skip_generation}" = true ]; then
         return
     fi
+    # Args
+    local slcp_file="${1:?Please specify a SLCP file}"
+    local generation_dir="${2:?Please specify generation directory}"
+    shift 2
 
-    local slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
-    local cmake_library="$1"
-    shift
+    set +x
+    echo "========================================================================================================="
+    echo "Generating ${slcp_file}"
+    echo "========================================================================================================="
+    set -x
 
-    if [[ ${cmake_library} == "openthread-efr32-soc-with-buttons" ]]; then
-        set +x
-        echo "========================================================================================================="
-        echo "Generate openthread-efr32-soc-with-buttons and openthread-efr32-soc-with-buttons-mbedtls libs"
-        echo "========================================================================================================="
-        set -x
-
-        generation_dir="${slc_generated_projects_dir}/soc-with-buttons"
-        slcp="${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons.slcp"
-
-        "${repo_dir}/script/generate" \
-            "${slcp}" \
-            "${generation_dir}" \
-            "${board}"
-        echo "${generation_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
-
-    elif [[ ${cmake_library} == "openthread-efr32-soc-with-buttons-power-manager" ]]; then
-        set +x
-        echo "========================================================================================================="
-        echo "Generate openthread-efr32-soc-with-buttons-power-manager and openthread-efr32-soc-with-buttons-power-manager-mbedtls libs"
-        echo "========================================================================================================="
-        set -x
-
-        generation_dir="${slc_generated_projects_dir}/soc-with-buttons-power-manager"
-        slcp="${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons-power-manager.slcp"
-
-        "${repo_dir}/script/generate" \
-            "${slcp}" \
-            "${generation_dir}" \
-            "${board}"
-        echo "${generation_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
-    elif [[ ${cmake_library} == "openthread-efr32-soc-with-buttons-power-manager-csl" ]]; then
-        set +x
-        echo "========================================================================================================="
-        echo "Generate openthread-efr32-soc-with-buttons-power-manager-csl and openthread-efr32-soc-with-buttons-power-manager-csl-mbedtls libs"
-        echo "========================================================================================================="
-        set -x
-
-        generation_dir="${slc_generated_projects_dir}/soc-with-buttons-power-manager-csl"
-        slcp="${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons-power-manager-csl.slcp"
-
-        "${repo_dir}/script/generate" \
-            "${slcp}" \
-            "${generation_dir}" \
-            "${board}"
-        echo "${generation_dir}" >>"${slc_generated_projects_dir}/generated_projects.txt"
-    else
-        echo "ERROR: Unrecognized cmake_library: ${cmake_library}"
-        exit 4
-    fi
+    "${repo_dir}/script/generate" \
+        "${slcp_file}" \
+        "${generation_dir}" \
+        "${board}"
 }
 
 build_example_app()
 {
-    local example_app_ninja_target=${1-}
-    local ot_platform_lib=${2-}
+    set -x
+
+    # Args
+    local example_app_ninja_target="${1:?}"
+    local slcp_file="${2:?}"
     shift 2
 
+    # Parse the project name from the slcp file
+    if [ ! -f "${slcp_file}" ]; then
+        die "SLCP file not found: ${slcp_file}"
+    fi
+    local ot_platform_lib
+    ot_platform_lib=$(grep -oP '(?<=project_name: ).*' "${slcp_file}" | tr -d '\r')
+
     # Generate the platform lib and related libs
-    generate "${ot_platform_lib}"
+    local generated_ot_platform_lib_dir=${slc_generated_projects_dir}/${ot_platform_lib}
+    generate "${slcp_file}" "${generated_ot_platform_lib_dir}"
 
+    # Create the build directory
     builddir="${OT_CMAKE_BUILD_DIR}/examples/${example_app_ninja_target}"
-
     mkdir -p "${builddir}"
     cd "${builddir}"
 
+    # Configure and build the example app
+    local ot_ftd=OFF
+    if [[ ${example_app_ninja_target} == *-ftd ]]; then
+        ot_ftd=ON
+    fi
+    local ot_mtd_ssed=OFF
+    if [[ ${example_app_ninja_target} == *-mtd || ${example_app_ninja_target} == *-ssed ]]; then
+        ot_mtd_ssed=ON
+    fi
     cmake -GNinja \
         -DOT_COMPILE_WARNING_AS_ERROR=ON \
         -DOT_PLATFORM_LIB="${ot_platform_lib}" \
+        -DOT_PLATFORM_LIB_DIR="${generated_ot_platform_lib_dir}" \
         -DOT_EXTERNAL_MBEDTLS="${ot_platform_lib}-mbedtls" \
+        -DOT_RCP=OFF \
+        -DOT_FTD=${ot_ftd} \
+        -DOT_MTD=${ot_mtd_ssed} \
         -DOT_APP_CLI=OFF \
         -DOT_APP_NCP=OFF \
         -DOT_APP_RCP=OFF \
         "$@" \
         "${repo_dir}"
-
     ninja "${example_app_ninja_target}"
 
     create_srec "${builddir}"
     cd "${repo_dir}"
+}
+
+get_associated_cmake_app_option()
+{
+    local cmake_executable="${1:?Please specify a CMake executable target}"
+    case "${cmake_executable}" in
+        sleepy-demo-ftd)
+            echo "EFR32_APP_SLEEPY_DEMO_FTD"
+            ;;
+        sleepy-demo-mtd)
+            echo "EFR32_APP_SLEEPY_DEMO_MTD"
+            ;;
+        sleepy-demo-ssed)
+            echo "EFR32_APP_SLEEPY_DEMO_SSED"
+            ;;
+        *)
+            die "Unknown CMake executable: ${cmake_executable}"
+            ;;
+    esac
+}
+
+# Given a CMake executable name, return the associated SLCP file
+get_associated_slcp()
+{
+    local cmake_executable="${1:?Please specify a CMake executable target}"
+
+    case "${cmake_executable}" in
+        sleepy-demo-ftd)
+            echo "${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons.slcp"
+            ;;
+        sleepy-demo-mtd)
+            echo "${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons-power-manager.slcp"
+            ;;
+        sleepy-demo-ssed)
+            echo "${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons-power-manager-csl.slcp"
+            ;;
+        *)
+            die "Unknown CMake executable: ${cmake_executable}"
+            ;;
+    esac
 }
 
 main()
@@ -221,22 +244,23 @@ main()
 
     options+=("$@")
     export OT_CMAKE_BUILD_DIR="$repo_dir/build/${board}"
+    slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
 
-    build_example_app sleepy-demo-ftd openthread-efr32-soc-with-buttons \
-        -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}" -DEFR32_APP_SLEEPY_DEMO_FTD=ON
-    build_example_app sleepy-demo-mtd openthread-efr32-soc-with-buttons-power-manager \
-        -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}" -DEFR32_APP_SLEEPY_DEMO_MTD=ON
-    build_example_app sleepy-demo-ssed openthread-efr32-soc-with-buttons-power-manager-csl \
-        -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}" -DEFR32_APP_SLEEPY_DEMO_SSED=ON
+    # If no target is specified, build all targets
+    if [ -z "${OT_CMAKE_NINJA_TARGET}" ]; then
+        OT_CMAKE_NINJA_TARGET=(sleepy-demo-ftd sleepy-demo-mtd sleepy-demo-ssed)
+    fi
 
-    apps=(
-        sleepy-demo-ftd
-        sleepy-demo-mtd
-        sleepy-demo-ssed
-    )
-    for app in "${apps[@]}"; do
-        if [ -d "${OT_CMAKE_BUILD_DIR}"/examples/"${app}" ]; then
-            ls -alh "${OT_CMAKE_BUILD_DIR}"/examples/"${app}"/bin/*
+    # Build the example apps
+    for target in "${OT_CMAKE_NINJA_TARGET[@]}"; do
+        build_example_app "${target}" "$(get_associated_slcp "${target}")" \
+            -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}" -D"$(get_associated_cmake_app_option "${target}")"=ON
+    done
+
+    # List the built binaries
+    for target in "${OT_CMAKE_NINJA_TARGET[@]}"; do
+        if [ -d "${OT_CMAKE_BUILD_DIR}"/examples/"${target}" ]; then
+            ls -alh "${OT_CMAKE_BUILD_DIR}"/examples/"${target}"/bin/*
         fi
     done
 }

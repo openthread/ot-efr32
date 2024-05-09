@@ -97,8 +97,6 @@ generate()
         return
     fi
 
-    local slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
-
     if contains ".*-(ftd|mtd)" "${OT_CMAKE_NINJA_TARGET[@]}"; then
         set +x
         echo "========================================================================================================="
@@ -148,6 +146,7 @@ build_rcp_uart()
 
     cmake \
         -GNinja \
+        -DOT_PLATFORM_LIB_DIR="${slc_generated_projects_dir}"/rcp_uart \
         -DOT_FTD=OFF \
         -DOT_MTD=OFF \
         -DOT_RCP=ON \
@@ -177,6 +176,7 @@ build_rcp_spi()
 
     cmake \
         -GNinja \
+        -DOT_PLATFORM_LIB_DIR="${slc_generated_projects_dir}"/rcp_spi \
         -DOT_FTD=OFF \
         -DOT_MTD=OFF \
         -DOT_RCP=ON \
@@ -211,6 +211,7 @@ build_soc()
 
     cmake \
         -GNinja \
+        -DOT_PLATFORM_LIB_DIR="${slc_generated_projects_dir}"/soc \
         -DOT_FTD=ON \
         -DOT_MTD=ON \
         -DOT_RCP=OFF \
@@ -295,6 +296,7 @@ main()
 
     options+=("$@")
     export OT_CMAKE_BUILD_DIR="$repo_dir/build/${board}"
+    slc_generated_projects_dir="${OT_CMAKE_BUILD_DIR}"/slc
 
     # Generate the platform libs and related libs
     if [ -n "${VENDOR_EXTENSION-}" ]; then

@@ -35,9 +35,16 @@ if [[ -n ${BASH_SOURCE[0]} ]]; then
 else
     script_path="$0"
 fi
-script_dir="$(realpath "$(dirname "${script_path}")")"
-repo_dir="$(dirname "${script_dir}")"
-sdk_dir="${repo_dir}/third_party/silabs/gecko_sdk"
+
+# Check if repo_dir is defined
+if [ -z ${repo_dir+x} ]; then
+    script_dir="$(realpath "$(dirname "${script_path}")")"
+    repo_dir="$(dirname "${script_dir}")"
+fi
+# Check if gsdk_dir is defined
+if [ -z ${gsdk_dir+x} ]; then
+    gsdk_dir="${repo_dir}/third_party/silabs/gecko_sdk"
+fi
 
 efr32_device_regex=""
 efr32_device_regex+="\(efr32\)*"                               # Group 1 - efr32 (optional)
@@ -69,7 +76,7 @@ efr32_get_board_slcc()
     # Find component file for latest revision of board
     local board_slcc
     board_slcc=$(
-        find "${sdk_dir}"/hardware/board/component -type f \( -name "${board}*" ! -name '*_support.slcc' \) \
+        find "${gsdk_dir}"/hardware/board/component -type f \( -name "${board}*" ! -name '*_support.slcc' \) \
             | sort --version-sort \
             | tail -n 1
     )
