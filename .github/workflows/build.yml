@@ -72,6 +72,12 @@ jobs:
         with:
           submodules: true
 
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ matrix.gcc_ver }}
+          verbose: 2
+
       - name: Create LFS file hash list
         run: git -C third_party/silabs/gecko_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
 
@@ -94,7 +100,14 @@ jobs:
         run: docker load -i ot-efr32-dev.tar
 
       - name: Start ot-efr32-dev container
-        run: docker run --rm -it --user $(id -u) --name ot-efr32-dev -d -v $PWD:/ot-efr32 -w /ot-efr32 ${{ env.DOCKER_IMAGE_SHA_TAG }}
+        run: |
+          docker run \
+            --rm -it -d \
+            --user $(id -u) \
+            --name ot-efr32-dev \
+            --env CCACHE_DIR=/ot-efr32/.ccache \
+            -v $PWD:/ot-efr32 -w /ot-efr32\
+            ${{ env.DOCKER_IMAGE_SHA_TAG }}
 
       - name: Bootstrap ARM Toolchain
         run: docker exec ot-efr32-dev script/bootstrap arm_toolchain ${{ matrix.gcc_download_url }} ${{ matrix.gcc_extract_dir }} ${{ env.TOOLCHAIN_DIR }}
