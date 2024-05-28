@@ -78,6 +78,11 @@ jobs:
           key: ${{ matrix.gcc_ver }}
           verbose: 2
 
+      - name: Append LFS include config to GSDK .lfsconfig
+        run: |
+          git -C third_party/silabs/gecko_sdk checkout -- .lfsconfig
+          echo 'fetchinclude = "platform/emdrv/nvm3/lib/libnvm3_*_gcc.a,platform/radio/rail_lib/autogen/librail_release/librail_config_mgm*_gcc.a,platform/radio/rail_lib/autogen/librail_release/*efr32xg*_gcc_release.a"' >> third_party/silabs/gecko_sdk/.lfsconfig
+
       - name: Create LFS file hash list
         run: git -C third_party/silabs/gecko_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
 
