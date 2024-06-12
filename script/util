@@ -85,10 +85,14 @@ parse_configuration()
     old_setting=${-//[^e]/}
     set +e
     # grep raw values from the configuration file
-    rcp_uart_slcp="$(grep -oP 'rcp_uart_slcp: \K(.*)' "${config_yml}")"
-    rcp_spi_slcp="$(grep -oP 'rcp_spi_slcp: \K(.*)' "${config_yml}")"
-    soc_slcp="$(grep -oP 'soc_slcp: \K(.*)' "${config_yml}")"
-    board="$(grep -oP 'board: \K(.*)' "${config_yml}")"
+    line="$(grep 'rcp_uart_slcp:' "${config_yml}")"
+    rcp_uart_slcp="$(echo $line//rcp_uart_slcp:/)"
+    line="$(grep 'rcp_spi_slcp:' "${config_yml}")"
+    rcp_spi_slcp="$(echo $line//rcp_spi_slcp:/)"
+    line="$(grep 'soc_slcp:' "${config_yml}")"
+    soc_slcp="$(echo $line//soc_slcp:/)"
+    line="$(grep 'board:' "${config_yml}")"
+    board="$(echo $line//board:/)"
 
     # Strip quotes
     rcp_uart_slcp=$(eval echo "${rcp_uart_slcp}")
@@ -103,3 +107,4 @@ parse_configuration()
     if [[ -n $old_setting ]]; then set -e; else set +e; fi
 
 }
+
