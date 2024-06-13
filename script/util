@@ -105,5 +105,4 @@ parse_configuration()
     rcp_spi_slcp="${extension_dir}/${rcp_spi_slcp#./}"
     soc_slcp="${extension_dir}/${soc_slcp#./}"
     if [[ -n $old_setting ]]; then set -e; else set +e; fi
-
 }
