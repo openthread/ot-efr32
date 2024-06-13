@@ -107,4 +107,3 @@ parse_configuration()
     if [[ -n $old_setting ]]; then set -e; else set +e; fi
 
 }
-
