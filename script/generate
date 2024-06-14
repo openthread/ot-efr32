@@ -178,7 +178,7 @@ generate()
     local project_name=""
     project_line=$(grep 'project_name: ' "${slcp}")
     project_name="${project_line//project_name:/}"
-    project_name="${project_line// /}"
+    project_name="${project_name// /}"
     local generation_dir=${2?A generation output dir is expected as the second argument}
     local export_templates="${repo_dir}/slc/exporter_templates/platform_library"
     local board=${3?A board is expected as the third argument}
