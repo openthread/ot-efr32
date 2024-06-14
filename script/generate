@@ -119,6 +119,7 @@ trust_sdk_and_extensions()
         local extension_name=""
         extension_line=$(grep -m 1 'id: ' "${slce_file}")
         extension_name="${extension_line//id:/}"
+        extension_name="${extension_name// /}"
 
         # Define symlink location
         local extension_symlink="${sdk_dir}/extension/${extension_name}"
@@ -177,6 +178,7 @@ generate()
     local project_name=""
     project_line=$(grep 'project_name: ' "${slcp}")
     project_name="${project_line//project_name:/}"
+    project_name="${project_line// /}"
     local generation_dir=${2?A generation output dir is expected as the second argument}
     local export_templates="${repo_dir}/slc/exporter_templates/platform_library"
     local board=${3?A board is expected as the third argument}

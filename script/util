@@ -94,6 +94,12 @@ parse_configuration()
     line="$(grep 'board:' "${config_yml}")"
     board="${line//board:/}"
 
+    # Strip spaces
+    rcp_uart_slcp="${rcp_uart_slcp// /}"
+    rcp_spi_slcp="${rcp_spi_slcp// /}"
+    soc_slcp="${soc_slcp// /}"
+    board="${board// /}"
+
     # Strip quotes
     rcp_uart_slcp=$(eval echo "${rcp_uart_slcp}")
     rcp_spi_slcp=$(eval echo "${rcp_spi_slcp}")
