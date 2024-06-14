@@ -86,13 +86,13 @@ parse_configuration()
     set +e
     # grep raw values from the configuration file
     line="$(grep 'rcp_uart_slcp:' "${config_yml}")"
-    rcp_uart_slcp="$(echo $line//rcp_uart_slcp:/)"
+    rcp_uart_slcp="${line//rcp_uart_slcp:/}"
     line="$(grep 'rcp_spi_slcp:' "${config_yml}")"
-    rcp_spi_slcp="$(echo $line//rcp_spi_slcp:/)"
+    rcp_spi_slcp="${line//rcp_spi_slcp:/}"
     line="$(grep 'soc_slcp:' "${config_yml}")"
-    soc_slcp="$(echo $line//soc_slcp:/)"
+    soc_slcp="${line//soc_slcp:/}"
     line="$(grep 'board:' "${config_yml}")"
-    board="$(echo $line//board:/)"
+    board="${line//board:/}"
 
     # Strip quotes
     rcp_uart_slcp=$(eval echo "${rcp_uart_slcp}")
