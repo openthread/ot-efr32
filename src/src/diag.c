@@ -73,31 +73,43 @@
 struct PlatformDiagCommand
 {
     const char *mName;
-    otError (*mCommand)(otInstance *aInstance, uint8_t aArgsLength, char *aArgs[], char *aOutput, size_t aOutputMaxLen);
+    otError (*mCommand)(otInstance *aInstance, uint8_t aArgsLength, char *aArgs[]);
 };
 
 // Diagnostics mode variables.
-static bool sDiagMode = false;
+static bool                     sDiagMode            = false;
+static otPlatDiagOutputCallback sDiagOutputCallback  = NULL;
+static void                    *sDiagCallbackContext = NULL;
+
+static void diagOutput(const char *aFormat, ...)
+{
+    va_list args;
+
+    va_start(args, aFormat);
+
+    if (sDiagOutputCallback != NULL)
+    {
+        sDiagOutputCallback(aFormat, args, sDiagCallbackContext);
+    }
+
+    va_end(args);
+}
 
 // *****************************************************************************
 // Helper functions
 // *****************************************************************************
-static void appendErrorResult(otError aError, char *aOutput, size_t aOutputMaxLen)
+static void appendErrorResult(otError aError)
 {
     if (aError != OT_ERROR_NONE)
     {
-        snprintf(aOutput, aOutputMaxLen, "failed\r\nstatus %#x\r\n", aError);
+        diagOutput("failed\r\nstatus %#x\r\n", aError);
     }
 }
 
 // *****************************************************************************
 // CLI functions
 // *****************************************************************************
-static otError processAddressMatch(otInstance *aInstance,
-                                   uint8_t     aArgsLength,
-                                   char       *aArgs[],
-                                   char       *aOutput,
-                                   size_t      aOutputMaxLen)
+static otError processAddressMatch(otInstance *aInstance, uint8_t aArgsLength, char *aArgs[])
 {
     OT_UNUSED_VARIABLE(aInstance);
 
@@ -116,15 +128,11 @@ static otError processAddressMatch(otInstance *aInstance,
     }
 
 exit:
-    appendErrorResult(error, aOutput, aOutputMaxLen);
+    appendErrorResult(error);
     return error;
 }
 
-static otError processAutoAck(otInstance *aInstance,
-                              uint8_t     aArgsLength,
-                              char       *aArgs[],
-                              char       *aOutput,
-                              size_t      aOutputMaxLen)
+static otError processAutoAck(otInstance *aInstance, uint8_t aArgsLength, char *aArgs[])
 {
     OT_UNUSED_VARIABLE(aInstance);
 
@@ -143,7 +151,7 @@ static otError processAutoAck(otInstance *aInstance,
     }
 
 exit:
-    appendErrorResult(error, aOutput, aOutputMaxLen);
+    appendErrorResult(error);
     return error;
 }
 
@@ -155,11 +163,15 @@ const struct PlatformDiagCommand sCommands[] = {
     {"auto-ack", &processAutoAck},
 };
 
-otError otPlatDiagProcess(otInstance *aInstance,
-                          uint8_t     aArgsLength,
-                          char       *aArgs[],
-                          char       *aOutput,
-                          size_t      aOutputMaxLen)
+void otPlatDiagSetOutputCallback(otInstance *aInstance, otPlatDiagOutputCallback aCallback, void *aContext)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    sDiagOutputCallback  = aCallback;
+    sDiagCallbackContext = aContext;
+}
+
+otError otPlatDiagProcess(otInstance *aInstance, uint8_t aArgsLength, char *aArgs[])
 {
     otError error = OT_ERROR_INVALID_COMMAND;
     size_t  i;
@@ -168,11 +180,7 @@ otError otPlatDiagProcess(otInstance *aInstance,
     {
         if (strcmp(aArgs[0], sCommands[i].mName) == 0)
         {
-            error = sCommands[i].mCommand(aInstance,
-                                          aArgsLength - 1,
-                                          aArgsLength > 1 ? &aArgs[1] : NULL,
-                                          aOutput,
-                                          aOutputMaxLen);
+            error = sCommands[i].mCommand(aInstance, aArgsLength - 1, aArgsLength > 1 ? &aArgs[1] : NULL);
             break;
         }
     }
