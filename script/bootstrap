@@ -124,13 +124,15 @@ install_arm_toolchain()
 {
     local url=${1-"https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi.tar.xz"}
     local extract_dir=${2-"arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi"}
+    local toolchain_dir=${3-""}
 
-    local toolchain_dir
-    # Link if root
-    if [ "$EUID" -eq 0 ]; then
-        toolchain_dir=/opt
-    else
-        toolchain_dir="${HOME}/.local"
+    # If toolchain_dir is not provided, use /opt if root, else use ~/.local
+    if [ -z "${toolchain_dir}" ]; then
+        if [ "$EUID" -eq 0 ]; then
+            toolchain_dir=/opt
+        else
+            toolchain_dir="${HOME}/.local"
+        fi
     fi
 
     # Check if the toolchain is already present at the desired location
