@@ -1,6 +1,6 @@
 /*******************************************************************************
  * @brief This file enables support for all Silabs specific features available
- * only through the GSDK
+ * only through the SiSDK
  *******************************************************************************
  * # License
  * <b>Copyright 2023 Silicon Laboratories Inc. www.silabs.com</b>

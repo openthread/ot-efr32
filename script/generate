@@ -39,7 +39,7 @@ else
 fi
 script_dir="$(realpath "$(dirname "${script_path}")")"
 repo_dir="$(dirname "${script_dir}")"
-sdk_dir="${repo_dir}/third_party/silabs/gecko_sdk"
+sdk_dir="${repo_dir}/third_party/silabs/simplicity_sdk"
 
 # shellcheck source=script/slc_cli
 source "${repo_dir}/script/slc_cli"
@@ -86,14 +86,14 @@ trust_sdk_and_extensions()
 
     set +x
     echo "======================================================================"
-    echo "Trusting Gecko SDK              :'${sdk_dir}':"
+    echo "Trusting Simplicity SDK              :'${sdk_dir}':"
     echo "======================================================================"
     set -x
 
-    # Trust the Gecko SDK submodule
+    # Trust the Simplicity SDK submodule
     run_slc --daemon -v 1 signature trust --sdk "${sdk_dir}" -data "${openthread_slc_data}"
 
-    # Ensure GSDK extension folder exists
+    # Ensure SDK extension folder exists
     mkdir -p "${sdk_dir}/extension"
 
     set +x

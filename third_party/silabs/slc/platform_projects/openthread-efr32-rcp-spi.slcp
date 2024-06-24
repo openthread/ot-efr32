@@ -7,7 +7,6 @@ quality: production
 
 component:
   - id: ot_crash_handler
-    from: ot-efr32
   - id: ot_platform_abstraction_core
   - id: ot_mbedtls
   - id: ot_stack_features_config
@@ -20,6 +19,8 @@ component:
 configuration:
   - name: SL_BOARD_ENABLE_VCOM
     value: 1
+  - name: CIRCULAR_QUEUE_LEN_MAX
+    value: 16
 
 define:
   - name: OPENTHREAD_COPROCESSOR

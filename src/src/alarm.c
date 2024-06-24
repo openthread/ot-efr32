@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -43,12 +43,19 @@
 #include "common/debug.hpp"
 #include "common/logging.hpp"
 
+#include "alarm.h"
 #include "platform-efr32.h"
 #include "utils/code_utils.h"
 
 #include "em_core.h"
 #include "rail.h"
 #include "sl_sleeptimer.h"
+
+#ifndef TESTING
+#define STATIC static
+#else
+#define STATIC
+#endif
 
 // timer data for handling wrapping
 typedef struct wrap_timer_data wrap_timer_data_t;
@@ -71,7 +78,8 @@ static bool              sIsUsRunning     = false;
 static wrap_timer_data_t micro_timer_data = {0};
 
 // millisecond-alarm callback
-static void AlarmCallback(sl_sleeptimer_timer_handle_t *aHandle, void *aData)
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_OT_PLATFORM_ABSTRACTION, SL_CODE_CLASS_TIME_CRITICAL)
+STATIC void AlarmCallback(sl_sleeptimer_timer_handle_t *aHandle, void *aData)
 {
     if (aData == NULL)
     {
@@ -106,7 +114,8 @@ static void AlarmCallback(sl_sleeptimer_timer_handle_t *aHandle, void *aData)
 }
 
 // microsecond-alarm callback
-static void radioTimerExpired(struct RAIL_MultiTimer *tmr, RAIL_Time_t expectedTimeOfEvent, void *cbArg)
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_OT_PLATFORM_ABSTRACTION, SL_CODE_CLASS_TIME_CRITICAL)
+STATIC void radioTimerExpired(struct RAIL_MultiTimer *tmr, RAIL_Time_t expectedTimeOfEvent, void *cbArg)
 {
     if (cbArg == NULL)
     {
@@ -139,109 +148,12 @@ static void radioTimerExpired(struct RAIL_MultiTimer *tmr, RAIL_Time_t expectedT
 void efr32AlarmInit(void)
 {
     memset(&sl_handle, 0, sizeof sl_handle);
-}
-
-uint32_t otPlatAlarmMilliGetNow(void)
-{
-    uint64_t    ticks;
-    uint64_t    now;
-    sl_status_t status;
-
-    ticks  = sl_sleeptimer_get_tick_count64();
-    status = sl_sleeptimer_tick64_to_ms(ticks, &now);
-    OT_ASSERT(status == SL_STATUS_OK);
-    return (uint32_t)now;
-}
-
-uint32_t otPlatTimeGetXtalAccuracy(void)
-{
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-    // For sleepies, we need to account for the low-frequency crystal
-    // accuracy when they go to sleep.  Accounting for that as well,
-    // for the worst case.
-    if (efr32AllowSleepCallback())
-    {
-        return SL_OPENTHREAD_HFXO_ACCURACY + SL_OPENTHREAD_LFXO_ACCURACY;
-    }
-#endif
-    return SL_OPENTHREAD_HFXO_ACCURACY;
-}
-
-void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
-{
-    OT_UNUSED_VARIABLE(aInstance);
-
-    sl_status_t status;
-    int64_t     remaining;
-    uint32_t    initial_wrap_time;
-
-    sl_sleeptimer_stop_timer(&sl_handle);
-
-    sMsAlarm     = (uint64_t)aT0 + (uint64_t)aDt;
-    remaining    = (int64_t)sMsAlarm - (int64_t)otPlatAlarmMilliGetNow();
-    sIsMsRunning = true;
-
-    if (remaining <= 0)
-    {
-        otSysEventSignalPending();
-    }
-    else
-    {
-        // The maximum value accepted by sleep timer ms32 APIs can be retrieved
-        // using sl_sleeptimer_get_max_ms32_conversion().
-        //
-        // (See platform/service/sleeptimer/inc/sl_sleeptimer.h)
-        //
-        if (remaining > sl_sleeptimer_get_max_ms32_conversion())
-        {
-            initial_wrap_time                 = (uint32_t)(remaining % sl_sleeptimer_get_max_ms32_conversion());
-            milli_timer_data.overflow_max     = (uint16_t)(remaining / sl_sleeptimer_get_max_ms32_conversion());
-            milli_timer_data.overflow_counter = 0;
-
-            // Start a timer with the initial time
-            status = sl_sleeptimer_start_timer_ms(&sl_handle,
-                                                  initial_wrap_time,
-                                                  AlarmCallback,
-                                                  (void *)&milli_timer_data,
-                                                  0,
-                                                  SL_SLEEPTIMER_NO_HIGH_PRECISION_HF_CLOCKS_REQUIRED_FLAG);
-            OT_ASSERT(status == SL_STATUS_OK);
-        }
-        else
-        {
-            status = sl_sleeptimer_start_timer_ms(&sl_handle,
-                                                  (uint32_t)remaining,
-                                                  AlarmCallback,
-                                                  NULL,
-                                                  0,
-                                                  SL_SLEEPTIMER_NO_HIGH_PRECISION_HF_CLOCKS_REQUIRED_FLAG);
-            OT_ASSERT(status == SL_STATUS_OK);
-        }
-    }
-}
-
-uint64_t efr32AlarmPendingTime(void)
-{
-    uint64_t remaining = 0;
-    uint32_t now       = otPlatAlarmMilliGetNow();
-    if (sIsMsRunning && (sMsAlarm > now))
-    {
-        remaining = sMsAlarm - (uint64_t)now;
-    }
-    return remaining;
-}
-
-bool efr32AlarmIsRunning(otInstance *aInstance)
-{
-    return (otInstanceIsInitialized(aInstance) ? sIsMsRunning : false);
-}
-
-void otPlatAlarmMilliStop(otInstance *aInstance)
-{
-    OT_UNUSED_VARIABLE(aInstance);
-
-    sl_sleeptimer_stop_timer(&sl_handle);
+    sMsAlarm     = 0;
+    sUsAlarm     = 0;
     sIsMsRunning = false;
+    sIsUsRunning = false;
+    memset(&milli_timer_data, 0, sizeof milli_timer_data);
+    memset(&micro_timer_data, 0, sizeof micro_timer_data);
 }
 
 void efr32AlarmProcess(otInstance *aInstance)
@@ -301,6 +213,119 @@ void efr32AlarmProcess(otInstance *aInstance)
 #endif
 }
 
+uint64_t efr32AlarmPendingTime(void)
+{
+    uint64_t remaining = 0;
+    uint32_t now       = otPlatAlarmMilliGetNow();
+    if (sIsMsRunning && (sMsAlarm > now))
+    {
+        remaining = sMsAlarm - (uint64_t)now;
+    }
+    return remaining;
+}
+
+bool efr32AlarmIsRunning(otInstance *aInstance)
+{
+    return (otInstanceIsInitialized(aInstance) ? sIsMsRunning : false);
+}
+
+uint32_t otPlatAlarmMilliGetNow(void)
+{
+    uint64_t    ticks;
+    uint64_t    now;
+    sl_status_t status;
+
+    ticks  = sl_sleeptimer_get_tick_count64();
+    status = sl_sleeptimer_tick64_to_ms(ticks, &now);
+    OT_ASSERT(status == SL_STATUS_OK);
+    return (uint32_t)now;
+}
+
+uint32_t otPlatTimeGetXtalAccuracy(void)
+{
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    // For sleepies, we need to account for the low-frequency crystal
+    // accuracy when they go to sleep.  Accounting for that as well,
+    // for the worst case.
+    if (efr32AllowSleepCallback())
+    {
+        return SL_OPENTHREAD_HFXO_ACCURACY + SL_OPENTHREAD_LFXO_ACCURACY;
+    }
+#endif
+    return SL_OPENTHREAD_HFXO_ACCURACY;
+}
+
+void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    sl_status_t status;
+    int64_t     remaining;
+    uint32_t    initial_wrap_time;
+
+    otEXPECT(sl_ot_rtos_task_can_access_pal());
+
+    sl_sleeptimer_stop_timer(&sl_handle);
+
+    sMsAlarm     = (uint64_t)aT0 + (uint64_t)aDt;
+    remaining    = (int64_t)sMsAlarm - (int64_t)otPlatAlarmMilliGetNow();
+    sIsMsRunning = true;
+
+    if (remaining <= 0)
+    {
+        otSysEventSignalPending();
+    }
+    else
+    {
+        // The maximum value accepted by sleep timer ms32 APIs can be retrieved
+        // using sl_sleeptimer_get_max_ms32_conversion().
+        //
+        // (See platform/service/sleeptimer/inc/sl_sleeptimer.h)
+        //
+        if (remaining > sl_sleeptimer_get_max_ms32_conversion())
+        {
+            initial_wrap_time                 = (uint32_t)(remaining % sl_sleeptimer_get_max_ms32_conversion());
+            milli_timer_data.overflow_max     = (uint16_t)(remaining / sl_sleeptimer_get_max_ms32_conversion());
+            milli_timer_data.overflow_counter = 0;
+
+            // Start a timer with the initial time
+            status = sl_sleeptimer_start_timer_ms(&sl_handle,
+                                                  initial_wrap_time,
+                                                  AlarmCallback,
+                                                  (void *)&milli_timer_data,
+                                                  0,
+                                                  SL_SLEEPTIMER_NO_HIGH_PRECISION_HF_CLOCKS_REQUIRED_FLAG);
+            OT_ASSERT(status == SL_STATUS_OK);
+        }
+        else
+        {
+            status = sl_sleeptimer_start_timer_ms(&sl_handle,
+                                                  (uint32_t)remaining,
+                                                  AlarmCallback,
+                                                  NULL,
+                                                  0,
+                                                  SL_SLEEPTIMER_NO_HIGH_PRECISION_HF_CLOCKS_REQUIRED_FLAG);
+            OT_ASSERT(status == SL_STATUS_OK);
+        }
+    }
+
+exit:
+    return;
+}
+
+void otPlatAlarmMilliStop(otInstance *aInstance)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    otEXPECT(sl_ot_rtos_task_can_access_pal());
+
+    sl_sleeptimer_stop_timer(&sl_handle);
+    sIsMsRunning = false;
+
+exit:
+    return;
+}
+
 uint32_t otPlatAlarmMicroGetNow(void)
 {
     return RAIL_GetTime();
@@ -334,6 +359,8 @@ void otPlatAlarmMicroStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
     int64_t       remaining;
     uint32_t      initial_wrap_time;
 
+    otEXPECT(sl_ot_rtos_task_can_access_pal());
+
     RAIL_CancelMultiTimer(&rail_timer);
 
     sUsAlarm     = (uint64_t)aT0 + (uint64_t)aDt;
@@ -366,12 +393,20 @@ void otPlatAlarmMicroStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
             OT_ASSERT(status == RAIL_STATUS_NO_ERROR);
         }
     }
+
+exit:
+    return;
 }
 
 void otPlatAlarmMicroStop(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
 
+    otEXPECT(sl_ot_rtos_task_can_access_pal());
+
     RAIL_CancelMultiTimer(&rail_timer);
     sIsUsRunning = false;
+
+exit:
+    return;
 }

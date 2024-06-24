@@ -29,7 +29,7 @@
 
 # ==============================================================================
 # Bash definitions
-
+# ==============================================================================
 if [[ -n ${BASH_SOURCE[0]} ]]; then
     script_path="${BASH_SOURCE[0]}"
 else
@@ -37,8 +37,10 @@ else
 fi
 script_dir="$(realpath "$(dirname "${script_path}")")"
 repo_dir="$(dirname "${script_dir}")"
-gsdk_dir="${repo_dir}/third_party/silabs/gecko_sdk"
 
+
+
+# ==============================================================================
 # shellcheck source=script/efr32-definitions
 source "${repo_dir}/script/efr32-definitions"
 
@@ -49,36 +51,54 @@ set -euxo pipefail
 
 # ==============================================================================
 # Pre-build checks
-
-set +x
-echo "========================================================================================================="
-echo "Check if the Git LFS package is installed"
-echo "========================================================================================================="
-set -x
-if ! git lfs >/dev/null; then
+# ==============================================================================
+# Initialize the Silicon Labs SDK
+# This function initializes the Silicon Labs SDK submodule and checks if the platform is supported
+# Arguments:
+#   $1: The board name
+# Returns:
+#   None
+init_silabs_sdk()
+{
     set +x
-    echo "ERROR: Git LFS is not installed"
-    echo
-    echo "Please run './script/bootstrap packages'" to install it
-    exit 3
-fi
+    echo "========================================================================================================="
+    echo "Ensure SDK submodule has been initialized"
+    echo "========================================================================================================="
+    set -x
+    # Skip LFS files for now. They will be pulled in init_silabs_sdk_lfs()
+    GIT_LFS_SKIP_SMUDGE=true git submodule update --init "${sdk_dir}"
 
-set +x
-echo "========================================================================================================="
-echo "Ensure Git LFS has been initialized for the GSDK"
-echo "========================================================================================================="
-set -x
-if [ ! -f "$(git -C "${gsdk_dir}" rev-parse --git-dir)/hooks/pre-push" ]; then
-    git -C "${gsdk_dir}" lfs install
-fi
+    set +x
+    echo "========================================================================================================="
+    echo "Check if the Git LFS package is installed"
+    echo "========================================================================================================="
+    set -x
+    if ! git lfs >/dev/null; then
+        set +x
+        echo "ERROR: Git LFS is not installed"
+        echo
+        echo "Please run './script/bootstrap packages'" to install it
+        exit 3
+    fi
 
-set +x
-echo "========================================================================================================="
-echo "Ensure GSDK submodule has been initialized and LFS objects have been pulled"
-echo "========================================================================================================="
-set -x
-git submodule update --init "${gsdk_dir}"
-git -C "${gsdk_dir}" lfs pull
+    set +x
+    echo "========================================================================================================="
+    echo "Ensure Git LFS has been initialized for the SDK"
+    echo "========================================================================================================="
+    set -x
+    if [ ! -f "$(git -C "${sdk_dir}" rev-parse --git-dir)/hooks/pre-push" ]; then
+        git -C "${sdk_dir}" lfs install
+    fi
+
+    set +x
+    echo "========================================================================================================="
+    echo "Ensure LFS objects have been pulled"
+    echo "========================================================================================================="
+    set -x
+
+    # TODO: Add .lfsconfig lines to only fetch the necessary files
+    git -C "${sdk_dir}" lfs pull
+}
 
 # ==============================================================================
 OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET-}
@@ -281,20 +301,28 @@ main()
         shift
     fi
 
-    platform=$(efr32_get_platform "${board}")
+    # Check if a platform can be found for a given board in Simplicity SDK
+    platform=$(efr32_get_platform "${board}" "${sisdk_dir}")
+
+    # Check if the platform is supported
     efr32_check_platform "${platform}" || die "Unsupported platform ${platform}"
+
+    set +x
+    echo "========================================================================================================="
+    echo "Using Simplicity SDK for board ${board} (${platform})"
+    echo "========================================================================================================="
+    set -x
+    # Initialize the SDK
+    init_silabs_sdk "${board}"
 
     local options=("${OT_OPTIONS[@]}")
 
     options+=("-DCMAKE_TOOLCHAIN_FILE=src/${platform}/arm-none-eabi.cmake")
 
+    # Set default OT_CMAKE_NINJA_TARGET based on platform
     if [ -z "${OT_CMAKE_NINJA_TARGET}" ]; then
         case "${platform}" in
-            efr32mg1)
-                OT_CMAKE_NINJA_TARGET=("ot-rcp-uart")
-                skip_silabs_apps=true
-                ;;
-            efr32mg12 | efr32mg13 | efr32mg21 | efr32mg24)
+            efr32mg2*)
                 OT_CMAKE_NINJA_TARGET=("ot-rcp-uart" "ot-rcp-spi" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
                 ;;
         esac

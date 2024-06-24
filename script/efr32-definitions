@@ -41,10 +41,6 @@ if [ -z ${repo_dir+x} ]; then
     script_dir="$(realpath "$(dirname "${script_path}")")"
     repo_dir="$(dirname "${script_dir}")"
 fi
-# Check if gsdk_dir is defined
-if [ -z ${gsdk_dir+x} ]; then
-    gsdk_dir="${repo_dir}/third_party/silabs/gecko_sdk"
-fi
 
 efr32_device_regex=""
 efr32_device_regex+="\(efr32\)*"                               # Group 1 - efr32 (optional)
@@ -60,23 +56,36 @@ efr32_device_regex+=".*"                                       # Rest of line
 readonly efr32_device_regex
 
 # ==============================================================================
+# SDKs
+# ==============================================================================
+# Simplicity SDK
+sisdk_dir="${repo_dir}/third_party/silabs/simplicity_sdk"
+readonly sisdk_dir
 
+# SDK directory to use
+sdk_dir="${sisdk_dir}"
+
+# ==============================================================================
 efr32_get_board_slcc()
 {
     local -r \
         doc="Gets the latest revision .slcc file for a efr32 board"
     #
     # Arg $1 -- efr32 board
-    if [ $# -ne 1 ] || [ -z "$1" ]; then
+    # Arg $2 -- SDK directory (optional)
+    if [ $# -lt 1 ] || [ -z "$1" ]; then
         printf "%s\n\nUsage:\n\t%s <efr32_board> \n" "${doc}" "${FUNCNAME[0]}" >&2
         return 1
     fi
-    local board=$1
+
+    # Default to existing values if not provided as arguments
+    local board=${1:-${board:?}}
+    local sdk_dir=${2:-${sdk_dir:?}}
 
     # Find component file for latest revision of board
     local board_slcc
     board_slcc=$(
-        find "${gsdk_dir}"/hardware/board/component -type f \( -name "${board}*" ! -name '*_support.slcc' \) \
+        find "${sdk_dir}"/hardware/board/component -type f \( -name "${board}*" ! -name '*_support.slcc' \) \
             | sort --version-sort \
             | tail -n 1
     )
@@ -85,7 +94,19 @@ efr32_get_board_slcc()
 
 efr32_get_platform()
 {
-    local board=${board-$1}
+    local -r \
+        doc="Gets the platform for a efr32 board"
+    #
+    # Arg $1 -- efr32 board (optional)
+    # Arg $2 -- SDK directory (optional)
+    if [ $# -gt 2 ]; then
+        printf "%s\n\nUsage:\n\t%s <efr32_board> \n" "${doc}" "${FUNCNAME[0]}" >&2
+        return 1
+    fi
+
+    # Default to existing values if not provided as arguments
+    local board=${1:-${board:?}}
+    local sdk_dir=${2:-${sdk_dir:?}}
 
     # Find component file for latest revision of board
     local board_slcc
@@ -99,16 +120,12 @@ efr32_get_platform()
             | head -n 1
     )
 
-    if [ -z "${platform}" ]; then
-        echo "Error parsing platform"
-        exit 3
-    fi
-
     echo "${platform}"
 }
 
 efr32_get_platforms()
 {
+    # TODO:
     local platform_dir="$repo_dir/src" \
         && find "$platform_dir" -type d -name '*efr32*' -exec basename {} \; | sort
 }
@@ -130,8 +147,8 @@ efr32_check_platform()
 
     if ! $match; then
         set +x
-        printf "\n\nERROR: Invalid platform\n" >&2
-        printf "Valid platforms:\n" >&2
+        printf "\n\nERROR: Unsupported platform\n" >&2
+        printf "Supported platforms:\n" >&2
         for platform in $(efr32_get_platforms); do
             printf " - %s\n" "${platform}" >&2
         done

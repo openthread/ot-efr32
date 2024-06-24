@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -670,29 +670,29 @@ otError otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
     // Initialize key derivation
     psa_key_derivation_operation_t operation = psa_key_derivation_operation_init();
     status                                   = psa_key_derivation_setup(&operation, algo);
-    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
     // Set capacity
     status = psa_key_derivation_set_capacity(&operation, aKeyLen);
-    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
     // Set iteration count as cost
     status = psa_key_derivation_input_integer(&operation, PSA_KEY_DERIVATION_INPUT_COST, aIterationCounter);
-    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
     // Create salt as a key
     psa_key_attributes_t saltKeyAttr = psa_key_attributes_init();
     psa_set_key_usage_flags(&saltKeyAttr, PSA_KEY_USAGE_DERIVE);
     psa_set_key_type(&saltKeyAttr, PSA_KEY_TYPE_RAW_DATA);
     psa_set_key_algorithm(&saltKeyAttr, algo);
-    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
     status = psa_import_key(&saltKeyAttr, aSalt, aSaltLen, &saltKeyId);
-    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
     // Provide salt
     status = psa_key_derivation_input_key(&operation, PSA_KEY_DERIVATION_INPUT_SALT, saltKeyId);
-    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
     // Create key for password (key)
     psa_key_attributes_t passwordKeyAttr = psa_key_attributes_init();
@@ -701,11 +701,11 @@ otError otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
     psa_set_key_algorithm(&passwordKeyAttr, algo);
 
     status = psa_import_key(&passwordKeyAttr, aPassword, aPasswordLen, &passwordKeyId);
-    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
     // Provide password (key)
     status = psa_key_derivation_input_key(&operation, PSA_KEY_DERIVATION_INPUT_PASSWORD, passwordKeyId);
-    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
     // Configure output as a key
     psa_key_attributes_t keyAttrResult = psa_key_attributes_init();
@@ -715,11 +715,11 @@ otError otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
     psa_set_key_algorithm(&keyAttrResult, PSA_ALG_CTR);
 
     status = psa_key_derivation_output_key(&keyAttrResult, &operation, &keyId);
-    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
     // Export output key
     status = psa_export_key(keyId, aKey, aKeyLen, &outSize);
-    otEXPECT_ACTION(status == PSA_SUCCESS, error = OT_ERROR_FAILED);
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
 
     // Release keys used
     psa_destroy_key(keyId);

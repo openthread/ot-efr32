@@ -180,8 +180,8 @@ set(LD_FILE "${CMAKE_CURRENT_SOURCE_DIR}/autogen/linkerfile.ld")
 target_link_libraries({{PROJECT_NAME}}
     PUBLIC
 {%- for lib_name in SYS_LIBS+USER_LIBS %}
-    {#- Ignore GSDK static libs. These will be added below #}
-    {%- if 'SILABS_GSDK_DIR' not in lib_name %}
+    {#- Ignore SDK static libs. These will be added below #}
+    {%- if 'SILABS_SDK_DIR' not in lib_name %}
         {{ lib_name }}
     {%- endif %}
 {%- endfor %}
@@ -202,20 +202,20 @@ target_link_options({{PROJECT_NAME}} PRIVATE {{ print_linker_flags() }}
 {% set lib_list = SYS_LIBS + USER_LIBS %}
 {%- if lib_list -%}
 # ==============================================================================
-# Static libraries from GSDK
+# Static libraries from SDK
 # ==============================================================================
-{#- Generate a list of GSDK libs #}
-set(GSDK_LIBS
+{#- Generate a list of SDK libs #}
+set(SDK_LIBS
 {%- for lib_name in lib_list -%}
-    {%- if ('SILABS_GSDK_DIR' in lib_name) and ('jlink' not in lib_name) %}
+    {%- if ('SILABS_SDK_DIR' in lib_name) and ('jlink' not in lib_name) %}
     {{lib_name}}
     {%- endif %}
 {%- endfor %}
 )
 
-# Import GSDK static libs and set a dependency on the GSDK library
+# Import SDK static libs and set a dependency on the SDK library
 # This will ensure proper linking order
-foreach(lib_file ${GSDK_LIBS})
+foreach(lib_file ${SDK_LIBS})
     # Parse lib name, stripping .a extension
     get_filename_component(lib_name ${lib_file} NAME_WE)
     set(imported_lib_name "silabs-${lib_name}")

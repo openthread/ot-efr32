@@ -106,23 +106,23 @@ jobs:
             -v $PWD:/ot-efr32 -w /ot-efr32\
             ${{ env.DOCKER_IMAGE_SHA_TAG }}
 
-      - name: Append LFS include config to GSDK .lfsconfig
+      - name: Append LFS include config to simplicity_sdk .lfsconfig
         run: |
-          git -C third_party/silabs/gecko_sdk checkout -- .lfsconfig
-          echo 'fetchinclude = "platform/emdrv/nvm3/lib/libnvm3_*_gcc.a,platform/radio/rail_lib/autogen/librail_release/librail_config_mgm*_gcc.a,platform/radio/rail_lib/autogen/librail_release/*efr32xg*_gcc_release.a"' >> third_party/silabs/gecko_sdk/.lfsconfig
+          git -C third_party/silabs/simplicity_sdk checkout -- .lfsconfig
+          echo 'fetchinclude = "platform/emdrv/nvm3/lib/libnvm3_*_gcc.a,platform/radio/rail_lib/autogen/librail_release/librail_config_mgm*_gcc.a,platform/radio/rail_lib/autogen/librail_release/*efr32xg*_gcc_release.a"' >> third_party/silabs/simplicity_sdk/.lfsconfig
 
       - name: Create LFS file hash list
-        run: git -C third_party/silabs/gecko_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+        run: git -C third_party/silabs/simplicity_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
 
-      - name: Restore gecko_sdk LFS cache
+      - name: Restore simplicity_sdk LFS cache
         uses: actions/cache@v4
-        id: lfs-cache-gecko_gsdk
+        id: lfs-cache-simplicity_sdk
         with:
-            path: .git/modules/third_party/silabs/gecko_sdk/lfs
+            path: .git/modules/third_party/silabs/simplicity_sdk/lfs
             key: lfs-${{ hashFiles('.lfs-assets-id') }}
 
       - name: Git LFS Pull
-        run: git -C third_party/silabs/gecko_sdk lfs pull
+        run: git -C third_party/silabs/simplicity_sdk lfs pull
 
       - name: Build
         run: docker exec ot-efr32-dev bash -c 'PATH=${{ env.TOOLCHAIN_DIR }}/${{ matrix.gcc_extract_dir }}/bin:$PATH script/test'

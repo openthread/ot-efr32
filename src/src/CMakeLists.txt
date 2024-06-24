@@ -44,7 +44,6 @@ add_library(efr32-platform-utils OBJECT)
 
 # Create a list with all sources in "openthread-platform-utils"
 get_target_property(OPENTHREAD_PLATFORM_UTILS_SOURCES openthread-platform-utils SOURCES)
-message(DEBUG "DEFAULT_OPENTHREAD_PLATFORM_UTILS_SOURCES (Original)\n\t" "${DEFAULT_OPENTHREAD_PLATFORM_UTILS_SOURCES}")
 
 # A list of sources that should be taken from the current directory instead of "openthread/examples/platforms/utils"
 file(GLOB EFR32_PAL_SOURCES
@@ -54,6 +53,7 @@ file(GLOB EFR32_PAL_SOURCES
 
 # Remove sources that will be taken from "src/src"
 set(DEFAULT_OPENTHREAD_PLATFORM_UTILS_SOURCES ${OPENTHREAD_PLATFORM_UTILS_SOURCES})
+message(DEBUG "DEFAULT_OPENTHREAD_PLATFORM_UTILS_SOURCES (Original)\n\t" "${DEFAULT_OPENTHREAD_PLATFORM_UTILS_SOURCES}")
 list(REMOVE_ITEM DEFAULT_OPENTHREAD_PLATFORM_UTILS_SOURCES ${EFR32_PAL_SOURCES})
 
 # Prepend SOURCE_DIR from  "openthread-platform-utils" for all default sources for use with target_sources()

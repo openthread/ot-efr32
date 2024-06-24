@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -55,21 +55,16 @@
 #include "sl_status.h"
 
 #ifdef SL_CATALOG_KERNEL_PRESENT
-
-static unsigned int sGpioIntContext = 0;
-
-static void gpioSerialWakeupCallback(uint8_t interrupt_no, void *context)
-{
-    unsigned int *pin = (unsigned int *)context;
-
-    (void)interrupt_no;
-
-    if (*pin == SL_UARTDRV_USART_VCOM_RX_PIN)
-    {
-        otSysEventSignalPending();
-    }
-}
+#include "sl_ot_rtos_adaptation.h"
 #endif // SL_CATALOG_KERNEL_PRESENT
+
+#define IRQ_CONCAT(type, instance, property) type##instance##property
+
+#define IRQ_LABEL_FORMAT(peripheral_no) IRQ_CONCAT(USART, peripheral_no, _RX_IRQn)
+#define IRQ_HANDLER_FORMAT(peripheral_no) IRQ_CONCAT(USART, peripheral_no, _RX_IRQHandler)
+
+#define USART_IRQ IRQ_LABEL_FORMAT(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
+#define USART_IRQHandler IRQ_HANDLER_FORMAT(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
 
 enum
 {
@@ -81,8 +76,9 @@ enum
 #define RECEIVE_BUFFER_SIZE 128
 static uint8_t       sReceiveBuffer1[RECEIVE_BUFFER_SIZE];
 static uint8_t       sReceiveBuffer2[RECEIVE_BUFFER_SIZE];
-static uint8_t       lastCount   = 0;
-static volatile bool sTxComplete = false;
+static uint8_t       lastCount    = 0;
+static volatile bool sTxComplete  = false;
+static volatile bool sRxDataReady = false;
 
 typedef struct ReceiveFifo_t
 {
@@ -99,6 +95,21 @@ static ReceiveFifo_t sReceiveFifo;
 static void processReceive(void);
 static void processTransmit(void);
 
+/* Clear the RXDATAV interrupt field by reading the RXDATA register */
+static inline void clearRxIRQ(void)
+{
+    (void)USART_RxDataGet(SL_UARTDRV_USART_VCOM_PERIPHERAL);
+}
+
+void USART_IRQHandler(void)
+{
+    sRxDataReady = true;
+    clearRxIRQ();
+#ifdef SL_CATALOG_KERNEL_PRESENT
+    sl_ot_rtos_set_pending_event(SL_OT_RTOS_EVENT_UART);
+#endif
+}
+
 static void receiveDone(UARTDRV_Handle_t aHandle, Ecode_t aStatus, uint8_t *aData, UARTDRV_Count_t aCount)
 {
     OT_UNUSED_VARIABLE(aStatus);
@@ -112,7 +123,10 @@ static void receiveDone(UARTDRV_Handle_t aHandle, Ecode_t aStatus, uint8_t *aDat
     }
 
     UARTDRV_Receive(aHandle, aData, aCount, receiveDone);
-    otSysEventSignalPending();
+
+#ifdef SL_CATALOG_KERNEL_PRESENT
+    sl_ot_rtos_set_pending_event(SL_OT_RTOS_EVENT_UART); // Receive Done event
+#endif
 }
 
 static void transmitDone(UARTDRV_Handle_t aHandle, Ecode_t aStatus, uint8_t *aData, UARTDRV_Count_t aCount)
@@ -124,7 +138,9 @@ static void transmitDone(UARTDRV_Handle_t aHandle, Ecode_t aStatus, uint8_t *aDa
 
     // This value will be used later in processTransmit() to call otPlatUartSendDone()
     sTxComplete = true;
-    otSysEventSignalPending();
+#ifdef SL_CATALOG_KERNEL_PRESENT
+    sl_ot_rtos_set_pending_event(SL_OT_RTOS_EVENT_UART);
+#endif
 }
 
 static void processReceive(void)
@@ -132,12 +148,21 @@ static void processReceive(void)
     uint8_t        *aData;
     UARTDRV_Count_t aCount, remaining;
 
-    CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(sl_uartdrv_usart_vcom_handle, &aData, &aCount, &remaining);
-                        if (aCount > lastCount) {
-                            memcpy(sReceiveFifo.mBuffer + sReceiveFifo.mTail, aData + lastCount, aCount - lastCount);
-                            sReceiveFifo.mTail = (sReceiveFifo.mTail + aCount - lastCount) % kReceiveFifoSize;
-                            lastCount          = aCount;
-                        })
+    otEXPECT(sRxDataReady);
+
+    CORE_DECLARE_IRQ_STATE;
+    CORE_ENTER_ATOMIC();
+
+    sRxDataReady = false;
+    UARTDRV_GetReceiveStatus(sl_uartdrv_usart_vcom_handle, &aData, &aCount, &remaining);
+    if (aCount > lastCount)
+    {
+        memcpy(sReceiveFifo.mBuffer + sReceiveFifo.mTail, aData + lastCount, aCount - lastCount);
+        sReceiveFifo.mTail = (sReceiveFifo.mTail + aCount - lastCount) % kReceiveFifoSize;
+        lastCount          = aCount;
+    }
+
+    CORE_EXIT_ATOMIC();
 
     // Copy tail to prevent multiple reads
     uint16_t tail = sReceiveFifo.mTail;
@@ -159,18 +184,19 @@ static void processReceive(void)
         // Set mHead to the local tail we have cached
         sReceiveFifo.mHead = tail;
     }
+exit:
+    return;
 }
 
 static void processTransmit(void)
 {
     // NOTE: This check needs to be done in here and cannot be done in transmitDone because the transmit may not be
     // fully complete when the transmitDone callback is called.
-    if (!sTxComplete)
-    {
-        return;
-    }
+    otEXPECT(sTxComplete);
     sTxComplete = false;
     otPlatUartSendDone();
+exit:
+    return;
 }
 
 void efr32UartProcess(void)
@@ -183,18 +209,10 @@ otError otPlatUartEnable(void)
 {
     otError error = OT_ERROR_NONE;
 
-#ifdef SL_CATALOG_KERNEL_PRESENT
-    unsigned int intNo;
-
-    GPIOINT_Init();
-
-    sGpioIntContext = SL_UARTDRV_USART_VCOM_RX_PIN;
-    intNo = GPIOINT_CallbackRegisterExt(SL_UARTDRV_USART_VCOM_RX_PIN, gpioSerialWakeupCallback, &sGpioIntContext);
-
-    otEXPECT_ACTION(intNo != INTERRUPT_UNAVAILABLE, error = OT_ERROR_FAILED);
-
-    GPIO_ExtIntConfig(SL_UARTDRV_USART_VCOM_RX_PORT, SL_UARTDRV_USART_VCOM_RX_PIN, intNo, false, true, true);
-#endif
+    // Enable USART interrupt to wake OT task when data arrives
+    NVIC_ClearPendingIRQ(USART_IRQ);
+    NVIC_EnableIRQ(USART_IRQ);
+    USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
 
     sReceiveFifo.mHead = 0;
     sReceiveFifo.mTail = 0;
@@ -204,9 +222,6 @@ otError otPlatUartEnable(void)
     UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, sReceiveBuffer1, RECEIVE_BUFFER_SIZE, receiveDone);
     UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, sReceiveBuffer2, RECEIVE_BUFFER_SIZE, receiveDone);
 
-#ifdef SL_CATALOG_KERNEL_PRESENT
-exit:
-#endif
     return error;
 }
 

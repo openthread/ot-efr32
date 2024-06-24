@@ -36,7 +36,7 @@ set(CMAKE_RANLIB                   arm-none-eabi-ranlib)
 
 execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE COMPILER_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set(COMMON_C_FLAGS                 "-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mthumb -fdata-sections -ffunction-sections")
+set(COMMON_C_FLAGS                 "-mcpu=cortex-m33 -mthumb -fmessage-length=0 -ffunction-sections -fdata-sections -mfpu=fpv5-sp-d16 -mfloat-abi=hard")
 
 set(CMAKE_C_FLAGS_INIT             "${COMMON_C_FLAGS} -std=c99")
 set(CMAKE_CXX_FLAGS_INIT           "${COMMON_C_FLAGS} -fno-exceptions -fno-rtti")
