@@ -59,6 +59,12 @@ OT_OPTIONS=(
     "-DOT_PING_SENDER=ON"
     "-DOT_SLAAC=ON"
 )
+
+# Check if ccache is installed and use it if available
+if command -v ccache >/dev/null; then
+    OT_OPTIONS+=("-DCMAKE_C_COMPILER_LAUNCHER=ccache")
+    OT_OPTIONS+=("-DCMAKE_CXX_COMPILER_LAUNCHER=ccache")
+fi
 readonly OT_OPTIONS
 
 die()

@@ -48,6 +48,7 @@ install_packages_apt()
     # Install dependencies
     sudo apt-get update
     apt_packages=(
+        ccache
         coreutils
         git
         git-lfs
@@ -77,6 +78,7 @@ install_packages_brew()
     echo 'Installing script dependencies...'
 
     brew_packages=(
+        ccache
         coreutils
         git
         git-lfs
