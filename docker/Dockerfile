@@ -1,4 +1,6 @@
-FROM ubuntu:22.04
+ARG BASE_IMAGE='ubuntu:22.04'
+
+FROM ${BASE_IMAGE} AS base
 
 ENV TZ="America/New_York"
 ENV repo_dir="/ot-efr32"
@@ -23,7 +25,11 @@ RUN ./script/bootstrap arm_toolchain
 COPY ./requirements.txt .
 RUN ./script/bootstrap python
 
+# ==============================================================================
+
 # Label the build date before downloading slc to force slc to always be downloaded during a docker build
+
+FROM base AS ot-efr32-dev
 ARG BUILD_DATE
 LABEL build_date=${BUILD_DATE}
 
@@ -34,8 +40,13 @@ RUN mkdir ${SLC_INSTALL_DIR} && \
       ./script/bootstrap silabs
 
 
+# Change workdir to root temporarily
+WORKDIR /
+
 # Clone repo for convenience
 ARG REPO_URL="https://github.com/openthread/ot-efr32"
-WORKDIR /
+ENV repo_dir="/ot-efr32"
 RUN rm -rf ${repo_dir} && git clone ${REPO_URL} ${repo_dir}
+
+# Change workdir back to repo
 WORKDIR ${repo_dir}

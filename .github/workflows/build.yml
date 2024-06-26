@@ -40,13 +40,22 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || (github.repository == 'openthread/ot-efr32' && github.run_id) || github.ref }}
   cancel-in-progress: true
 
+env:
+  TOOLCHAIN_DIR: .toolchain
+  DOCKER_IMAGE_SHA_TAG: siliconlabsinc/ot-efr32-dev:${{ github.sha }}
+
 jobs:
+  docker:
+    name: Docker
+    uses: ./.github/workflows/docker.yml
+
   arm-gcc:
-    name: arm-gcc-${{ matrix.gcc_ver }}
+    name: Arm GNU Toolchain ${{ matrix.gcc_ver }}
     runs-on: ubuntu-22.04
-    container:
-      image: siliconlabsinc/ot-efr32-dev:latest
-      options: --user 1001
+    needs: docker
+    continue-on-error: true
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -59,46 +68,54 @@ jobs:
             gcc_extract_dir: arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: Create LFS file hash list
-      run: git -C third_party/silabs/gecko_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+      - name: Create LFS file hash list
+        run: git -C third_party/silabs/gecko_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
 
-    - name: Restore gecko_sdk LFS cache
-      uses: actions/cache@v4
-      id: lfs-cache
-      with:
-          path: .git/modules/third_party/silabs/gecko_sdk/lfs
-          key: lfs-${{ hashFiles('.lfs-assets-id') }}
+      - name: Restore gecko_sdk LFS cache
+        uses: actions/cache@v4
+        id: lfs-cache
+        with:
+            path: .git/modules/third_party/silabs/gecko_sdk/lfs
+            key: lfs-${{ hashFiles('.lfs-assets-id') }}
 
-    - name: Git LFS Pull
-      run: git -C third_party/silabs/gecko_sdk lfs pull
+      - name: Git LFS Pull
+        run: git -C third_party/silabs/gecko_sdk lfs pull
 
-    - name: Bootstrap ARM Toolchain
-      run: |
-        script/bootstrap arm_toolchain ${{ matrix.gcc_download_url }} ${{ matrix.gcc_extract_dir }}
+      - name: Download Docker image
+        uses: actions/download-artifact@v4
+        with:
+          name: ot-efr32-dev
 
-    - name: Build
-      run: |
-        export PATH=${HOME}/.local/${{ matrix.gcc_extract_dir }}/bin:$PATH
-        script/test
+      - name: Load docker image
+        run: docker load -i ot-efr32-dev.tar
 
-    - name: Gather SLC generated files
-      if: failure()
-      run: |
-        rm -rf artifact && mkdir artifact
-        for b in build/*/slc; do
-            board=$(basename $(dirname "${b}"))
+      - name: Start ot-efr32-dev container
+        run: docker run --rm -it --user $(id -u) --name ot-efr32-dev -d -v $PWD:/ot-efr32 -w /ot-efr32 ${{ env.DOCKER_IMAGE_SHA_TAG }}
 
-            echo "Artifacting '${board}'"
-            mkdir -p "artifact/${board}"
-            mv "build/${board}/slc" "artifact/${board}"
-        done
+      - name: Bootstrap ARM Toolchain
+        run: docker exec ot-efr32-dev script/bootstrap arm_toolchain ${{ matrix.gcc_download_url }} ${{ matrix.gcc_extract_dir }} ${{ env.TOOLCHAIN_DIR }}
 
-    - uses: actions/upload-artifact@v4
-      if: failure()
-      with:
-        name: build-${{ matrix.gcc_ver }}
-        path: artifact
+      - name: Build
+        run: docker exec ot-efr32-dev bash -c 'PATH=${{ env.TOOLCHAIN_DIR }}/${{ matrix.gcc_extract_dir }}/bin:$PATH script/test'
+
+      - name: Gather SLC generated files
+        if: failure()
+        run: |
+          rm -rf artifact && mkdir artifact
+          for b in build/*/slc; do
+              board=$(basename $(dirname "${b}"))
+
+              echo "Artifacting '${board}'"
+              mkdir -p "artifact/${board}"
+              mv "build/${board}/slc" "artifact/${board}"
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: build-${{ matrix.gcc_ver }}
+          path: artifact
