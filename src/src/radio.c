@@ -1006,7 +1006,13 @@ static inline void setInternalFlag(uint16_t flag, bool val)
 // Returns true if the passed flag is set, false otherwise.
 static inline bool getInternalFlag(uint16_t flag)
 {
-    return ((miscRadioState & flag) != 0);
+    bool isFlagSet;
+    CORE_DECLARE_IRQ_STATE;
+    CORE_ENTER_ATOMIC();
+    isFlagSet = (miscRadioState & flag) ? true : false;
+    CORE_EXIT_ATOMIC();
+
+    return isFlagSet;
 }
 
 static inline bool txWaitingForAck(void)
@@ -1585,12 +1591,34 @@ exit:
     return error;
 }
 
-otError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
+otError efr32RadioLoadChannelConfig(uint8_t aChannel, int8_t aTxPower)
 {
     otError          error = OT_ERROR_NONE;
-    RAIL_Status_t    status;
     efr32BandConfig *config;
-    int8_t           txPower;
+
+    config = efr32RadioGetBandConfig(aChannel);
+    otEXPECT_ACTION(config != NULL, error = OT_ERROR_INVALID_ARGS);
+
+    if (sCurrentBandConfig != config)
+    {
+        RAIL_Idle(gRailHandle, RAIL_IDLE, true);
+        efr32RailConfigLoad(config, aTxPower);
+        sCurrentBandConfig = config;
+    }
+    else
+    {
+        efr32RadioSetTxPower(aTxPower);
+    }
+
+exit:
+    return error;
+}
+
+otError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
+{
+    otError       error = OT_ERROR_NONE;
+    RAIL_Status_t status;
+    int8_t        txPower;
 
     OT_UNUSED_VARIABLE(aInstance);
     otEXPECT_ACTION(!getInternalFlag(FLAG_ONGOING_TX_DATA) && sEnergyScanStatus != ENERGY_SCAN_STATUS_IN_PROGRESS,
@@ -1603,19 +1631,8 @@ otError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
 #endif
 
     txPower = sli_get_max_tx_power_across_iids();
-    config  = efr32RadioGetBandConfig(aChannel);
-    otEXPECT_ACTION(config != NULL, error = OT_ERROR_INVALID_ARGS);
-
-    if (sCurrentBandConfig != config)
-    {
-        RAIL_Idle(gRailHandle, RAIL_IDLE, true);
-        efr32RailConfigLoad(config, txPower);
-        sCurrentBandConfig = config;
-    }
-    else
-    {
-        efr32RadioSetTxPower(txPower);
-    }
+    error   = efr32RadioLoadChannelConfig(aChannel, txPower);
+    otEXPECT(error == OT_ERROR_NONE);
 
     status = radioSetRx(aChannel);
     otEXPECT_ACTION(status == RAIL_STATUS_NO_ERROR, error = OT_ERROR_FAILED);
@@ -1631,26 +1648,14 @@ exit:
 #if (OPENTHREAD_CONFIG_THREAD_VERSION >= OT_THREAD_VERSION_1_2)
 otError otPlatRadioReceiveAt(otInstance *aInstance, uint8_t aChannel, uint32_t aStart, uint32_t aDuration)
 {
-    otError          error = OT_ERROR_NONE;
-    RAIL_Status_t    status;
-    efr32BandConfig *config;
-    int8_t           txPower = sli_get_max_tx_power_across_iids();
+    otError       error = OT_ERROR_NONE;
+    RAIL_Status_t status;
+    int8_t        txPower = sli_get_max_tx_power_across_iids();
 
     OT_UNUSED_VARIABLE(aInstance);
 
-    config = efr32RadioGetBandConfig(aChannel);
-    otEXPECT_ACTION(config != NULL, error = OT_ERROR_INVALID_ARGS);
-
-    if (sCurrentBandConfig != config)
-    {
-        RAIL_Idle(gRailHandle, RAIL_IDLE, true);
-        efr32RailConfigLoad(config, txPower);
-        sCurrentBandConfig = config;
-    }
-    else
-    {
-        efr32RadioSetTxPower(txPower);
-    }
+    error = efr32RadioLoadChannelConfig(aChannel, txPower);
+    otEXPECT(error == OT_ERROR_NONE);
 
     status = radioScheduleRx(aChannel, aStart, aDuration);
     otEXPECT_ACTION(status == RAIL_STATUS_NO_ERROR, error = OT_ERROR_FAILED);
@@ -1666,9 +1671,8 @@ exit:
 
 otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aFrame)
 {
-    otError          error = OT_ERROR_NONE;
-    efr32BandConfig *config;
-    int8_t           txPower = sli_get_max_tx_power_across_iids();
+    otError error   = OT_ERROR_NONE;
+    int8_t  txPower = sli_get_max_tx_power_across_iids();
 
 #if OPENTHREAD_RADIO && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE == 1 && (defined SL_CATALOG_OT_RCP_GP_INTERFACE_PRESENT)
     // Accept GP packets even if radio is not in required state.
@@ -1679,24 +1683,12 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aFrame)
     else
 #endif
     {
-        config = efr32RadioGetBandConfig(aFrame->mChannel);
-        otEXPECT_ACTION(config != NULL, error = OT_ERROR_INVALID_ARGS);
-
-        if (sCurrentBandConfig != config)
-        {
-            // TODO: Do we need to do this? RAIL takes care of sending the
-            // packet in the right channel.
-            RAIL_Idle(gRailHandle, RAIL_IDLE, true);
-            efr32RailConfigLoad(config, txPower);
-            sCurrentBandConfig = config;
-        }
-        else
-        {
-            efr32RadioSetTxPower(txPower);
-        }
+        error = efr32RadioLoadChannelConfig(aFrame->mChannel, txPower);
+        otEXPECT(error == OT_ERROR_NONE);
 
         OT_ASSERT(!getInternalFlag(FLAG_ONGOING_TX_DATA));
         OT_ASSERT(aFrame == &sTransmitFrame);
+        OT_ASSERT(aFrame->mPsdu == sTransmitPsdu);
 
         setInternalFlag(RADIO_TX_EVENTS, false);
         sTxFrame = aFrame;
@@ -2052,7 +2044,7 @@ otError otPlatRadioSetTransmitPower(otInstance *aInstance, int8_t aPower)
     maxTxPower                                   = sli_get_max_tx_power_across_iids();
 
     // RAIL_SetTxPowerDbm() takes power in units of deci-dBm (0.1dBm)
-    // Divide by 10 because aPower is supposed be in units dBm
+    // Multiply by 10 because aPower is supposed be in units dBm
     status = RAIL_SetTxPowerDbm(gRailHandle, ((RAIL_TxPower_t)maxTxPower) * 10);
     OT_ASSERT(status == RAIL_STATUS_NO_ERROR);
 
