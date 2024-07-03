@@ -67,16 +67,24 @@ void otPlatReset(otInstance *aInstance)
     NVIC_SystemReset();
 }
 
-#if defined(SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT)
-#if OPENTHREAD_CONFIG_PLATFORM_BOOTLOADER_MODE_ENABLE
+OT_TOOL_WEAK void bootloader_rebootAndInstall(void)
+{
+    // Weak stub function
+    // This should be discarded in favor of the function definition in bootloader_interface code, when that component is
+    // used
+}
+
 otError otPlatResetToBootloader(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
     bootloader_rebootAndInstall();
-    return OT_ERROR_NONE;
+
+    // This should only be reached if the bootloader_interface component is not present.
+    // When it is present, the stubbed bootloader_rebootAndInstall above is not used.
+    // Instead, the non-weak definition of the function in the component is used, causing
+    // the device to reset.
+    return OT_ERROR_NOT_CAPABLE;
 }
-#endif
-#endif
 
 otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
 {

@@ -41,6 +41,7 @@
 #include <string.h>
 #include <openthread/platform/time.h>
 #include "common/logging.hpp"
+#include "utils/code_utils.h"
 #include "utils/mac_frame.h"
 
 // This implements mechanism to buffer outgoing Channel Configuration (0xF3) and
@@ -160,6 +161,8 @@ bool sl_gp_intf_is_gp_pkt(otRadioFrame *aFrame, bool isRxFrame)
 
     uint8_t fc = *gpFrameStartIndex;
 
+    otEXPECT_ACTION(gp_state == SL_GP_STATE_WAITING_FOR_PKT, isGpPkt = false);
+
     otLogDebgPlat("GP RCP INTF : (%s) PL Index = %d Channel = %d Length = %d FC = %0X",
                   isRxFrame ? "Rx" : "Tx",
                   (gpFrameStartIndex - aFrame->mPsdu),
@@ -261,10 +264,12 @@ bool sl_gp_intf_is_gp_pkt(otRadioFrame *aFrame, bool isRxFrame)
             }
         }
     }
+
     if (isGpPkt)
     {
         otLogDebgPlat("GP RCP INTF: GP filter passed!!");
     }
 
+exit:
     return isGpPkt;
 }

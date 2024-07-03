@@ -63,8 +63,12 @@
  * Allow triggering a platform reset to bootloader mode, if supported.
  *
  */
+#ifndef OPENTHREAD_CONFIG_PLATFORM_BOOTLOADER_MODE_ENABLE
 #if defined(SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT)
 #define OPENTHREAD_CONFIG_PLATFORM_BOOTLOADER_MODE_ENABLE 1
+#else
+#define OPENTHREAD_CONFIG_PLATFORM_BOOTLOADER_MODE_ENABLE 0
+#endif
 #endif
 
 /**
