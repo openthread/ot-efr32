@@ -77,8 +77,8 @@ __pycache__
 
 # slc-cli
 ?/
-slc/slc_cli/
-slc/**/*.zip
+**/third_party/silabs/slc/slc_cli/
+**/third_party/silabs/slc/**/*.zip
 
 .cache
 .toolchain

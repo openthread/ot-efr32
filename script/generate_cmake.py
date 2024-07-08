@@ -214,7 +214,7 @@ mbedtls_lib_vars = filter_mbedtls_lib_vars(slc_vars)
 script_dir: Path = Path(os.path.dirname(os.path.abspath(__file__)))
 repo_root: Path = script_dir.parent
 environment = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(f"{repo_root}/slc/exporter_templates/platform_library"))
+    loader=jinja2.FileSystemLoader(f"{repo_root}/third_party/silabs/slc/exporter_templates/platform_library"))
 platform_lib_template: jinja2.Template = environment.get_template("CMakeLists.txt.jinja")
 mbedtls_lib_template: jinja2.Template = environment.get_template("mbedtls.cmake.jinja")
 

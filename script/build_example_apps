@@ -174,13 +174,13 @@ get_associated_slcp()
 
     case "${cmake_executable}" in
         sleepy-demo-ftd)
-            echo "${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons.slcp"
+            echo "${repo_dir}/third_party/silabs/slc/platform_projects/openthread-efr32-soc-with-buttons.slcp"
             ;;
         sleepy-demo-mtd)
-            echo "${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons-power-manager.slcp"
+            echo "${repo_dir}/third_party/silabs/slc/platform_projects/openthread-efr32-soc-with-buttons-power-manager.slcp"
             ;;
         sleepy-demo-ssed)
-            echo "${repo_dir}/slc/platform_projects/openthread-efr32-soc-with-buttons-power-manager-csl.slcp"
+            echo "${repo_dir}/third_party/silabs/slc/platform_projects/openthread-efr32-soc-with-buttons-power-manager-csl.slcp"
             ;;
         *)
             die "Unknown CMake executable: ${cmake_executable}"

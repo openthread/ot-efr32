@@ -180,7 +180,7 @@ generate()
     project_name="${project_line//project_name:/}"
     project_name="${project_name// /}"
     local generation_dir=${2?A generation output dir is expected as the second argument}
-    local export_templates="${repo_dir}/slc/exporter_templates/platform_library"
+    local export_templates="${repo_dir}/third_party/silabs/slc/exporter_templates/platform_library"
     local board=${3?A board is expected as the third argument}
     local build_dir=${OT_CMAKE_BUILD_DIR-"${repo_dir}/build/${board}"}
     local openthread_slc_data=${openthread_slc_data-"${build_dir}/slc/openthread_slc.data"}
@@ -202,7 +202,7 @@ generate()
 
     trust_sdk_and_extensions
 
-    local yaml_export_templates="${repo_dir}/slc/exporter_templates/yaml"
+    local yaml_export_templates="${repo_dir}/third_party/silabs/slc/exporter_templates/yaml"
     set +x
     echo
     echo

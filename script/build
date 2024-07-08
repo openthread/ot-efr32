@@ -110,7 +110,7 @@ generate()
         echo "========================================================================================================="
         set -x
         "${repo_dir}/script/generate" \
-            "${repo_dir}/slc/platform_projects/openthread-efr32-soc.slcp" \
+            "${repo_dir}/third_party/silabs/slc/platform_projects/openthread-efr32-soc.slcp" \
             "${slc_generated_projects_dir}/soc" \
             "${board}"
     fi
@@ -121,7 +121,7 @@ generate()
         echo "========================================================================================================="
         set -x
         "${repo_dir}/script/generate" \
-            "${repo_dir}/slc/platform_projects/openthread-efr32-rcp-uart.slcp" \
+            "${repo_dir}/third_party/silabs/slc/platform_projects/openthread-efr32-rcp-uart.slcp" \
             "${slc_generated_projects_dir}/rcp_uart" \
             "${board}"
     fi
@@ -132,7 +132,7 @@ generate()
         echo "========================================================================================================="
         set -x
         "${repo_dir}/script/generate" \
-            "${repo_dir}/slc/platform_projects/openthread-efr32-rcp-spi.slcp" \
+            "${repo_dir}/third_party/silabs/slc/platform_projects/openthread-efr32-rcp-spi.slcp" \
             "${slc_generated_projects_dir}/rcp_spi" \
             "${board}"
     fi
