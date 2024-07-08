@@ -1,0 +1,59 @@
+id: ot_headers
+label: OpenThread headers
+package: OpenThread
+category: OpenThread
+quality: production
+description: This component provides the OpenThread header files.
+provides:
+  - name: ot_headers
+requires:
+  - name: ot_headers_tcp
+ui_hints:
+  visibility: never
+root_path: openthread/src/core
+include:
+  - path: ../../include/openthread
+    file_list:
+      - path: platform/alarm-micro.h
+      - path: platform/alarm-milli.h
+      - path: platform/ble.h
+      - path: platform/border_routing.h
+      - path: platform/crypto.h
+      - path: platform/diag.h
+      - path: platform/dns.h
+      - path: platform/dnssd.h
+      - path: platform/dso_transport.h
+      - path: platform/entropy.h
+      - path: platform/flash.h
+      - path: platform/infra_if.h
+      - path: platform/memory.h
+      - path: platform/misc.h
+      - path: platform/multipan.h
+      - path: platform/logging.h
+      - path: platform/mdns_socket.h
+      - path: platform/otns.h
+      - path: platform/radio.h
+      - path: platform/time.h
+      - path: platform/udp.h
+      - path: platform/spi-slave.h
+      - path: platform/settings.h
+      - path: platform/messagepool.h
+      - path: platform/toolchain.h
+      - path: platform/trel.h
+      - path: platform/debug_uart.h
+  - path: ../lib
+    file_list:
+      - path: platform/exit_code.h
+  - path: ../../examples/platforms
+    file_list:
+      - path: openthread-system.h
+      - path: utils/code_utils.h
+      - path: utils/link_metrics.h
+      - path: utils/mac_frame.h
+      - path: utils/logging_rtt.h
+      - path: utils/settings.h
+      - path: utils/uart.h
+      - path: utils/uart_rtt.h
+metadata:
+  sbom:
+    reference: ot_sbom_openthread
