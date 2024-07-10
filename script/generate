@@ -217,6 +217,7 @@ generate()
 
     run_slc -v 1 generate \
         -data "${openthread_slc_data?}" \
+        --cache-home "${build_dir}/slc/slcc_components.cache" \
         --sdk="${sdk_dir?}" \
         --clear-cache \
         --project-file="${slcp}" \

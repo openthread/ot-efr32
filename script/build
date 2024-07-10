@@ -38,11 +38,30 @@ fi
 script_dir="$(realpath "$(dirname "${script_path}")")"
 repo_dir="$(dirname "${script_dir}")"
 
+# CMake Build targets
+OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET-}
 
+# CMake Build options
+OT_OPTIONS=(
+    "-DCMAKE_BUILD_TYPE=Release"
+    "-DOT_DIAGNOSTIC=ON"
+    "-DOT_EXTERNAL_HEAP=ON"
+    "-DOT_SLAAC=ON"
+)
+
+# Check if ccache is installed and use it if available
+if command -v ccache >/dev/null; then
+    OT_OPTIONS+=("-DCMAKE_C_COMPILER_LAUNCHER=ccache")
+    OT_OPTIONS+=("-DCMAKE_CXX_COMPILER_LAUNCHER=ccache")
+fi
+readonly OT_OPTIONS
 
 # ==============================================================================
 # shellcheck source=script/efr32-definitions
 source "${repo_dir}/script/efr32-definitions"
+
+# shellcheck source=script/slc_cli
+source "${repo_dir}/script/slc_cli"
 
 # shellcheck source=script/util
 source "${repo_dir}/script/util"
@@ -101,22 +120,8 @@ init_silabs_sdk()
 }
 
 # ==============================================================================
-OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET-}
-
-OT_OPTIONS=(
-    "-DCMAKE_BUILD_TYPE=Release"
-    "-DOT_DIAGNOSTIC=ON"
-    "-DOT_EXTERNAL_HEAP=ON"
-    "-DOT_SLAAC=ON"
-)
-
-# Check if ccache is installed and use it if available
-if command -v ccache >/dev/null; then
-    OT_OPTIONS+=("-DCMAKE_C_COMPILER_LAUNCHER=ccache")
-    OT_OPTIONS+=("-DCMAKE_CXX_COMPILER_LAUNCHER=ccache")
-fi
-readonly OT_OPTIONS
-
+# Build functions
+# ==============================================================================
 generate()
 {
     if [ "${skip_generation}" = true ]; then
@@ -254,6 +259,7 @@ build_soc()
     cd "${repo_dir}"
 }
 
+# ==============================================================================
 main()
 {
     local usage="usage: $0 [-h] [--skip-silabs-apps] <brdXXXXy> [-D<OT_XXXX=ON> -D<OT_YYYY=OFF>]"
@@ -361,7 +367,7 @@ main()
     fi
 
     # Build silabs apps
-    if [ "${skip_silabs_apps}" = false ]; then
+    if [ -z ${OT_CMAKE_NINJA_TARGET+x} ] && [ "${skip_silabs_apps}" = false ]; then
         local before_flags=()
         local after_flags=()
 
@@ -370,7 +376,6 @@ main()
         fi
 
         "${repo_dir}"/script/build_example_apps "${before_flags[@]-}" "${board}" "${after_flags[@]-}" "$@"
-
     fi
 
     ls -alh "${OT_CMAKE_BUILD_DIR}"/openthread/*/bin/*

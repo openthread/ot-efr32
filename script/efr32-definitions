@@ -29,6 +29,7 @@
 
 # ==============================================================================
 # Bash definitions
+# ==============================================================================
 
 if [[ -n ${BASH_SOURCE[0]} ]]; then
     script_path="${BASH_SOURCE[0]}"
@@ -42,18 +43,21 @@ if [ -z ${repo_dir+x} ]; then
     repo_dir="$(dirname "${script_dir}")"
 fi
 
-efr32_device_regex=""
-efr32_device_regex+="\(efr32\)*"                               # Group 1 - efr32 (optional)
-efr32_device_regex+="\([[:alpha:]]\{2\}\)"                     # Group 2 - mg, bg, xg (product line)
-efr32_device_regex+="\(m*\)"                                   # Group 3 - m (optional, modules only)
-efr32_device_regex+="\([[:digit:]]\{1,2\}\)[[:digit:]]\{0,1\}" # Group 4 - 1, 12, 13, 21, 24, 210, 240 etc (series and configuration)
-efr32_device_regex+="\([[:alpha:]]\{1\}\)"                     # Group 5 - a, b, c, p, v (revision)
-efr32_device_regex+="\([[:alpha:]]\{0,1\}[[:digit:]]\{1,3\}\)" # Group 6 - xxx, a32, 032
-efr32_device_regex+="\(f[[:digit:]]\{1,\}\)*"                  # Group 7 - fXXX (flash size)
-efr32_device_regex+="\([[:alpha:]]\{2,3\}\)*"                  # Group 8 - im, gl, gm, jia, vna, etc
-efr32_device_regex+="\(f[[:digit:]]\{1,\}\)*"                  # Group 9 - 32, 40, 48, 68, 125
-efr32_device_regex+=".*"                                       # Rest of line
-readonly efr32_device_regex
+# Define the regex for efr32 devices if not already defined
+if [ -z ${efr32_device_regex+x} ]; then
+    efr32_device_regex=""
+    efr32_device_regex+="\(efr32\)*"                               # Group 1 - efr32 (optional)
+    efr32_device_regex+="\([[:alpha:]]\{2\}\)"                     # Group 2 - mg, bg, xg (product line)
+    efr32_device_regex+="\(m*\)"                                   # Group 3 - m (optional, modules only)
+    efr32_device_regex+="\([[:digit:]]\{1,2\}\)[[:digit:]]\{0,1\}" # Group 4 - 1, 12, 13, 21, 24, 210, 240 etc (series and configuration)
+    efr32_device_regex+="\([[:alpha:]]\{1\}\)"                     # Group 5 - a, b, c, p, v (revision)
+    efr32_device_regex+="\([[:alpha:]]\{0,1\}[[:digit:]]\{1,3\}\)" # Group 6 - xxx, a32, 032
+    efr32_device_regex+="\(f[[:digit:]]\{1,\}\)*"                  # Group 7 - fXXX (flash size)
+    efr32_device_regex+="\([[:alpha:]]\{2,3\}\)*"                  # Group 8 - im, gl, gm, jia, vna, etc
+    efr32_device_regex+="\(f[[:digit:]]\{1,\}\)*"                  # Group 9 - 32, 40, 48, 68, 125
+    efr32_device_regex+=".*"                                       # Rest of line
+    readonly efr32_device_regex
+fi
 
 # ==============================================================================
 # SDKs
@@ -71,10 +75,10 @@ efr32_get_board_slcc()
     local -r \
         doc="Gets the latest revision .slcc file for a efr32 board"
     #
-    # Arg $1 -- efr32 board
-    # Arg $2 -- SDK directory (optional)
+    # Arg $1 -- efr32 board (optional) (default: $board)
+    # Arg $2 -- SDK directory (optional) (default: $sdk_dir)
     if [ $# -lt 1 ] || [ -z "$1" ]; then
-        printf "%s\n\nUsage:\n\t%s <efr32_board> \n" "${doc}" "${FUNCNAME[0]}" >&2
+        printf "%s\n\nUsage:\n\t%s [efr32_board] \n" "${doc}" "${FUNCNAME[0]}" >&2
         return 1
     fi
 
@@ -97,8 +101,8 @@ efr32_get_platform()
     local -r \
         doc="Gets the platform for a efr32 board"
     #
-    # Arg $1 -- efr32 board (optional)
-    # Arg $2 -- SDK directory (optional)
+    # Arg $1 -- efr32 board (optional) (default: $board)
+    # Arg $2 -- SDK directory (optional) (default: $sdk_dir)
     if [ $# -gt 2 ]; then
         printf "%s\n\nUsage:\n\t%s <efr32_board> \n" "${doc}" "${FUNCNAME[0]}" >&2
         return 1
@@ -125,16 +129,21 @@ efr32_get_platform()
 
 efr32_get_platforms()
 {
-    # TODO:
     local platform_dir="$repo_dir/src" \
         && find "$platform_dir" -type d -name '*efr32*' -exec basename {} \; | sort
 }
 
 efr32_check_platform()
 {
-    # Checks if a value is a valid efr32 platform
+    local -r \
+        doc="Checks if a value is a valid efr32 platform"
     #
-    # Arg $1 -- value
+    # Arg $1 -- platform
+    if [ $# -ne 1 ]; then
+        printf "%s\n\nUsage:\n\t%s <platform> \n" "${doc}" "${FUNCNAME[0]}" >&2
+        return 1
+    fi
+
     local match=false
     local platform="${1?}"
 
@@ -145,6 +154,7 @@ efr32_check_platform()
         fi
     done
 
+    # if no match, print error message
     if ! $match; then
         set +x
         printf "\n\nERROR: Unsupported platform\n" >&2
