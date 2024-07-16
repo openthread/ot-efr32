@@ -6,4 +6,4 @@ sdk:
   id: gecko_sdk
   version: 4.4.0
 component_path:
-  - path: slc/component
+  - path: third_party/silabs/slc/component
