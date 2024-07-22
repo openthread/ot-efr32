@@ -91,7 +91,7 @@ trust_sdk_and_extensions()
     set -x
 
     # Trust the Simplicity SDK submodule
-    run_slc --daemon -v 1 signature trust --sdk "${sdk_dir}" -data "${openthread_slc_data}"
+    run_slc -v 1 signature trust --sdk "${sdk_dir}" -data "${openthread_slc_data}"
 
     # Ensure SDK extension folder exists
     mkdir -p "${sdk_dir}/extension"
@@ -138,7 +138,7 @@ trust_sdk_and_extensions()
         fi
 
         # Trust the extension
-        run_slc --daemon -v 1 signature trust --sdk "${sdk_dir}" -extpath "${extension_symlink}" -data "${openthread_slc_data}"
+        run_slc -v 1 signature trust --sdk "${sdk_dir}" -extpath "${extension_symlink}" -data "${openthread_slc_data}"
     done
 
     ls -alh "${sdk_dir}/extension"
@@ -215,9 +215,10 @@ generate()
     echo "======================================================================"
     set -x
 
-    run_slc --daemon -v 1 generate \
+    run_slc -v 1 generate \
         -data "${openthread_slc_data?}" \
         --sdk="${sdk_dir?}" \
+        --clear-cache \
         --project-file="${slcp}" \
         --project-name="${project_name}" \
         --output-type=makefile \
