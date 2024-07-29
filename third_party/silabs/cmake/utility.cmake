@@ -32,9 +32,9 @@ string(TOUPPER "${EFR32_PLATFORM}" PLATFORM_UPPERCASE)
 string(TOLOWER "${BOARD}" BOARD_LOWERCASE)
 string(TOUPPER "${BOARD}" BOARD_UPPERCASE)
 
-set(SILABS_GSDK_DIR ${PROJECT_SOURCE_DIR}/third_party/silabs/gecko_sdk)
+set(SILABS_SDK_DIR ${PROJECT_SOURCE_DIR}/third_party/silabs/simplicity_sdk)
 
-# Check if GSDK exists
-if(NOT EXISTS "${SILABS_GSDK_DIR}")
-    message(FATAL_ERROR "Cannot find: ${SILABS_GSDK_DIR}\nPlease make sure the submodule is initialized")
+# Check if SDK exists
+if(NOT EXISTS "${SILABS_SDK_DIR}")
+    message(FATAL_ERROR "Cannot find: ${SILABS_SDK_DIR}\nPlease make sure the submodule is initialized")
 endif()

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -41,24 +41,15 @@
 #include <string.h>
 
 #include <openthread/logging.h>
+#if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
+#include <openthread/platform/multipan.h>
+#endif
+#include "sl_multipan.h"
 #include "common/debug.hpp"
 #include "utils/code_utils.h"
 
 // Print entire source match tables when
 #define PRINT_MULTIPAN_SOURCE_MATCH_TABLES 0
-
-#if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
-extern uint8_t        otNcpPlatGetCurCommandIid(void);
-static inline uint8_t getPanIndex(uint8_t iid)
-{
-    // Assert if iid=0 (broadcast iid)
-    OT_ASSERT(iid != 0);
-    return iid - 1;
-}
-#else // !OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
-#define otNcpPlatGetCurCommandIid() 0
-#define getPanIndex(iid) 0
-#endif // OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
 
 #if RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM || RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM
 static uint16_t sPanId[RADIO_CONFIG_SRC_MATCH_PANID_NUM] = {0};
@@ -77,9 +68,7 @@ static void printPanIdTable(void)
 
 void utilsSoftSrcMatchSetPanId(uint8_t iid, uint16_t aPanId)
 {
-    OT_UNUSED_VARIABLE(iid);
-
-    const uint8_t panIndex = getPanIndex(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
     sPanId[panIndex]       = aPanId;
     otLogInfoPlat("Setting panIndex=%d to 0x%04x", panIndex, aPanId);
 
@@ -99,9 +88,7 @@ static sSrcMatchShortEntry srcMatchShortEntry[RADIO_CONFIG_SRC_MATCH_PANID_NUM][
 #if PRINT_MULTIPAN_SOURCE_MATCH_TABLES
 static void printShortEntryTable(uint8_t iid)
 {
-    const uint8_t panIndex = getPanIndex(iid);
-    OT_UNUSED_VARIABLE(iid);
-    OT_UNUSED_VARIABLE(panIndex);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
 
     otLogDebgPlat("================================|============|===========");
     otLogDebgPlat("ShortEntry[panIndex][entry]     | .allocated | .checksum ");
@@ -122,8 +109,6 @@ static void printShortEntryTable(uint8_t iid)
 
 int16_t utilsSoftSrcMatchShortFindEntry(uint8_t iid, uint16_t aShortAddress)
 {
-    OT_UNUSED_VARIABLE(iid);
-
     int16_t entry = -1;
 
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
@@ -133,7 +118,7 @@ int16_t utilsSoftSrcMatchShortFindEntry(uint8_t iid, uint16_t aShortAddress)
     }
 #endif
 
-    const uint8_t panIndex = getPanIndex(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
     uint16_t      checksum = aShortAddress + sPanId[panIndex];
 
     for (int16_t i = 0; i < RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM; i++)
@@ -150,10 +135,8 @@ int16_t utilsSoftSrcMatchShortFindEntry(uint8_t iid, uint16_t aShortAddress)
 
 static int16_t findSrcMatchShortAvailEntry(uint8_t iid)
 {
-    OT_UNUSED_VARIABLE(iid);
-
     int16_t       entry    = -1;
-    const uint8_t panIndex = getPanIndex(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
 
     for (int16_t i = 0; i < RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM; i++)
     {
@@ -169,9 +152,7 @@ static int16_t findSrcMatchShortAvailEntry(uint8_t iid)
 
 static inline void addToSrcMatchShortIndirect(uint8_t iid, uint16_t entry, uint16_t aShortAddress)
 {
-    OT_UNUSED_VARIABLE(iid);
-
-    const uint8_t panIndex = getPanIndex(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
     uint16_t      checksum = aShortAddress + sPanId[panIndex];
 
     srcMatchShortEntry[panIndex][entry].checksum  = checksum;
@@ -182,9 +163,7 @@ static inline void addToSrcMatchShortIndirect(uint8_t iid, uint16_t entry, uint1
 
 static inline void removeFromSrcMatchShortIndirect(uint8_t iid, uint16_t entry)
 {
-    OT_UNUSED_VARIABLE(iid);
-
-    const uint8_t panIndex = getPanIndex(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
 
     srcMatchShortEntry[panIndex][entry].allocated = false;
     srcMatchShortEntry[panIndex][entry].checksum  = 0;
@@ -197,13 +176,12 @@ otError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, uint16_t aShortA
     OT_UNUSED_VARIABLE(aInstance);
 
     otError error = OT_ERROR_NONE;
-    int8_t  iid   = -1;
+    int8_t  iid   = efr32GetIidFromInstance(aInstance);
     int16_t entry = -1;
 
-    iid = otNcpPlatGetCurCommandIid();
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
-    // Prevent duplicate entries in multipan use case.
     entry = utilsSoftSrcMatchShortFindEntry(iid, aShortAddress);
+    // Prevent duplicate entries in multipan use case.
     otEXPECT(!(entry >= 0 && entry < RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM));
 #endif
 
@@ -224,12 +202,9 @@ otError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, uint16_t aShor
     OT_UNUSED_VARIABLE(aInstance);
 
     otError error = OT_ERROR_NONE;
-    int16_t entry = -1;
-    int8_t  iid   = -1;
+    int8_t  iid   = efr32GetIidFromInstance(aInstance);
+    int16_t entry = utilsSoftSrcMatchShortFindEntry(iid, aShortAddress);
 
-    iid = otNcpPlatGetCurCommandIid();
-
-    entry = utilsSoftSrcMatchShortFindEntry(iid, aShortAddress);
     otLogDebgPlat("Clear ShortAddr: iid=%d, entry=%d, addr=0x%04x", iid, entry, aShortAddress);
 
     otEXPECT_ACTION(entry >= 0 && entry < RADIO_CONFIG_SRC_MATCH_SHORT_ENTRY_NUM, error = OT_ERROR_NO_ADDRESS);
@@ -242,11 +217,9 @@ exit:
 
 void otPlatRadioClearSrcMatchShortEntries(otInstance *aInstance)
 {
-    OT_UNUSED_VARIABLE(aInstance);
+    uint8_t iid = efr32GetIidFromInstance(aInstance);
 
-    uint8_t       iid      = otNcpPlatGetCurCommandIid();
-    const uint8_t panIndex = getPanIndex(iid);
-    OT_UNUSED_VARIABLE(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
 
     otLogDebgPlat("Clear ShortAddr entries (iid: %d)", iid);
 
@@ -268,9 +241,7 @@ static sSrcMatchExtEntry srcMatchExtEntry[RADIO_CONFIG_SRC_MATCH_PANID_NUM][RADI
 #if PRINT_MULTIPAN_SOURCE_MATCH_TABLES
 static void printExtEntryTable(uint8_t iid)
 {
-    OT_UNUSED_VARIABLE(iid);
-    const uint8_t panIndex = getPanIndex(iid);
-    OT_UNUSED_VARIABLE(panIndex);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
 
     otLogDebgPlat("==============================|============|===========");
     otLogDebgPlat("ExtEntry[panIndex][entry]     | .allocated | .checksum ");
@@ -291,8 +262,6 @@ static void printExtEntryTable(uint8_t iid)
 
 int16_t utilsSoftSrcMatchExtFindEntry(uint8_t iid, const otExtAddress *aExtAddress)
 {
-    OT_UNUSED_VARIABLE(iid);
-
     int16_t entry = -1;
 
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
@@ -302,7 +271,7 @@ int16_t utilsSoftSrcMatchExtFindEntry(uint8_t iid, const otExtAddress *aExtAddre
     }
 #endif
 
-    const uint8_t panIndex = getPanIndex(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
     uint16_t      checksum = sPanId[panIndex];
 
     checksum += (uint16_t)aExtAddress->m8[0] | (uint16_t)(aExtAddress->m8[1] << 8);
@@ -324,10 +293,8 @@ int16_t utilsSoftSrcMatchExtFindEntry(uint8_t iid, const otExtAddress *aExtAddre
 
 static int16_t findSrcMatchExtAvailEntry(uint8_t iid)
 {
-    OT_UNUSED_VARIABLE(iid);
-
     int16_t       entry    = -1;
-    const uint8_t panIndex = getPanIndex(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
 
     for (int16_t i = 0; i < RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM; i++)
     {
@@ -343,9 +310,7 @@ static int16_t findSrcMatchExtAvailEntry(uint8_t iid)
 
 static inline void addToSrcMatchExtIndirect(uint8_t iid, uint16_t entry, const otExtAddress *aExtAddress)
 {
-    OT_UNUSED_VARIABLE(iid);
-
-    const uint8_t panIndex = getPanIndex(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
     uint16_t      checksum = sPanId[panIndex];
 
     checksum += (uint16_t)aExtAddress->m8[0] | (uint16_t)(aExtAddress->m8[1] << 8);
@@ -361,9 +326,7 @@ static inline void addToSrcMatchExtIndirect(uint8_t iid, uint16_t entry, const o
 
 static inline void removeFromSrcMatchExtIndirect(uint8_t iid, uint16_t entry)
 {
-    OT_UNUSED_VARIABLE(iid);
-
-    const uint8_t panIndex = getPanIndex(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
 
     srcMatchExtEntry[panIndex][entry].allocated = false;
     srcMatchExtEntry[panIndex][entry].checksum  = 0;
@@ -376,12 +339,12 @@ otError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const otExtAddress
     OT_UNUSED_VARIABLE(aInstance);
 
     otError error = OT_ERROR_NONE;
+    uint8_t iid   = efr32GetIidFromInstance(aInstance);
     int16_t entry = -1;
 
-    uint8_t iid = otNcpPlatGetCurCommandIid();
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
-    // Prevent duplicate entries in multipan use case.
     entry = utilsSoftSrcMatchExtFindEntry(iid, aExtAddress);
+    // Prevent duplicate entries in multipan use case.
     otEXPECT(!(entry >= 0 && entry < RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM));
 #endif
 
@@ -399,13 +362,10 @@ exit:
 
 otError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const otExtAddress *aExtAddress)
 {
-    OT_UNUSED_VARIABLE(aInstance);
-
     otError error = OT_ERROR_NONE;
-    int16_t entry = -1;
+    uint8_t iid   = efr32GetIidFromInstance(aInstance);
+    int16_t entry = utilsSoftSrcMatchExtFindEntry(iid, aExtAddress);
 
-    uint8_t iid = otNcpPlatGetCurCommandIid();
-    entry       = utilsSoftSrcMatchExtFindEntry(iid, aExtAddress);
     otLogDebgPlat("Clear ExtAddr: iid=%d, entry=%d", iid, entry);
 
     otEXPECT_ACTION(entry >= 0 && entry < RADIO_CONFIG_SRC_MATCH_EXT_ENTRY_NUM, error = OT_ERROR_NO_ADDRESS);
@@ -418,13 +378,10 @@ exit:
 
 void otPlatRadioClearSrcMatchExtEntries(otInstance *aInstance)
 {
-    OT_UNUSED_VARIABLE(aInstance);
-
-    uint8_t iid = otNcpPlatGetCurCommandIid();
-    OT_UNUSED_VARIABLE(iid);
+    uint8_t iid = efr32GetIidFromInstance(aInstance);
 
     otLogDebgPlat("Clear ExtAddr entries (iid: %d)", iid);
-    const uint8_t panIndex = getPanIndex(iid);
+    const uint8_t panIndex = efr32GetPanIndexFromIid(iid);
 
     memset(srcMatchExtEntry[panIndex], 0, sizeof(srcMatchExtEntry[panIndex]));
 
@@ -434,7 +391,7 @@ void otPlatRadioClearSrcMatchExtEntries(otInstance *aInstance)
 
 uint8_t utilsSoftSrcMatchFindIidFromPanId(otPanId panId)
 {
-    uint8_t iid = 0xFF;
+    uint8_t iid = INVALID_INTERFACE_INDEX;
 
     for (uint8_t index = 0; index < RADIO_CONFIG_SRC_MATCH_PANID_NUM; index++)
     {

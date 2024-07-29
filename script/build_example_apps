@@ -40,11 +40,9 @@ fi
 script_dir="$(realpath "$(dirname "${script_path}")")"
 repo_dir="$(dirname "${script_dir}")"
 
+# ==============================================================================
 # shellcheck source=script/efr32-definitions
 source "${repo_dir}/script/efr32-definitions"
-
-# shellcheck source=script/slc_cli
-source "${repo_dir}/script/slc_cli"
 
 # shellcheck source=script/util
 source "${repo_dir}/script/util"
@@ -244,9 +242,6 @@ main()
     local options=("${OT_OPTIONS[@]}")
 
     options+=("-DCMAKE_TOOLCHAIN_FILE=src/${platform}/arm-none-eabi.cmake")
-
-    # Find slc-cli installation
-    slc_init
 
     options+=("$@")
     export OT_CMAKE_BUILD_DIR="$repo_dir/build/${board}"

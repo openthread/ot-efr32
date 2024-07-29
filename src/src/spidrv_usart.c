@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "em_cmu.h"
 #include "em_core.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
@@ -48,6 +47,7 @@
 #include "gpiointerrupt.h"
 #include "spidrv.h"
 
+#include "sl_clock_manager.h"
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
 #endif
@@ -55,9 +55,9 @@
 #include "sl_ncp_spidrv_usart_config.h"
 
 #include "platform-efr32.h"
-#include "spi-slave.h"
 #include <openthread-system.h>
 #include <openthread/error.h>
+#include <openthread/platform/spi-slave.h>
 #include "utils/code_utils.h"
 
 // DEFINES
@@ -187,7 +187,7 @@ otError otPlatSpiSlaveEnable(otPlatSpiSlaveTransactionCompleteCallback aComplete
     otEXPECT_ACTION(process_callback == NULL, error = OT_ERROR_ALREADY);
     otEXPECT_ACTION(context == NULL, error = OT_ERROR_ALREADY);
 
-    CMU_ClockEnable(cmuClock_GPIO, true);
+    sl_clock_manager_enable_bus_clock(SL_BUS_CLOCK_GPIO);
 
     SPIDRV_Init_t init_data = (SPIDRV_Init_t)
     {

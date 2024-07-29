@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -26,56 +26,65 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*******************************************************************************
+/**
  * @file
- * @brief This file implements Green Power interface.
- ******************************************************************************/
-
-#ifndef SL_RCP_GP_INTERFACE_H_
-#define SL_RCP_GP_INTERFACE_H_
-
-#include <stdbool.h>
-#include <openthread/platform/radio.h>
-
-// GP state-machine states
-typedef enum
-{
-    SL_GP_STATE_INIT,
-    SL_GP_STATE_IDLE,
-    SL_GP_STATE_WAITING_FOR_PKT,
-    SL_GP_STATE_SEND_RESPONSE,
-    SL_GP_STATE_MAX
-} sl_gp_state_t;
-
-/**
- * This function returns if the given frame is a GP frame.
- *
- * @param[in]  aFrame       A pointer to the MAC frame buffer.
- * @param[in]  isRxFrame    If the give frame is a incoming or outgoing frame.
- *
- * @retval  true    Frame is a GP packet.
- * @retval  false   Frame is not a GP packet.
+ * @brief
+ *   Helper functions for Silicon Labs Multipan implementation.
  */
-bool sl_gp_intf_is_gp_pkt(otRadioFrame *aFrame, bool isRxFrame);
 
-/**
- * This function stores the provided packet in global memory, to be sent as
- * a response for specific incoming packet.
- *
- * @param[in]  aFrame       A pointer to the MAC frame buffer.
- */
-void sl_gp_intf_buffer_pkt(otRadioFrame *aFrame);
+#ifndef SL_MULTIPAN_H_
+#define SL_MULTIPAN_H_
 
-/**
- * This function returns current state of GP state machine.
- *
- * @retval  true    Status of GP state machine.
- */
-sl_gp_state_t sl_gp_intf_get_state(void);
-
-/**
- * This function performs GP RCP processing.
- *
- */
-void efr32GpProcess(void);
+#if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
+#include <openthread/platform/multipan.h>
 #endif
+#include "utils/code_utils.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
+#define RADIO_INTERFACE_COUNT (OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_NUM + 1)
+#else
+#define RADIO_INTERFACE_COUNT 1
+#endif
+
+#define INVALID_INTERFACE_INDEX (0xFF)
+
+/*
+ * RAIL accepts 3 pan indices 0, 1 or 2. But valid IIDs are 1, 2 and 3 (0 is reserved for bcast).
+ * This API validates the passed IID and converts it into usable PanIndex.
+ */
+
+static inline uint8_t efr32GetPanIndexFromIid(uint8_t iid)
+{
+    uint8_t panIndex = 0;
+
+#if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
+    otEXPECT_ACTION(((iid < RADIO_INTERFACE_COUNT) && (iid != 0)), panIndex = INVALID_INTERFACE_INDEX);
+    panIndex = iid - 1;
+exit:
+#else
+    panIndex = iid;
+#endif
+
+    return panIndex;
+}
+
+static inline uint8_t efr32GetIidFromInstance(otInstance *aInstance)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+#if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
+    return otPlatMultipanInstanceToIid(aInstance);
+#else
+    return 0;
+#endif
+}
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+#endif // SL_MULTIPAN_H_

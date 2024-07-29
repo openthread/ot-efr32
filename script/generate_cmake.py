@@ -53,14 +53,14 @@ def prepare_path(path: str) -> str:
     if path.startswith('"') and path.endswith('"'):
         path = path.strip('"')
 
-    # Replace SDK_PATH with SILABS_GSDK_DIR
-    path = path.replace('(SDK_PATH)', '{SILABS_GSDK_DIR}')
+    # Replace SDK_PATH with SILABS_SDK_DIR
+    path = path.replace('(SDK_PATH)', '{SILABS_SDK_DIR}')
 
     # Redirect OpenThread stack sources to the ot-efr32 openthread submodule #}
-    path = path.replace('${SILABS_GSDK_DIR}/util/third_party/openthread', '${PROJECT_SOURCE_DIR}/openthread')
+    path = path.replace('${SILABS_SDK_DIR}/util/third_party/openthread', '${PROJECT_SOURCE_DIR}/openthread')
 
     # Redirect PAL sources to the ot-efr32 PAL
-    path = path.replace('${SILABS_GSDK_DIR}/protocol/openthread/platform-abstraction/efr32',
+    path = path.replace('${SILABS_SDK_DIR}/protocol/openthread/platform-abstraction/efr32',
                         '${PROJECT_SOURCE_DIR}/src/src')
 
     return path
@@ -68,7 +68,7 @@ def prepare_path(path: str) -> str:
 
 def is_mbedtls_source(source: str) -> bool:
     r: bool = False
-    r |= '${SILABS_GSDK_DIR}/util/third_party/mbedtls' in source
+    r |= '${SILABS_SDK_DIR}/util/third_party/mbedtls' in source
     return r
 
 
@@ -107,9 +107,9 @@ def filter_mbedtls_lib_vars(slc_vars: dict) -> dict:
     def f(include: str) -> bool:
         keep: bool = False
         keep |= (include == '"autogen"') or (include == '"config"')
-        keep |= '${SILABS_GSDK_DIR}/hardware' in include
-        keep |= '${SILABS_GSDK_DIR}/platform' in include
-        keep |= '${SILABS_GSDK_DIR}/util/third_party/crypto' in include
+        keep |= '${SILABS_SDK_DIR}/hardware' in include
+        keep |= '${SILABS_SDK_DIR}/platform' in include
+        keep |= '${SILABS_SDK_DIR}/util/third_party/crypto' in include
         if not keep:
             pass
         return keep

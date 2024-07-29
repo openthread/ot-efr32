@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -44,11 +44,6 @@
 
 #include "em_rmu.h"
 #include "platform-efr32.h"
-
-#if defined(SL_CATALOG_OT_CRASH_HANDLER_PRESENT)
-#include "crash_handler.h"
-#include <openthread/logging.h>
-#endif
 
 static uint32_t sResetCause;
 
@@ -158,24 +153,6 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
     return reason;
 }
 
-#if defined(SL_CATALOG_OT_CRASH_HANDLER_PRESENT)
-void efr32PrintResetInfo(void)
-{
-    otLogCritPlat("Reset info: 0x%x (%s)", halGetResetInfo(), halGetResetString());
-
-    otLogCritPlat("Extended Reset info: 0x%2X (%s)", halGetExtendedResetInfo(), halGetExtendedResetString());
-
-    if (halResetWasCrash())
-    {
-        // We pass port 0 here though this parameter is unused in the legacy HAL
-        // version of the diagnostic code.
-        halPrintCrashSummary(0);
-        halPrintCrashDetails(0);
-        halPrintCrashData(0);
-    }
-}
-#endif // SL_CATALOG_OT_CRASH_HANDLER_PRESENT
-
 void otPlatWakeHost(void)
 {
     // TODO: implement an operation to wake the host from sleep state.
@@ -220,3 +197,18 @@ otError railStatusToOtError(RAIL_Status_t status)
         return OT_ERROR_FAILED;
     }
 }
+
+#if OPENTHREAD_CONFIG_PLATFORM_LOG_CRASH_DUMP_ENABLE
+otError otPlatLogCrashDump(void)
+{
+    otError error = OT_ERROR_NONE;
+
+#if defined(SL_CATALOG_OT_CRASH_HANDLER_PRESENT)
+    efr32PrintResetInfo();
+#else
+    error = OT_ERROR_NOT_CAPABLE;
+#endif
+
+    return error;
+}
+#endif

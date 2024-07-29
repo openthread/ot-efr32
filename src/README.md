@@ -38,7 +38,7 @@ See [EFR32 Sleepy Demo Example](../examples/sleepy-demo/README.md) for instructi
 
 When using this repo to generate a solution that requires two different projects, such as an RCP & OTBR, make sure they are relying on the same OpenThread version to ensure maximum compatibility. You can check which commit this repo relies upon in the "openthread" submodule (in the root of this repo).
 
-If your OTBR project was generated using the Silabs GSDK / Simplicity Studio, we recommend to also use it to generate the RCP project and not this repo. This will mitigate potential incompatibility issues due to mismatched OpenThread versions.
+If your OTBR project was generated using the Silabs SiSDK / Simplicity Studio, we recommend to also use it to generate the RCP project and not this repo. This will mitigate potential incompatibility issues due to mismatched OpenThread versions.
 
 <a name="prerequisites"/>
 
@@ -122,7 +122,7 @@ Simplicity Commander provides command line and graphical interfaces for J-Link C
 - [Mac](https://www.silabs.com/documents/public/software/SimplicityCommander-Mac.zip)
 - [Windows](https://www.silabs.com/documents/public/software/SimplicityCommander-Windows.zip)
 
-For Windows and Linux, the Simplicity Commander executable can be found in the location that the package is extracted.  
+For Windows and Linux, the Simplicity Commander executable can be found in the location that the package is extracted.
 On MacOS, the executable can be found at the following directory:
 
 ```bash
@@ -142,7 +142,7 @@ Launch the Simplicity Commander executable `commander` at the path stated above 
 
 #### Commander CLI
 
-The Simplicity Commander CLI provides another method of flashing binaries to a device without opening a GUI.  
+The Simplicity Commander CLI provides another method of flashing binaries to a device without opening a GUI.
 When using Simplicity Commander in CLI mode, it is highly recommended to add the directory of the executable to your environment's `PATH` variable. This can be done with the following command:
 
 ```bash
@@ -349,6 +349,6 @@ The following toolchain has been used for testing and verification:
 
 - gcc version 7.3.1
 
-The EFR32 example has been verified with following Silicon Labs Gecko SDK Library version:
+The EFR32 example has been verified with following Silicon Labs Simplicity SDK Library version:
 
-- Silicon Labs Gecko SDK v4.1.x
+- Silicon Labs Simplicity SDK v4.1.x

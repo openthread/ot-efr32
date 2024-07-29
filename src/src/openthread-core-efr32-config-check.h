@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,10 @@
     && !defined(RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT)
 #error \
     "One of the following must be defined: RADIO_CONFIG_915MHZ_OQPSK_SUPPORT, RADIO_CONFIG_SUBGHZ_SUPPORT or RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT"
+#endif
+
+#if defined(_SILICON_LABS_32B_SERIES_1)
+#error "EFR32 Series 1 parts are not supported."
 #endif
 
 #endif /* OPENTHREAD_CORE_EFR32_CONFIG_CHECK_H_ */

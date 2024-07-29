@@ -37,10 +37,10 @@
 
 id: example_vendor
 version: 0.0.1
-description: "example_vendor extension for Gecko SDK Suite"
+description: "example_vendor extension for Simplicity SDK Suite"
 label: "Example Vendor extension"
 sdk:
-  id: gecko_sdk
-  version: 4.2.1
+  id: simplicity_sdk
+  version: 2024.6.0
 component_path:
   - path: component

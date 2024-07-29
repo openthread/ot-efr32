@@ -61,22 +61,6 @@ readonly OT_OPTIONS=(
 )
 
 # List of boards to test
-readonly MG1_BOARDS=(
-    brd4151a
-)
-
-readonly MG12_BOARDS=(
-    brd4161a
-    brd4164a
-    brd4166a
-    brd4170a
-    brd4304a
-)
-
-readonly MG13_BOARDS=(
-    brd4168a
-)
-
 readonly MG21_BOARDS=(
     brd4180a
     brd4180b
@@ -86,6 +70,10 @@ readonly MG21_BOARDS=(
 readonly MG24_BOARDS=(
     brd4186c
     brd4187c
+)
+
+readonly MG26_BOARDS=(
+    brd4116a
 )
 
 # ==============================================================================
@@ -123,19 +111,15 @@ main()
     BOARDS=()
     if [ "${all_boards}" = true ]; then
         BOARDS+=(
-            "${MG1_BOARDS[@]}"
-            "${MG12_BOARDS[@]}"
-            "${MG13_BOARDS[@]}"
             "${MG21_BOARDS[@]}"
             "${MG24_BOARDS[@]}"
+            "${MG26_BOARDS[@]}"
         )
     else
         BOARDS+=(
-            "${MG1_BOARDS[0]}"
-            "${MG12_BOARDS[0]}"
-            "${MG13_BOARDS[0]}"
             "${MG21_BOARDS[0]}"
             "${MG24_BOARDS[0]}"
+            "${MG26_BOARDS[0]}"
         )
     fi
 

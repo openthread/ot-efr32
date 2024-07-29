@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,10 @@
  */
 
 #include <openthread-core-config.h>
+#include "common/debug.hpp"
+#include "utils/code_utils.h"
+
+#include "platform-efr32.h"
 
 #ifdef SL_COMPONENT_CATALOG_PRESENT
 #include "sl_component_catalog.h"
@@ -104,6 +108,7 @@ void otPlatFlashRead(otInstance *aInstance, uint8_t aSwapIndex, uint32_t aOffset
 #elif defined(SL_CATALOG_NVM3_PRESENT) // Defaults to Silabs nvm3 system
 
 #include "nvm3_default.h"
+#include "sl_memory_manager.h"
 #include <string.h>
 #include <openthread/platform/settings.h>
 #include "common/code_utils.hpp"
@@ -125,6 +130,8 @@ void otPlatSettingsInit(otInstance *aInstance, const uint16_t *aSensitiveKeys, u
     OT_UNUSED_VARIABLE(aSensitiveKeys);
     OT_UNUSED_VARIABLE(aSensitiveKeysLength);
 
+    otEXPECT(sl_ot_rtos_task_can_access_pal());
+
     // Only call nmv3_open if it has not been opened yet.
     if (nvm3_defaultHandle->hasBeenOpened)
     {
@@ -141,16 +148,25 @@ void otPlatSettingsInit(otInstance *aInstance, const uint16_t *aSensitiveKeys, u
             nvmOpenedByOT = true;
         }
     }
+
+exit:
+    return;
 }
 
 void otPlatSettingsDeinit(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
+
+    otEXPECT(sl_ot_rtos_task_can_access_pal());
+
     if (nvmOpenedByOT && nvm3_defaultHandle->hasBeenOpened)
     {
         nvm3_close(nvm3_defaultHandle);
         nvmOpenedByOT = false;
     }
+
+exit:
+    return;
 }
 
 otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint8_t *aValue, uint16_t *aValueLength)
@@ -164,6 +180,8 @@ otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint
 
     otError  err;
     uint16_t valueLength = 0;
+
+    otEXPECT_ACTION(sl_ot_rtos_task_can_access_pal(), err = OT_ERROR_REJECTED);
 
     nvm3_ObjectKey_t nvm3Key  = makeNvm3ObjKey(aKey, 0); // The base nvm3 key value.
     bool             idxFound = false;
@@ -193,15 +211,20 @@ otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint
                     // Only perform read if an input buffer was passed in.
                     if ((aValue != NULL) && (aValueLength != NULL))
                     {
+                        sl_status_t status;
                         // Read all nvm3 obj bytes into a tmp buffer, then copy the required
                         // number of bytes to the read destination buffer.
-                        uint8_t *buf = malloc(valueLength);
-                        err          = mapNvm3Error(nvm3_readData(nvm3_defaultHandle, nvm3Key, buf, valueLength));
+                        uint8_t *buf = NULL;
+
+                        status = sl_memory_alloc(valueLength, BLOCK_TYPE_SHORT_TERM, (void **)&buf);
+                        VerifyOrExit(status == SL_STATUS_OK, err = OT_ERROR_FAILED);
+
+                        err = mapNvm3Error(nvm3_readData(nvm3_defaultHandle, nvm3Key, buf, valueLength));
                         if (err == OT_ERROR_NONE)
                         {
                             memcpy(aValue, buf, (valueLength < *aValueLength) ? valueLength : *aValueLength);
                         }
-                        free(buf);
+                        sl_free(buf);
                         SuccessOrExit(err);
                     }
                 }
@@ -230,8 +253,9 @@ exit:
 otError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength)
 {
     OT_UNUSED_VARIABLE(aInstance);
-
     otError err;
+
+    otEXPECT_ACTION(sl_ot_rtos_task_can_access_pal(), err = OT_ERROR_REJECTED);
 
     // Delete all nvm3 objects matching the input key (i.e. the 'setting indexes' of the key).
     err = otPlatSettingsDelete(aInstance, aKey, -1);
@@ -249,7 +273,14 @@ exit:
 otError otPlatSettingsAdd(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength)
 {
     OT_UNUSED_VARIABLE(aInstance);
-    return addSetting(aKey, aValue, aValueLength);
+    otError error = OT_ERROR_NONE;
+
+    otEXPECT_ACTION(sl_ot_rtos_task_can_access_pal(), error = OT_ERROR_REJECTED);
+
+    error = addSetting(aKey, aValue, aValueLength);
+
+exit:
+    return error;
 }
 
 otError otPlatSettingsDelete(otInstance *aInstance, uint16_t aKey, int aIndex)
@@ -266,6 +297,9 @@ otError otPlatSettingsDelete(otInstance *aInstance, uint16_t aKey, int aIndex)
     bool             idxFound = false;
     int              idx      = 0;
     err                       = OT_ERROR_NOT_FOUND;
+
+    otEXPECT_ACTION(sl_ot_rtos_task_can_access_pal(), err = OT_ERROR_REJECTED);
+
     while ((idx <= NUM_INDEXED_SETTINGS) && (!idxFound))
     {
         // Get the next nvm3 key list.
@@ -312,6 +346,7 @@ exit:
 void otPlatSettingsWipe(otInstance *aInstance)
 {
     OT_UNUSED_VARIABLE(aInstance);
+    otEXPECT(sl_ot_rtos_task_can_access_pal());
 
     // Delete nvm3 objects for all OT Settings keys (and any of their associated 'indexes').
     // Note- any OT User nvm3 objects in the OT nvm3 area are NOT be erased.
@@ -319,6 +354,9 @@ void otPlatSettingsWipe(otInstance *aInstance)
     {
         otPlatSettingsDelete(NULL, aKey, -1);
     }
+
+exit:
+    return;
 }
 
 // Local functions..

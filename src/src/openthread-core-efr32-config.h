@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -35,10 +35,18 @@
 #ifndef OPENTHREAD_CORE_EFR32_CONFIG_H_
 #define OPENTHREAD_CORE_EFR32_CONFIG_H_
 
+#ifdef SL_COMPONENT_CATALOG_PRESENT
+#include "sl_component_catalog.h"
+#endif
+
+#ifdef SL_CATALOG_CLOCK_MANAGER_PRESENT
+#include "sl_clock_manager_oscillator_config.h"
+#else
 #include "sl_device_init_hfxo.h"
 #include "sl_device_init_hfxo_config.h"
+#endif
 
-#if defined(HARDWARE_BOARD_HAS_LFXO)
+#if defined(HARDWARE_BOARD_HAS_LFXO) && !defined(SL_CATALOG_CLOCK_MANAGER_PRESENT)
 #include "sl_device_init_lfxo.h"
 #include "sl_device_init_lfxo_config.h"
 #endif
@@ -512,7 +520,11 @@
  *
  */
 #ifndef SL_OPENTHREAD_HFXO_ACCURACY
+#ifdef SL_CATALOG_CLOCK_MANAGER_PRESENT
+#define SL_OPENTHREAD_HFXO_ACCURACY SL_CLOCK_MANAGER_HFXO_PRECISION
+#else
 #define SL_OPENTHREAD_HFXO_ACCURACY SL_DEVICE_INIT_HFXO_PRECISION
+#endif
 #endif
 
 /**
@@ -524,10 +536,14 @@
  */
 #ifndef SL_OPENTHREAD_LFXO_ACCURACY
 #if defined(HARDWARE_BOARD_HAS_LFXO)
+#if SL_CATALOG_CLOCK_MANAGER_PRESENT
+#define SL_OPENTHREAD_LFXO_ACCURACY SL_CLOCK_MANAGER_LFXO_PRECISION
+#else
 #define SL_OPENTHREAD_LFXO_ACCURACY SL_DEVICE_INIT_LFXO_PRECISION
+#endif // SL_CATALOG_CLOCK_MANAGER_PRESENT
 #else
 #define SL_OPENTHREAD_LFXO_ACCURACY 0
-#endif
+#endif // HARDWARE_BOARD_HAS_LFXO
 #endif
 
 /**
@@ -541,16 +557,6 @@
 #endif
 
 /**
- * @def SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT
- *
- * Max number of RX buffers to use in the radio driver
- *
- */
-#ifndef SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT
-#define SL_OPENTHREAD_RADIO_RX_BUFFER_COUNT 16
-#endif
-
-/**
  * @def SL_OPENTHREAD_ECDSA_PRIVATE_KEY_SIZE
  *
  * Max Private key size supported by ECDSA Crypto handler.
@@ -559,5 +565,13 @@
 #ifndef SL_OPENTHREAD_ECDSA_PRIVATE_KEY_SIZE
 #define SL_OPENTHREAD_ECDSA_PRIVATE_KEY_SIZE 32
 #endif
+
+/**
+ * @def OPENTHREAD_CONFIG_PLATFORM_POWER_CALIBRATION_ENABLE
+ *
+ * Power Calibration (SPINEL) Module (Host and RCP configuration)
+ *
+ */
+#define OPENTHREAD_CONFIG_PLATFORM_POWER_CALIBRATION_ENABLE OPENTHREAD_CONFIG_POWER_CALIBRATION_ENABLE
 
 #endif // OPENTHREAD_CORE_EFR32_CONFIG_H_

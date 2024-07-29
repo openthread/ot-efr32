@@ -7,14 +7,14 @@ description: This component provides the OpenThread stack features configuration
 provides:
   - name: ot_stack_features_config
 config_file:
-  - path: third_party/silabs/gecko_sdk/protocol/openthread/config/sl_openthread_features_config.h
+  - path: third_party/silabs/simplicity_sdk/protocol/openthread/config/sl_openthread_features_config.h
     file_id: openthread_features
     unless: [ot_reference_device]
-  - path: third_party/silabs/gecko_sdk/protocol/openthread/config/sl_openthread_reference_device_config.h
+  - path: third_party/silabs/simplicity_sdk/protocol/openthread/config/sl_openthread_reference_device_config.h
     file_id: openthread_features
     condition: [ot_reference_device]
 validation_helper:
-  - path: third_party/silabs/gecko_sdk/protocol/openthread/component/script/ot_log_validation.lua
+  - path: third_party/silabs/simplicity_sdk/protocol/openthread/component/script/ot_log_validation.lua
 define:
   - name: SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE
     value: "\"sl_openthread_features_config.h\""

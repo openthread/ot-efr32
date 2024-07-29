@@ -54,7 +54,7 @@ set_target_properties({{PROJECT_NAME}}-mbedtls
 # ==============================================================================
 # Includes
 # ==============================================================================
-set(SILABS_MBEDTLS_DIR "${SILABS_GSDK_DIR}/util/third_party/crypto")
+set(SILABS_MBEDTLS_DIR "${SILABS_SDK_DIR}/util/third_party/crypto")
 
 {%- if MBEDTLS_INCLUDES %}
 target_include_directories({{PROJECT_NAME}}-mbedtls

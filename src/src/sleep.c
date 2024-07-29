@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2024, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@
 #define CURRENT_MODULE_NAME "OPENTHREAD"
 
 #include "sleep.h"
+#include "alarm.h"
 #include "em_core.h"
 #include "em_gpio.h"
 #include "platform-efr32.h"
@@ -123,7 +124,8 @@ void sl_ot_sleep_init(void)
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 }
 
-__WEAK bool efr32AllowSleepCallback(void)
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_OT_PLATFORM_ABSTRACTION, SL_CODE_CLASS_TIME_CRITICAL)
+OT_TOOL_WEAK bool efr32AllowSleepCallback(void)
 {
     return true;
 }
@@ -192,6 +194,7 @@ bool sl_ot_is_ok_to_sleep(void)
 //------------------------------------------------------------------------------
 // Static functions
 
+SL_CODE_CLASSIFY(SL_CODE_COMPONENT_OT_PLATFORM_ABSTRACTION, SL_CODE_CLASS_TIME_CRITICAL)
 static void energy_mode_transition_callback(sl_power_manager_em_t from, sl_power_manager_em_t to)
 {
 #if defined(_SILICON_LABS_32B_SERIES_2) && defined(VCOM_TX_PORT)

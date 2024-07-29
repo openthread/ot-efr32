@@ -6,20 +6,26 @@ category: OpenThread Examples
 quality: production
 
 component:
+  # ot-efr32 components
   - id: ot_crash_handler
-    from: ot-efr32
   - id: ot_platform_abstraction_core
-  - id: ot_mbedtls
+  - id: ot_headers
+    from: ot-efr32
   - id: ot_stack_features_config
     from: ot-efr32
   - id: ot_core_vendor_extension
     from: ot-efr32
+
+  # SDK Components
+  - id: ot_mbedtls
   - id: ot_ncp_spidrv
   - id: rail_util_pti
 
 configuration:
   - name: SL_BOARD_ENABLE_VCOM
     value: 1
+  - name: CIRCULAR_QUEUE_LEN_MAX
+    value: 16
 
 define:
   - name: OPENTHREAD_COPROCESSOR

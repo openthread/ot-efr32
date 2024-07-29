@@ -26,80 +26,68 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
+/*******************************************************************************
  * @file
- *   This file includes the initializers for supporting Security manager.
- *
- */
+ * @brief This file implements Green Power interface.
+ ******************************************************************************/
 
-#ifndef SL_PACKET_HANDLER_H
-#define SL_PACKET_HANDLER_H
+#ifndef SL_GP_INTERFACE_H_
+#define SL_GP_INTERFACE_H_
 
+#include <stdbool.h>
 #include <openthread/platform/radio.h>
 
-#ifdef __cplusplus
-extern "C" {
+// GP state-machine states
+typedef enum
+{
+    SL_GP_STATE_INIT,
+    SL_GP_STATE_IDLE,
+    SL_GP_STATE_WAITING_FOR_PKT,
+    SL_GP_STATE_SEND_RESPONSE,
+    SL_GP_STATE_MAX
+} sl_gp_state_t;
+
+/**
+ * This function returns current state of GP state machine.
+ *
+ * @retval  Status of GP state machine.
+ */
+sl_gp_state_t sl_gp_intf_get_state(void);
+
+/**
+ * This function performs GP RCP processing.
+ *
+ */
+void efr32GpProcess(void);
+
+/**
+ * This function stores the provided packet in global memory, to be sent as
+ * a response for specific incoming packet.
+ *
+ * @param[in]  aInstance    A pointer to the OpenThread instance structure.
+ */
+void sl_gp_intf_buffer_pkt(otInstance *aInstance);
+
+/**
+ * This function returns if the given frame is a GP frame and should be buffered
+ *
+ * @param[in]  aInstance    A pointer to the OpenThread instance structure.
+ * @param[in]  aFrame       A pointer to the MAC frame buffer.
+ * @param[in]  isRxFrame    If the give frame is a incoming or outgoing frame.
+ *
+ * @retval  true    Frame should be buffered
+ * @retval  false   Frame should not be buffered
+ */
+bool sl_gp_intf_should_buffer_pkt(otInstance *aInstance, otRadioFrame *aFrame, bool isRxFrame);
+
+/**
+ * This function returns if the given frame is a GP frame.
+ *
+ * @param[in]  aFrame       A pointer to the MAC frame buffer.
+ *
+ * @retval  true    Frame is a GP packet.
+ * @retval  false   Frame is not a GP packet.
+ */
+bool sl_gp_intf_is_gp_pkt(otRadioFrame *aFrame);
+
 #endif
-
-/**
- * This function performs AES CCM on the frame which is going to be sent.
- *
- * @param[in]  aFrame       A pointer to the MAC frame buffer that is going to be sent.
- * @param[in]  aExtAddress  A pointer to the extended address, which will be used to generate nonce
- *                          for AES CCM computation.
- *
- */
-void efr32PlatProcessTransmitAesCcm(otRadioFrame *aFrame, const otExtAddress *aExtAddress);
-
-/**
- * This function returns if the Frame Pending bit is set in any given frame.
- *
- * @param[in]  aFrame       A pointer to the MAC frame buffer.
- *
- * @retval  true    Frame Pending is set.
- * @retval  false   Frame Pending is not set.
- */
-bool efr32IsFramePending(otRadioFrame *aFrame);
-
-/**
- * This function returns the Destination PanId, if present.
- *
- * @param[in]  aFrame       A pointer to the MAC frame buffer.
- *
- * @retval  DstPanId    If present.
- * @retval  BcastPanId  If Dest PanId is compressed.
- */
-otPanId efr32GetDstPanId(otRadioFrame *aFrame);
-
-/**
- * This function returns the start of payload pointer.
- *
- * @param[in]  aFrame       A pointer to the MAC frame buffer.
- *
- * @retval  Pointer to start of 802.15.4 payload.
- */
-uint8_t *efr32GetPayload(otRadioFrame *aFrame);
-
-/**
- * This function checks if the PAN ID Compression bit is set in the given MAC frame.
- *
- * @param[in]  aFrame       A pointer to the MAC frame buffer.
- *
- * @return true if the PAN ID Compression bit is set, false otherwise.
- */
-bool efr32FrameIsPanIdCompressed(otRadioFrame *aFrame);
-
-/**
- * This function returns the frame version.
- *
- * @param[in]  aFrame       A pointer to the MAC frame buffer.
- *
- * @retval  Frame version.
- */
-uint16_t efr32GetFrameVersion(otRadioFrame *aFrame);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
-
-#endif /* SL_PACKET_HANDLER_H */

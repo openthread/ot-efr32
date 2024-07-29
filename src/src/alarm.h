@@ -26,21 +26,44 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "platform-efr32.h"
-#include <openthread-core-config.h>
+/**
+ * @file
+ *   This file defines platform specific alarm methods.
+ *
+ */
 
-#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
-#include <openthread/platform/memory.h>
+#ifndef _ALARM_H
+#define _ALARM_H
 
-#include "sl_memory_manager.h"
+#include <stdint.h>
+#include "openthread/instance.h"
 
-void *otPlatCAlloc(size_t aNum, size_t aSize)
-{
-    return sl_calloc(aNum, aSize);
-}
+/**
+ * This function initializes the alarm service used by OpenThread.
+ *
+ */
+void efr32AlarmInit(void);
 
-void otPlatFree(void *aPtr)
-{
-    sl_free(aPtr);
-}
-#endif
+/**
+ * This function provides the remaining time (in milliseconds) on an alarm service.
+ *
+ */
+uint64_t efr32AlarmPendingTime(void);
+
+/**
+ * This function checks if the alarm service is running.
+ *
+ * @param[in]  aInstance  The OpenThread instance structure.
+ *
+ */
+bool efr32AlarmIsRunning(otInstance *aInstance);
+
+/**
+ * This function performs alarm driver processing.
+ *
+ * @param[in]  aInstance  The OpenThread instance structure.
+ *
+ */
+void efr32AlarmProcess(otInstance *aInstance);
+
+#endif // _ALARM_H

@@ -15,7 +15,7 @@ The example platform drivers are intended to present the minimal code necessary 
 
 When using this repo to generate a solution that requires two different projects, such as an RCP & OTBR, make sure they are relying on the same OpenThread version to ensure maximum compatibility. You can check which commit this repo relies upon in the "openthread" submodule.
 
-If your OTBR project was generated using the Silabs GSDK / Simplicity Studio, we recommend to also use it to generate the RCP project and not this repo. This will mitigate potential incompatibility issues due to mismatched OpenThread versions.
+If your OTBR project was generated using the Silabs SiSDK / Simplicity Studio, we recommend to also use it to generate the RCP project and not this repo. This will mitigate potential incompatibility issues due to mismatched OpenThread versions.
 
 To learn more about building and running the examples please check:
 
