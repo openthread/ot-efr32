@@ -40,10 +40,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || (github.repository == 'openthread/ot-efr32' && github.run_id) || github.ref }}
   cancel-in-progress: true
 
-env:
-  TOOLCHAIN_DIR: .toolchain
-  DOCKER_IMAGE_SHA_TAG: siliconlabsinc/ot-efr32-dev:${{ github.sha }}
-
 jobs:
   docker:
     name: Docker
@@ -52,10 +48,13 @@ jobs:
   arm-gcc:
     name: Arm GNU Toolchain ${{ matrix.gcc_ver }}
     runs-on: ubuntu-22.04
-    needs: docker
+    needs: [docker]
     continue-on-error: true
     permissions:
       contents: read
+    env:
+      container_name: ot-efr32-dev
+      TOOLCHAIN_DIR: .toolchain
     strategy:
       fail-fast: false
       matrix:
@@ -91,20 +90,20 @@ jobs:
       - name: Download Docker image
         uses: actions/download-artifact@v4
         with:
-          name: ot-efr32-dev
+          name: ${{ needs.docker.outputs.artifact_name }}
 
       - name: Load docker image
-        run: docker load -i ot-efr32-dev.tar
+        run: docker load -i ${{ needs.docker.outputs.image_name }}.tar
 
       - name: Start ot-efr32-dev container
         run: |
           docker run \
             --rm -it -d \
             --user $(id -u) \
-            --name ot-efr32-dev \
+            --name ${{ env.container_name }} \
             --env CCACHE_DIR=/ot-efr32/.ccache \
             -v $PWD:/ot-efr32 -w /ot-efr32\
-            ${{ env.DOCKER_IMAGE_SHA_TAG }}
+            ${{ needs.docker.outputs.image_name }}
 
       - name: Append LFS include config to simplicity_sdk .lfsconfig
         run: |
@@ -125,7 +124,7 @@ jobs:
         run: git -C third_party/silabs/simplicity_sdk lfs pull
 
       - name: Build
-        run: docker exec ot-efr32-dev bash -c 'PATH=${{ env.TOOLCHAIN_DIR }}/${{ matrix.gcc_extract_dir }}/bin:$PATH script/test'
+        run: docker exec ${{ env.container_name }} bash -c 'PATH=${{ env.TOOLCHAIN_DIR }}/${{ matrix.gcc_extract_dir }}/bin:$PATH script/test'
 
       - name: Gather SLC generated files
         if: failure()
@@ -144,3 +143,16 @@ jobs:
         with:
           name: build-${{ matrix.gcc_ver }}
           path: artifact
+
+  dockerhub-publish:
+    name: DockerHub Publish
+    uses: ./.github/workflows/dockerhub-publish.yml
+    needs: [docker, arm-gcc]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository_owner == 'SiliconLabs'
+    with:
+      artifact_name: ${{ needs.docker.outputs.artifact_name }}
+      image_name: ${{ needs.docker.outputs.image_name }}
+      new_image_name: siliconlabsinc/ot-efr32-dev:latest
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_PERSONAL_ACCESS_TOKEN }}
