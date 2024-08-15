@@ -38,9 +38,6 @@ fi
 script_dir="$(realpath "$(dirname "${script_path}")")"
 repo_dir="$(dirname "${script_dir}")"
 
-# CMake Build targets
-OT_CMAKE_NINJA_TARGET=${OT_CMAKE_NINJA_TARGET-}
-
 # CMake Build options
 OT_OPTIONS=(
     "-DCMAKE_BUILD_TYPE=Release"
@@ -128,7 +125,7 @@ generate()
         return
     fi
 
-    if contains ".*-(ftd|mtd)" "${OT_CMAKE_NINJA_TARGET[@]}"; then
+    if contains ".*-(ftd|mtd)" "${target_apps[@]}"; then
         set +x
         echo "========================================================================================================="
         echo "Generate openthread-efr32-soc and openthread-efr32-soc-mbedtls libs"
@@ -139,7 +136,7 @@ generate()
             "${slc_generated_projects_dir}/soc" \
             "${board}"
     fi
-    if contains "ot-rcp-uart" "${OT_CMAKE_NINJA_TARGET[@]}"; then
+    if contains "ot-rcp-uart" "${target_apps[@]}"; then
         set +x
         echo "========================================================================================================="
         echo "Generate openthread-efr32-rcp-uart and openthread-efr32-rcp-uart-mbedtls libs"
@@ -150,7 +147,7 @@ generate()
             "${slc_generated_projects_dir}/rcp_uart" \
             "${board}"
     fi
-    if contains "ot-rcp-spi" "${OT_CMAKE_NINJA_TARGET[@]}"; then
+    if contains "ot-rcp-spi" "${target_apps[@]}"; then
         set +x
         echo "========================================================================================================="
         echo "Generate openthread-efr32-rcp-spi and openthread-efr32-rcp-spi-mbedtls libs"
@@ -325,13 +322,17 @@ main()
 
     options+=("-DCMAKE_TOOLCHAIN_FILE=src/${platform}/arm-none-eabi.cmake")
 
-    # Set default OT_CMAKE_NINJA_TARGET based on platform
-    if [ -z "${OT_CMAKE_NINJA_TARGET}" ]; then
+    # Set the target apps
+    if [ -z ${OT_CMAKE_NINJA_TARGET:+x} ]; then
+        # Default target apps
         case "${platform}" in
             efr32mg2*)
-                OT_CMAKE_NINJA_TARGET=("ot-rcp-uart" "ot-rcp-spi" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
+                target_apps=("ot-rcp-uart" "ot-rcp-spi" "ot-cli-ftd" "ot-cli-mtd" "ot-ncp-ftd" "ot-ncp-mtd")
                 ;;
         esac
+    else
+        # Use the specified target apps
+        target_apps=("${OT_CMAKE_NINJA_TARGET[@]}")
     fi
 
     options+=("$@")
@@ -349,10 +350,10 @@ main()
         generate
     fi
 
-    # Separate OT_CMAKE_NINJA_TARGET into two lists
+    # Separate target_apps into two lists
     rcp_targets=()
     soc_targets=()
-    for t in "${OT_CMAKE_NINJA_TARGET[@]}"; do [[ $t =~ .*rcp.* ]] && rcp_targets+=("$t") || soc_targets+=("$t"); done
+    for t in "${target_apps[@]}"; do [[ $t =~ .*rcp.* ]] && rcp_targets+=("$t") || soc_targets+=("$t"); done
 
     # Build ot-rcp targets
     if contains "ot-rcp-uart" "${rcp_targets[@]-}"; then
@@ -366,8 +367,8 @@ main()
         build_soc -DEFR32_PLATFORM="${platform}" -DBOARD="${board}" "${options[@]}"
     fi
 
-    # Build silabs apps
-    if [ -z ${OT_CMAKE_NINJA_TARGET+x} ] && [ "${skip_silabs_apps}" = false ]; then
+    # Build silabs apps if no target apps are specified and the flag is not set
+    if [ -z ${OT_CMAKE_NINJA_TARGET:+x} ] && [ "${skip_silabs_apps}" = false ]; then
         local before_flags=()
         local after_flags=()
 
