@@ -164,14 +164,3 @@ elseif(OT_FTD OR OT_MTD)
 endif()
 message("-- OT_EXTERNAL_MBEDTLS      = ${OT_EXTERNAL_MBEDTLS}")
 message("===================================================================")
-
-
-# efr32mg12 Sub-GHz support
-set(EFR32MG12_915MHZ_PHY_SOURCES
-    ${PROJECT_SOURCE_DIR}/src/efr32mg12/phy/PHY_IEEE802154_915MHZ_OQPSK_EFR32XG12.c
-    ${PROJECT_SOURCE_DIR}/src/efr32mg12/phy/PHY_IEEE802154_915MHZ_2GFSK_EFR32XG12.c
-)
-string(COMPARE EQUAL "${PLATFORM_LOWERCASE}" "efr32mg12" _cmp)
-if (_cmp AND TARGET ${OT_PLATFORM_LIB})
-    target_sources(${OT_PLATFORM_LIB} PUBLIC ${EFR32MG12_915MHZ_PHY_SOURCES})
-endif()

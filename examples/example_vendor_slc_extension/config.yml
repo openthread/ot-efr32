@@ -27,7 +27,7 @@
 #
 
 # Target board
-board: brd4161a
+board: brd4186c
 
 # SLCP locations
 # NOTE: These paths are relative to the extension's root dir

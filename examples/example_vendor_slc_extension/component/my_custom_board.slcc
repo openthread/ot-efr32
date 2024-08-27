@@ -38,7 +38,7 @@ description: This is an example component that adds vendor-specific sources
 provides:
   - name: my_custom_board
 requires:
-  - efr32mg1p232f256gm48
+  - efr32mg24b210f1536im48
 
 # Set the root path for all relative paths in this component.
 # The value of root_path is relative to the root of this repo
