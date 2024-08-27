@@ -10,11 +10,11 @@ For setting up the build environment refer to [OpenThread on EFR32](../../src/RE
 
 ## 1. Build
 
-In this `README`, all example commands will be targeting the `brd4161a` board on the `efr32mg12` platform. The same commands should work for the other boards
+In this `README`, all example commands will be targeting the `brd4186c` board on the `efr32mg24` platform. The same commands should work for the other boards
 
 ```bash
 $ cd <path-to-ot-efr32>
-$ board="brd4161a"
+$ board="brd4186c"
 $ ./script/build $board
 ```
 
@@ -22,7 +22,7 @@ The build script will convert the resulting executables into S-Record format and
 
 ```bash
 $ ls build/$board/bin/sleepy*
-build/brd4161a/bin/sleepy-demo-ftd  build/brd4161a/bin/sleepy-demo-ftd.s37  build/brd4161a/bin/sleepy-demo-mtd  build/brd4161a/bin/sleepy-demo-mtd.s37
+build/brd4186c/bin/sleepy-demo-ftd  build/brd4186c/bin/sleepy-demo-ftd.s37  build/brd4186c/bin/sleepy-demo-mtd  build/brd4186c/bin/sleepy-demo-mtd.s37
 ```
 
 In Silicon Labs Simplicity Studio flash one device with the `sleepy-demo-mtd.s37` image and the other device with the `sleepy-demo-ftd.s37` image.

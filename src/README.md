@@ -79,12 +79,12 @@ Before building example apps, make sure to initialize all submodules. Afterward,
 
 **Example**
 
-The example below demonstrates how to build for `efr32mg12` on `brd4161a`, but the same command maybe used for other platforms and boards.
+The example below demonstrates how to build for `efr32mg24` on `brd4186c`, but the same command maybe used for other platforms and boards.
 
 ```bash
 $ cd <path-to-ot-efr32>
 $ git submodule update --init --recursive .
-$ board="brd4161a"
+$ board="brd4186c"
 $ ./script/build $board
 ...
 -- Configuring done
@@ -175,12 +175,12 @@ Compiled binaries also may be flashed onto the specified EFR32 dev board using [
 
 [j-link-commander]: https://www.segger.com/products/debug-probes/j-link/tools/j-link-commander/
 
-**Example:** Flashing `ot-cli-ftd` to a `brd4161a` device
+**Example:** Flashing `ot-cli-ftd` to a `brd4186c` device
 
 ```bash
 $ cd <path-to-ot-efr32>
 $ source ./script/efr32-definitions
-$ board="brd4161a"
+$ board="brd4186c"
 $ cd <path-to-ot-efr32>/build/$board/bin
 $ arm-none-eabi-objcopy -O ihex ot-cli-ftd ot-cli-ftd.hex
 $ <path-to-JLinkGDBServer>/JLinkExe -device $(efr32_get_jlink_device $board) -speed 4000 -if SWD -autoconnect 1 -SelectEmuBySN <SerialNo>
@@ -313,11 +313,11 @@ A debug session may be started with [J-LinkGDBServer][jlinkgdbserver].
 
 [jlinkgdbserver]: https://www.segger.com/jlink-gdb-server.html
 
-**Example:** Debugging `ot-cli-ftd` on a `brd4161a` device
+**Example:** Debugging `ot-cli-ftd` on a `brd4186c` device
 
 ```bash
 $ source <path-to-ot-efr32>/script/efr32-definitions
-$ board="brd4161a"
+$ board="brd4186c"
 $ cd <path-to-JLinkGDBServer>
 $ sudo ./JLinkGDBServer -if swd -singlerun -device $(efr32_get_jlink_device $board)
 $ cd <path-to-ot-efr32>/build/$board/bin
@@ -334,11 +334,11 @@ $ (gdb) c
 
 The above example demonstrates basic OpenThread capabilities. Enable more features/roles (e.g. commissioner, joiner, DHCPv6 Server/Client, etc.) by assigning compile-options before compiling.
 
-**Example** Building efr32mg12 for board `brd4161a` with some more features/roles enabled
+**Example** Building efr32mg24 for board `brd4186c` with some more features/roles enabled
 
 ```bash
 $ cd <path-to-ot-efr32>
-$ ./script/build brd4161a -DOT_COMMISSIONER=ON -DOT_JOINER=ON -DOT_DHCP6_CLIENT=ON -DOT_DHCP6_SERVER=ON
+$ ./script/build brd4186c -DOT_COMMISSIONER=ON -DOT_JOINER=ON -DOT_DHCP6_CLIENT=ON -DOT_DHCP6_SERVER=ON
 ```
 
 <a name="verification"/>
