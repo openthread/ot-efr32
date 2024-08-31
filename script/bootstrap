@@ -83,7 +83,7 @@ install_packages_brew()
         git
         git-lfs
         grep
-        ninja-build
+        ninja
         openjdk@17
         unzip
         wget
