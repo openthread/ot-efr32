@@ -3238,7 +3238,7 @@ static rxBuffer *prepareNextRxPacketforCb(void)
     sLastRssi                          = rxPacketBuf->packetInfo.rssi;
 
     sReceive.frame.mInfo.mRxInfo.mLqi = rxPacketBuf->packetInfo.lqi;
-    sLastLqi                          = rxPacketBuf->packetInfo.rssi;
+    sLastLqi                          = rxPacketBuf->packetInfo.lqi;
 
     sReceive.iid = rxPacketBuf->packetInfo.iid;
 
