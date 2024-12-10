@@ -3,4 +3,4 @@
 	url = https://github.com/openthread/openthread.git
 [submodule "third_party/silabs/simplicity_sdk"]
 	path = third_party/silabs/simplicity_sdk
-	url = https://github.com/SiliconLabs/simplicity_sdk.git
+	url = git@github.com:LevelHome/simplicity_sdk.git
