@@ -1,0 +1,148 @@
+{
+  "$id": "https://silabs.com/schemas/uc/upgrade.json",
+  "type": "object",
+  "properties": {
+    "upgrade": {
+      "type": "array",
+      "description": "List of upgrades to specific version numbers",
+      "items": {
+        "type": "object",
+        "description": "A single upgrade transformation",
+        "properties": {
+          "sdk": {
+            "type": "object",
+            "description": "The SDK to upgrade to",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "ID of the SDK"
+              },
+              "version": {
+                "type": "string",
+                "description": "Version number of the SDK represented as a string"
+              }
+            },
+            "required": ["id", "version"],
+            "additionalProperties": false
+          },
+          "component": {
+            "type": "array",
+            "description": "List of component upgrades",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "description": "Declarative component upgrade",
+                  "title": "DeclarativeUpgrade",
+                  "properties": {
+                    "trigger": {
+                      "type": "string",
+                      "description": "Rule is triggered if component with this ID is listed in the project"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Description of the upgrade rule"
+                    },
+                    "remove": {
+                      "type": "array",
+                      "description": "List of components to remove from the project. Typically includes the trigger component.",
+                      "items": {"type": "string"}
+                    },
+                    "add": {
+                      "type": "array",
+                      "description": "List of components to add to the project",
+                      "items": {"type": "string"}
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "One of nothing, automatic, user_verification, impossible. If this upgrade rule is triggered, this status will affect the UX.",
+                      "enum": ["nothing", "automatic", "user_verification", "impossible"]
+                    }
+                  },
+                  "required": ["trigger", "description"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "description": "Scripted component upgrade",
+                  "title": "ScriptedUpgrade",
+                  "properties": {
+                    "script": {
+                      "type": "string",
+                      "description": "Path to the lua upgrade script relative to the upgrade manifest file",
+                      "pattern": ".*\\.lua"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Description of the upgrade rule"
+                    }
+                  },
+                  "required": ["script", "description"],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "configuration": {
+            "type": "array",
+            "description": "List of configuration upgrades",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "description": "Declarative configuration upgrade",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Configuration option to replace"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Description of the upgrade rule"
+                    },
+                    "replacement": {
+                      "type": "string",
+                      "description": "New configuration option name"
+                    },
+                    "value": {
+                      "type": "object",
+                      "description": "Map of replacement configuration values. Key is the old value, value is the new configuration value.",
+                      "additionalProperties": {"type": "string"}
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "One of nothing, automatic, user_verification, impossible. If this upgrade rule is triggered, this status will affect the UX.",
+                      "enum": ["nothing", "automatic", "user_verification", "impossible"]
+                    }
+                  },
+                  "required": ["name", "replacement"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "description": "Scripted configuration upgrade",
+                  "properties": {
+                    "script": {
+                      "type": "string",
+                      "description": "Path to the lua upgrade script relative to the upgrade manifest file",
+                      "pattern": ".*\\.lua"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Description of the upgrade rule"
+                    }
+                  },
+                  "required": ["script"],
+                  "additionalProperties": false
+                }
+              ]
+            }}
+        },
+        "required": ["sdk"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["upgrade"],
+  "additionalProperties": false
+}

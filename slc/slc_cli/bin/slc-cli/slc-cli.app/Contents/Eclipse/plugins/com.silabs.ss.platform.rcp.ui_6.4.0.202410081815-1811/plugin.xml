@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="OpenAPIDefinitions" name="Open API Definitions" schema="schema/OpenAPIDefinitions.exsd"/>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.silabs.ss.platform.internal.rcp.ui.ExtensionDriverStartup">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.equinox.http.registry.servlets">
+      <servlet
+            alias="/rest/studio/ui/services"
+            class="com.silabs.ss.platform.internal.rcp.ui.UiServicesServlet">
+      </servlet>
+   </extension>
+   <extension
+         point="org.eclipse.equinox.http.registry.servlets">
+      <servlet
+            alias="/ws/event"
+            class="com.silabs.ss.platform.internal.rcp.ui.EventWebSocketServlet">
+      </servlet>
+   </extension>
+   <extension
+         point="org.eclipse.equinox.http.registry.servlets">
+      <servlet
+            alias="/rest/openapis"
+            class="com.silabs.ss.platform.internal.rcp.ui.OpenAPIServlet">
+      </servlet>
+   </extension>
+   <extension
+         point="com.silabs.ss.platform.rcp.ui.OpenAPIDefinitions">
+      <definition
+            class="com.silabs.ss.platform.internal.rcp.ui.RcpOpenAPI">
+      </definition>
+   </extension>
+
+</plugin>

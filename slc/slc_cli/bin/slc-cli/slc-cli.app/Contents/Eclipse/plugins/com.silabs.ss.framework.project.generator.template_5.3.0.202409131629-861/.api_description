@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component name="com.silabs.ss.framework.project.generator.template_5.3.0.202409131629-861" version="1.2">
+    <plugin id="com.silabs.ss.framework.project.generator.template_5.3.0.202409131629-861"/>
+    <package name="com.silabs.ss.framework.project.api.generator.template" visibility="1">
+        <type name="ITemplateGenerator" restrictions="3"/>
+        <type name="ITemplateGeneratorFactory" restrictions="3"/>
+        <type name="TemplateManager" restrictions="4"/>
+    </package>
+</component>

@@ -1,0 +1,150 @@
+Signature-Version: 1.0
+Created-By: 17.0.11 (Amazon.com Inc.)
+SHA-256-Digest-Manifest: U79zpzwAUve705L3K6PwlKSjvGm7MWmi2DnyV7oiU38=
+SHA-256-Digest-Manifest-Main-Attributes: 503HmRlmIEgjyVRipZaWF1QNng/G+Ih
+ 9gS/nQ7+bE3A=
+
+Name: plugin.xml
+SHA-256-Digest: dym3uKUs/TQCR/VyCEef+ZuicES8KYv4Ku7WtpBzAZQ=
+
+Name: com.silabs.ss.platform.jetty.server/distws/index.html
+SHA-256-Digest: yN3+VUf1qCFRMyITiXMpU1pFqVgQS3d0E6A0rGM0F2g=
+
+Name: com/silabs/ss/platform/jetty/server/impl/ContentServerServlet.clas
+ s
+SHA-256-Digest: 52/NqKv9o7ACKsnGIrYdL2o2p3o/lPW02kutAeYCqso=
+
+Name: com/silabs/ss/platform/jetty/server/impl/config/JettyConfiguration
+ .class
+SHA-256-Digest: rolh++qDwu50xcxo3hcgEOtdnLv5Yj2afuPa1Gtib7I=
+
+Name: com/silabs/ss/platform/jetty/server/GenericWebSocketWrapper.class
+SHA-256-Digest: 7xSznvl87yu+9ZOk55Wd6ozSDOPRf0xrnjeVYRMOTQ0=
+
+Name: com/silabs/ss/platform/internal/jetty/extensions/RestRequestFilter
+ ExtParser.class
+SHA-256-Digest: JICD2N55+AV0lqWgDrViz3qrKp0wYbjr9LheARFK1L0=
+
+Name: com/silabs/ss/platform/jetty/server/LazyLoadedWebSocketServlet.cla
+ ss
+SHA-256-Digest: OD8epY2OKaWCUgGuIze/WFvF64Ew5879Or6UidiNS/U=
+
+Name: com/silabs/ss/platform/jetty/server/IServerStartup.class
+SHA-256-Digest: mXaBB1mjjodV7qEb8thP3gZ0IyhUWGLpAin6ktOlxOA=
+
+Name: com/silabs/ss/platform/jetty/server/RequestFilterManager.class
+SHA-256-Digest: BaX4aMlGOP3b0joIoMTbA+RDrtV11+//OZKdQw94UBI=
+
+Name: com/silabs/ss/platform/jetty/websocket/server/ContentServerBinaryW
+ ebSocketServlet.class
+SHA-256-Digest: 3ts8+r9dTtHTa5VenzbAeaJd7xUvXbHBisaV9YXNrAc=
+
+Name: com/silabs/ss/platform/jetty/server/GenericListenerWrapper.class
+SHA-256-Digest: yABxVl5WYWL2guMYbRJu+jH00CtKgJFSrm7+PvRvpL0=
+
+Name: com/silabs/ss/platform/jetty/server/WebSocketEndpointRegistry.clas
+ s
+SHA-256-Digest: exdFIwi76DqAyIm863KBLNmtsRLcOP0kGGS/c0SdZnY=
+
+Name: com/silabs/ss/platform/jetty/server/impl/ContentServerImpl$StopSer
+ verThread.class
+SHA-256-Digest: v7Lo1j3or3yPttp41n8d/hDk0wiuro7HdzQkb9oQ50s=
+
+Name: com/silabs/ss/platform/jetty/websocket/server/SocketAddressDebugHe
+ lper.class
+SHA-256-Digest: tjftW5u45XiU2GVJ3KcSb2t3bng8uMGaRk4K6fkuQdk=
+
+Name: com/silabs/ss/platform/jetty/server/LazyLoadedWebSocketServletProx
+ y.class
+SHA-256-Digest: JbQgYKnvdhnR06le2BQ+Vv3UaP0cPEBE4YugY6WmuqA=
+
+Name: com/silabs/ss/platform/internal/jetty/extensions/OnStartupFilterEx
+ tensions.class
+SHA-256-Digest: 2IoOcc91qBj1KJbqKjrQEb02tChI7FpiEddhqY6P4RU=
+
+Name: com/silabs/ss/platform/jetty/server/LazyLoadedServlet.class
+SHA-256-Digest: NgD+u1pTMlE3fRO2S49O7zf5SFdITycufGozD418RIU=
+
+Name: com/silabs/ss/platform/jersey/LazyLoadedServletContainer.class
+SHA-256-Digest: 7tPdHbeJPoelSLh73pfMHrUuxFfbmSgQ0V06md8ozbc=
+
+Name: com/silabs/ss/platform/jetty/server/ManagedWebSocketAdapter.class
+SHA-256-Digest: 81r1tKHwGorh1pUpAzixWRyO9Qav1AVPwbGv23L6Qz0=
+
+Name: com/silabs/ss/platform/jetty/websocket/server/ContentServerTextWeb
+ Socket.class
+SHA-256-Digest: lEUPjHo7K+Jz5cDzZN69Xdh8k4+3VJ3bHh6MY3IZXPo=
+
+Name: com/silabs/ss/platform/jetty/server/IRequestFilter.class
+SHA-256-Digest: d+qcvWsoc5FpJAo8M92UNwAsTTN6ThVhPB63srVelS4=
+
+Name: com/silabs/ss/platform/jetty/server/impl/ContentServerImpl$StartSe
+ rverThread.class
+SHA-256-Digest: d+lx+x7nIuzEI3NZe5a9TQez8Oear/bUFHQKPvK3ZRo=
+
+Name: com/silabs/ss/platform/jetty/server/IRequestFilterFactory.class
+SHA-256-Digest: 999qSRnbDyBHNrQzoWWj5/fPdb5E7eAKVjubgQNyG04=
+
+Name: .api_description
+SHA-256-Digest: 9NLAEIh9ABOmRJh799XxCKd9IQq0YWpKTyt1InJ54Ig=
+
+Name: com/silabs/ss/platform/jetty/server/impl/ContentServerImpl$WorkerT
+ hread.class
+SHA-256-Digest: uNSlYT8zFvq2OE5q1f6GtcY+ZOvOX/zH6Abb2cQOPlo=
+
+Name: com/silabs/ss/platform/jetty/server/impl/BundleResource.class
+SHA-256-Digest: 1WeoGXEp0Opj8cbtUdlfzZ00mVJOa/4nEdRE30Ndj4Q=
+
+Name: com/silabs/ss/platform/jetty/server/Activator.class
+SHA-256-Digest: GpuqUWpu3LcBFKgsXBF2Ho4HRskfXRwg9D0jM02av4I=
+
+Name: com/silabs/ss/platform/jetty/server/WebappManager.class
+SHA-256-Digest: zpSSf7TUU07n0W5o8ZiV9Fdo2k8wEdbDtR7dR0hbb+0=
+
+Name: com/silabs/ss/platform/jetty/server/impl/BundleHttpContext.class
+SHA-256-Digest: 4HnEME9lOoj0pzBdKzoeA/3j/79Hdxqxly99fU8mJiM=
+
+Name: com/silabs/ss/platform/jetty/server/ContentServer.class
+SHA-256-Digest: tYHOfvP6AL+44P0QU6D331kGH3HkdXxYjUPipahoiRk=
+
+Name: com/silabs/ss/platform/jetty/server/impl/ContentServerImpl.class
+SHA-256-Digest: sfI9NqLkIRZfDTltqWJILWfVxyfWRv72Opq3+Kp+h+g=
+
+Name: com/silabs/ss/platform/jetty/websocket/server/ContentServerBinaryW
+ ebSocket.class
+SHA-256-Digest: hMbRUES8HSv26geZk33hMJwioR2EBZFoBHi62Tkt79o=
+
+Name: com/silabs/ss/platform/jersey/DiHelper.class
+SHA-256-Digest: Yp1kcTFnEwFpx4S7Z5HjcriYEDoHDfDZp7lhd1+kQ0U=
+
+Name: com/silabs/ss/platform/jetty/server/ManagedWebSocketAdapter$Binary
+ Message.class
+SHA-256-Digest: 3YOjs2LHnUFXtuDMfV4+FKrOmHqblT4JI+fcByAlA7I=
+
+Name: com/silabs/ss/platform/internal/jetty/extensions/RestRequestFilter
+ Extensions.class
+SHA-256-Digest: 7dN9nAeJxAO5fT1KxDkGLPvgSZMlp5MYUFkRgRYlZsQ=
+
+Name: com/silabs/ss/platform/jetty/websocket/PlatformWebSocketServlet.cl
+ ass
+SHA-256-Digest: LifX7L/mm8yKH+IXn+/UViFmVhKgFryFnhsviUC77bM=
+
+Name: com/silabs/ss/platform/jetty/websocket/server/ContentServerTextWeb
+ SocketServlet.class
+SHA-256-Digest: yuTzbGNZBUXD1Lqsoq/os7eFGdKCBmX1MNk6hbX0K34=
+
+Name: com/silabs/ss/platform/jersey/CustomResourceConfig.class
+SHA-256-Digest: 9PB/DirSGSudmRLKRkLCjb7ap7+HnSLcvgtMIiucfmM=
+
+Name: com/silabs/ss/platform/jetty/server/impl/JettyServer.class
+SHA-256-Digest: sKBmP/mvMYqDZjBiCeDIUlsOUy/0lMglQVxau0IEbGI=
+
+Name: com/silabs/ss/platform/jetty/server/impl/ResourceTreeHandler.class
+SHA-256-Digest: OfqXb5nucFb1en/NaC12UX01OeJWjAT+5wv0rlVk4LI=
+
+Name: com/silabs/ss/platform/jersey/JerseyManager.class
+SHA-256-Digest: bj3jSMiO7O00UzgPEtuSYp0Kveeyu6NLeR+ngEPe6AM=
+
+Name: com/silabs/ss/platform/jetty/server/GenericWebSocket.class
+SHA-256-Digest: iNRHCYQwHv3FvGWwu+WuM6maBblxMkaHiO77RCiI7mE=
+

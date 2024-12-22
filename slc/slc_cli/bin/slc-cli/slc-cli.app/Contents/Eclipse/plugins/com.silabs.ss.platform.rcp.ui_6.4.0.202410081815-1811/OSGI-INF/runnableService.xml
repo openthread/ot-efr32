@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="IRunnableService">
+   <implementation class="com.silabs.ss.platform.internal.rcp.ui.RunnableService"/>
+   <service>
+      <provide interface="com.silabs.ss.platform.api.rcp.core.IRunnableService"/>
+   </service>
+</scr:component>

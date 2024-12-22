@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bom xmlns="http://cyclonedx.org/schema/bom/1.6" version="1">
+  <metadata>
+    <timestamp>{{timestamp}}</timestamp>
+    <authors>
+      <author>
+        <name>Silicon Laboratories, Inc.</name>
+      </author>
+    </authors>
+  </metadata>
+  <components>
+    {%- for sdk in sdks %}
+    <component bom-ref="{{sdk.id}}" type="library">
+      {%- if sdk.supplier %}
+      <supplier>
+        <name>{{sdk.supplier}}</name>
+      </supplier>{% endif %}
+      <name>{{sdk.name}}</name>
+      <version>{{sdk.version}}</version>
+      <components>
+        {%- for comp in sdk.components %}
+        <component bom-ref="{{comp.id}}" type="library">
+          <name>{{comp.name}}</name>
+          <version>{{comp.version}}</version>
+          <licenses>
+            <expression>{{comp.license}}</expression>
+          </licenses>
+          {%- if comp.upstream %}
+          <pedigree>
+            <ancestors>
+            {%- for up in comp.upstream %}
+              <component bom-ref="{{up.id}}" type="library">
+                {%- if up.supplier %}
+                <supplier>
+                  <name>{{up.supplier}}</name>
+                </supplier>{% endif %}
+                {%- if up.originator %}
+                <authors>
+                  <author>
+                    <name>{{up.originator}}</name>
+                  </author>
+                </authors>{% endif %}
+                <name>{{up.name}}</name>
+                <version>{{up.version}}</version>
+                {%- if up.package_url %}
+                <purl>{{up.package_url}}</purl>{% endif %}
+                {%- if up.comment %}
+                <pedigree>
+                  <notes>{{up.comment}}</notes>
+                </pedigree>{% endif %}
+                {%- if up.url %}
+                <externalReferences>
+                  <reference type="website">
+                    <url>{{up.url}}</url>
+                  </reference>
+                </externalReferences>{% endif %}
+              </component>
+            {%- endfor %}
+            </ancestors>
+          </pedigree>
+          {%- endif %}
+        </component>
+        {%- endfor %}
+      </components>
+    </component>
+    {%- endfor %}
+  </components>
+</bom>

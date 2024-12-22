@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.e4.rcp"
+      label="%featureName"
+      version="4.23.0.v20220308-0630"
+      provider-name="%providerName">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <requires>
+      <import feature="org.eclipse.emf.common" version="2.7.0" match="compatible"/>
+      <import feature="org.eclipse.emf.ecore" version="2.7.0" match="compatible"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.e4.core.services"
+         download-size="69"
+         install-size="124"
+         version="2.3.100.v20210910-0640"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.workbench.swt"
+         download-size="147"
+         install-size="288"
+         version="0.16.400.v20220222-1128"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.core.commands"
+         download-size="25"
+         install-size="46"
+         version="1.0.100.v20211204-1536"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.bindings"
+         download-size="45"
+         install-size="92"
+         version="0.13.100.v20210722-1426"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.model.workbench"
+         download-size="394"
+         install-size="1181"
+         version="2.2.0.v20210727-1533"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.services"
+         download-size="24"
+         install-size="38"
+         version="1.5.0.v20210115-1333"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.workbench.renderers.swt"
+         download-size="251"
+         install-size="553"
+         version="0.15.400.v20220308-0630"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.workbench"
+         download-size="260"
+         install-size="546"
+         version="1.13.100.v20211019-0756"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.css.core"
+         download-size="213"
+         install-size="430"
+         version="0.13.200.v20211022-1402"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.css.swt"
+         download-size="203"
+         install-size="417"
+         version="0.14.400.v20211026-1534"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.css"
+         download-size="353"
+         install-size="712"
+         version="1.14.0.v20210324-0332"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.css.sac"
+         download-size="35"
+         install-size="61"
+         version="1.3.1.v200903091627"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.util"
+         download-size="144"
+         install-size="283"
+         version="1.14.0.v20210324-0332"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.dom.svg"
+         download-size="95"
+         install-size="134"
+         version="1.1.0.v201011041433"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.dom.smil"
+         download-size="21"
+         install-size="40"
+         version="1.0.1.v200903091627"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.dom.events"
+         download-size="15"
+         install-size="22"
+         version="3.0.0.draft20060413_v201105210656"
+         unpack="false"/>
+
+   <plugin
+         id="javax.inject"
+         download-size="14"
+         install-size="24"
+         version="1.0.0.v20091030"
+         unpack="false"/>
+
+   <plugin
+         id="javax.annotation"
+         download-size="46"
+         install-size="115"
+         version="1.3.5.v20200909-1856"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.core.di"
+         download-size="52"
+         install-size="107"
+         version="1.8.100.v20210910-0640"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.core.contexts"
+         download-size="55"
+         install-size="108"
+         version="1.9.100.v20211011-1349"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.i18n"
+         download-size="23"
+         install-size="44"
+         version="1.14.0.v20210324-0332"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.constants"
+         download-size="20"
+         install-size="39"
+         version="1.14.0.v20210324-0332"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.xmlgraphics"
+         download-size="703"
+         install-size="1400"
+         version="2.6.0.v20210409-0748"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.io"
+         download-size="302"
+         install-size="604"
+         version="2.8.0.v20210415-0900"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.logging"
+         download-size="71"
+         install-size="145"
+         version="1.2.0.v20180409-1502"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.core.di.extensions"
+         download-size="11"
+         install-size="14"
+         version="0.17.100.v20210910-0640"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.css.swt.theme"
+         download-size="27"
+         install-size="50"
+         version="0.13.0.v20201026-1147"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.di"
+         download-size="16"
+         install-size="24"
+         version="1.4.0.v20210621-1133"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.widgets"
+         download-size="13"
+         install-size="21"
+         version="1.3.0.v20210621-1136"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.workbench.renderers.swt.cocoa"
+         os="macosx"
+         ws="cocoa"
+         download-size="29"
+         install-size="53"
+         version="0.12.600.v20200416-0656"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.common"
+         download-size="144"
+         install-size="277"
+         version="3.16.0.v20220211-2322"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.felix.scr"
+         download-size="411"
+         install-size="960"
+         version="2.1.24.v20200924-1939"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.event"
+         download-size="33"
+         install-size="58"
+         version="1.6.100.v20211021-1418"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.commands"
+         download-size="114"
+         install-size="213"
+         version="3.10.100.v20210722-1426"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.contenttype"
+         download-size="100"
+         install-size="206"
+         version="3.8.100.v20210910-0640"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.databinding"
+         download-size="287"
+         install-size="668"
+         version="1.11.0.v20220118-1028"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.databinding.beans"
+         download-size="92"
+         install-size="261"
+         version="1.8.0.v20210619-1111"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.databinding.observable"
+         download-size="312"
+         install-size="720"
+         version="1.12.0.v20211231-1006"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.databinding.property"
+         download-size="163"
+         install-size="418"
+         version="1.9.0.v20210619-1129"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.expressions"
+         download-size="92"
+         install-size="178"
+         version="3.8.100.v20210910-0640"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.jobs"
+         download-size="108"
+         install-size="210"
+         version="3.12.100.v20220120-1329"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.runtime"
+         download-size="70"
+         install-size="149"
+         version="3.24.100.v20220211-2001"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.app"
+         download-size="89"
+         install-size="176"
+         version="1.6.100.v20211021-1418"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.launcher"
+         download-size="52"
+         install-size="92"
+         version="1.6.400.v20210924-0641"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.preferences"
+         download-size="136"
+         install-size="274"
+         version="3.9.100.v20211021-1418"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.registry"
+         download-size="194"
+         install-size="401"
+         version="3.11.100.v20211021-1418"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.simpleconfigurator"
+         download-size="45"
+         install-size="85"
+         version="1.4.0.v20210315-2228"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osgi"
+         download-size="1492"
+         install-size="3162"
+         version="3.17.200.v20220215-2237"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osgi.compatibility.state"
+         download-size="249"
+         install-size="597"
+         version="1.2.600.v20220207-1403"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osgi.services"
+         download-size="126"
+         install-size="201"
+         version="3.10.200.v20210723-0643"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osgi.util"
+         download-size="72"
+         install-size="148"
+         version="3.6.100.v20210723-1119"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.launcher.cocoa.macosx.x86_64"
+         os="macosx"
+         ws="cocoa"
+         arch="x86_64"
+         download-size="40"
+         install-size="109"
+         version="1.2.400.v20211117-0650"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.equinox.launcher.cocoa.macosx.aarch64"
+         os="macosx"
+         ws="cocoa"
+         arch="aarch64"
+         download-size="39"
+         install-size="124"
+         version="1.2.400.v20211117-0650"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.equinox.launcher.gtk.linux.ppc64le"
+         os="linux"
+         ws="gtk"
+         arch="ppc64le"
+         download-size="69"
+         install-size="238"
+         version="1.2.400.v20211117-0650"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.equinox.launcher.gtk.linux.aarch64"
+         os="linux"
+         ws="gtk"
+         arch="aarch64"
+         download-size="82"
+         install-size="261"
+         version="1.2.400.v20211117-0650"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.equinox.launcher.gtk.linux.x86_64"
+         os="linux"
+         ws="gtk"
+         arch="x86_64"
+         download-size="84"
+         install-size="196"
+         version="1.2.400.v20211117-0650"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.equinox.launcher.win32.win32.x86_64"
+         os="win32"
+         ws="win32"
+         arch="x86_64"
+         download-size="132"
+         install-size="248"
+         version="1.2.400.v20211117-0650"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.swt"
+         download-size="16"
+         install-size="33"
+         version="3.119.0.v20220223-1102"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.win32.win32.x86_64"
+         os="win32"
+         ws="win32"
+         arch="x86_64"
+         download-size="2525"
+         install-size="5214"
+         version="3.119.0.v20220223-1102"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.gtk.linux.ppc64le"
+         os="linux"
+         ws="gtk"
+         arch="ppc64le"
+         download-size="2088"
+         install-size="5235"
+         version="3.119.0.v20220223-1102"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.gtk.linux.aarch64"
+         os="linux"
+         ws="gtk"
+         arch="aarch64"
+         download-size="2122"
+         install-size="5198"
+         version="3.119.0.v20220223-1102"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.gtk.linux.x86_64"
+         os="linux"
+         ws="gtk"
+         arch="x86_64"
+         download-size="2132"
+         install-size="4806"
+         version="3.119.0.v20220223-1102"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.cocoa.macosx.x86_64"
+         os="macosx"
+         ws="cocoa"
+         arch="x86_64"
+         download-size="2196"
+         install-size="5088"
+         version="3.119.0.v20220223-1102"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.cocoa.macosx.aarch64"
+         os="macosx"
+         ws="cocoa"
+         arch="aarch64"
+         download-size="2189"
+         install-size="5083"
+         version="3.119.0.v20220223-1102"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jface"
+         download-size="1136"
+         install-size="2242"
+         version="3.25.0.v20220218-1636"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jface.databinding"
+         download-size="295"
+         install-size="666"
+         version="1.13.0.v20210619-1146"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.workbench3"
+         download-size="21"
+         install-size="33"
+         version="0.16.0.v20210619-0956"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.felix.gogo.command"
+         download-size="52"
+         install-size="106"
+         version="1.1.2.v20210111-1007"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.felix.gogo.runtime"
+         download-size="219"
+         install-size="422"
+         version="1.1.4.v20210111-1007"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.felix.gogo.shell"
+         download-size="69"
+         install-size="138"
+         version="1.1.4.v20210111-1007"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.console"
+         download-size="129"
+         install-size="258"
+         version="1.4.500.v20211021-1418"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.workbench.addons.swt"
+         download-size="118"
+         install-size="247"
+         version="1.4.400.v20211102-0453"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.bidi"
+         download-size="50"
+         install-size="93"
+         version="1.4.100.v20211021-1418"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.dialogs"
+         download-size="56"
+         install-size="104"
+         version="1.3.200.v20211210-1500"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.jxpath"
+         download-size="317"
+         install-size="658"
+         version="1.3.0.v200911051830"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.emf.xpath"
+         download-size="51"
+         install-size="98"
+         version="0.3.0.v20210722-1426"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.core.di.annotations"
+         download-size="11"
+         install-size="15"
+         version="1.7.100.v20210910-0640"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.swt.gtk"
+         ws="gtk"
+         download-size="10"
+         install-size="14"
+         version="1.1.100.v20210108-1832"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.ui.swt.win32"
+         ws="win32"
+         download-size="10"
+         install-size="14"
+         version="1.1.0.v20201119-1132"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.core.di.extensions.supplier"
+         download-size="40"
+         install-size="82"
+         version="0.16.200.v20210910-0640"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.urischeme"
+         download-size="51"
+         install-size="98"
+         version="1.2.100.v20211001-1648"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jface.notifications"
+         download-size="29"
+         install-size="51"
+         version="0.4.0.v20211004-0555"
+         unpack="false"/>
+
+   <plugin
+         id="com.sun.jna"
+         download-size="1724"
+         install-size="4777"
+         version="5.8.0.v20210503-0343"
+         unpack="false"/>
+
+   <plugin
+         id="com.sun.jna.platform"
+         download-size="1444"
+         install-size="2885"
+         version="5.8.0.v20210406-1004"
+         unpack="false"/>
+
+</feature>

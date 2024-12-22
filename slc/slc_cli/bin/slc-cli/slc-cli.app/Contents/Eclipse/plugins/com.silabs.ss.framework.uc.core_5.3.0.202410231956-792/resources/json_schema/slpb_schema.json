@@ -1,0 +1,44 @@
+{
+    "$id": "https://silabs.com/schemas/uc/slpb/metadata.json",
+    "type": "object",
+    "properties": {
+        "parameters": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" }
+                }
+            }
+        },
+        "constants": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                	"oneOf": [
+                		{
+		                    "name": { "type": "string" },
+		                    "value": { "type": "string" }
+	                    },
+	                    {
+	                    	"path": { "type": "string" }
+                    	}
+                    ]
+                }
+            }
+        },
+        "steps": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "task": { "type": "string" },
+                    "output": { "type": "string" },
+                    "export": { "type": "string" },
+                    "additionalProperties": true
+                }
+            }
+        }
+    }
+}

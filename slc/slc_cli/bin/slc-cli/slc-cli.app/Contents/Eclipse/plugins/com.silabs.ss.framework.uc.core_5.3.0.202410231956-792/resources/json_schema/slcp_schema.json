@@ -1,0 +1,59 @@
+{
+    "$id": "https://silabs.com/schemas/uc/slcp/metadata.json",
+    "type": "object",
+    "properties": {
+        "component": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "name": { "type" : "string" },
+                    "instance": { 
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "from": { "type": "string" }
+                },
+                "additionalProperties": true
+            }
+        },
+        "export": {
+            "type": "object",
+            "properties": {
+                "library": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "path": { "type" : "string" }
+                        }
+                    },
+                    "required": ["path"]
+                },
+                "include": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "path": { "type": "string" },
+                            "file_list": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "path": { "type": "string" }
+                                    }
+                                }
+                            },
+                            "required": ["path"]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "additionalProperties": true
+}

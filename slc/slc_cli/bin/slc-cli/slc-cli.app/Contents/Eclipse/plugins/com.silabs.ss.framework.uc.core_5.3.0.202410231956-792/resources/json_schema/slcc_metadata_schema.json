@@ -1,0 +1,89 @@
+{
+  "$id": "https://silabs.com/schemas/uc/slcc/metadata.json",
+  "type": "object",
+  "properties": {
+    "device": {
+      "type": "object",
+      "properties": {
+        "opn": { "type": "string" },
+        "default": { "type": "boolean" },
+        "memory": {
+          "type": "array",
+          "description": "list of sections describing available device memory",
+          "items": {
+            "type": "object",
+            "description": "describes a section of available device memory",
+            "properties": {
+              "name": { "type": "string" },
+              "start": { "type": "integer" },
+              "size": { "type": "integer" },
+              "page_size": { "type": "integer" },
+              "type": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["opn"]
+    },
+    "board": {
+      "type": "object",
+      "properties": {
+        "revision": { "type": "string" },
+        "variant": { "type": "string" },
+        "pn": { "type": "string" }
+      },
+      "required": ["revision", "variant", "pn"]
+    },
+    "kit": {
+      "type": "object",
+      "properties": {
+        "opn": { "type": "string" },
+        "revision": { "type": "string" },
+        "variant": { "type": "string" },
+        "pn": { "type": "string" }
+      },
+      "required": ["opn", "revision", "pn", "variant"]
+    },
+    "toolchain": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "variant": { "type": "string" }
+      }
+    },
+    "pin_tool": {
+      "type": "object",
+      "properties": {
+        "peripheral": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["peripheral"]
+    },
+    "sbom": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "reference": { "type": "string" },
+        "license": { "type": "string" },
+        "upstream": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "supplier": { "type": "string" },
+            "originator": { "type": "string" },
+            "url": { "type": "string" },
+            "package_url": { "type": "string" },
+            "comment": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

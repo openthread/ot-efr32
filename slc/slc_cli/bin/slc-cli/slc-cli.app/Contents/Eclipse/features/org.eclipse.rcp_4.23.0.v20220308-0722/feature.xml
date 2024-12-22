@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.rcp"
+      label="%featureName"
+      version="4.23.0.v20220308-0722"
+      provider-name="%providerName"
+      plugin="org.eclipse.rcp">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <includes
+         id="org.eclipse.e4.rcp"
+         version="4.23.0.v20220308-0630"/>
+
+   <plugin
+         id="org.eclipse.help"
+         download-size="270"
+         install-size="683"
+         version="3.9.100.v20210721-0601"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui"
+         download-size="432"
+         install-size="544"
+         version="3.201.0.v20220124-1108"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.workbench"
+         download-size="3571"
+         install-size="7482"
+         version="3.125.0.v20220308-0722"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.update.configurator"
+         download-size="94"
+         install-size="189"
+         version="3.4.800.v20210415-1314"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.rcp"
+         download-size="11"
+         install-size="15"
+         version="4.23.0.v20220308-0310"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.cocoa"
+         os="macosx"
+         ws="cocoa"
+         download-size="9"
+         install-size="13"
+         version="1.2.400.v20191217-1850"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.ibm.icu"
+         download-size="13251"
+         install-size="29339"
+         version="67.1.0.v20200706-1749"
+         unpack="false"/>
+
+</feature>

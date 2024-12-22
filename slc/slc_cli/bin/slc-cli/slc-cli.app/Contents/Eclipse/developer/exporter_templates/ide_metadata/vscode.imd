@@ -1,0 +1,57 @@
+---
+ideName: Visual Studio Code
+ideDescription: Studio support for Visual Studio Code with cmake based build.
+ideCompatibility: visual-studio-code
+projectFileExtensions:
+  - cmake
+idePath: ~
+keywords: ["vscode"]
+templatesVersion: 1
+templates:
+  - template:
+    toolchains:
+      - id: gcc
+    partCompatibility:
+      - id: arm
+    files:
+      - file: "cmake_templates/CMakeLists.txt"
+        generated: true
+        alwaysRegenerate: false
+        targetPath: "${PROJECT_NAME}_cmake/CMakeLists.txt"
+      - file: "cmake_templates/CMakePresets.json"
+        generated: true
+        alwaysRegenerate: false
+        targetPath: "${PROJECT_NAME}_cmake/CMakePresets.json"
+      - file: "cmake_templates/Project.cmake"
+        generated: true
+        studioMetadataFile: true
+        targetPath: "${PROJECT_NAME}_cmake/${PROJECT_NAME}.cmake"
+      - file: "cmake_templates/toolchain.cmake"
+        generated: true
+        alwaysRegenerate: false
+        targetPath: "${PROJECT_NAME}_cmake/toolchain.cmake"
+generators:
+  - generatorName: "VSCodeConfigFileGenerator"
+    optional: false
+  - generatorName: "SvdFileGenerator"
+    optional: true
+launcherId: "VscodeLauncher"
+solutionTemplates:
+  - template:
+    toolchains:
+      - id: gcc
+    partCompatibility:
+      - id: arm
+    files:
+      - file: "cmake_templates/solutionCMakeLists.txt"
+        generated: true
+        alwaysRegenerate: false
+        targetPath: "${SOLUTION_NAME}_cmake/CMakeLists.txt"
+      - file: "cmake_templates/solutionCMakePresets.json"
+        generated: true
+        alwaysRegenerate: false
+        targetPath: "${SOLUTION_NAME}_cmake/CMakePresets.json"
+solutionGenerators:
+  - generatorName: "VSCodeSolutionConfigFileGenerator"
+    optional: false
+...

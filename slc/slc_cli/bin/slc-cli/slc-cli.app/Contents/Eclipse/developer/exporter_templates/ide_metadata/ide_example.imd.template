@@ -1,0 +1,22 @@
+---
+ideName: Example IDE
+ideDescription: Example of IDE Metadata file
+ideCompatibility: generic-template
+projectFileExtensions:
+  - json
+idePath: ~
+keywords: ["example-ide"]
+templatesVersion: 1
+templates:
+  - template:
+    toolchains:
+      - id: gcc
+    partCompatibility:
+      - id: arm
+    files:
+      - file: "example_ide/example_ide_template.json"
+        generated: true
+        alwaysRegenerate: true
+        targetPath: ~
+
+...

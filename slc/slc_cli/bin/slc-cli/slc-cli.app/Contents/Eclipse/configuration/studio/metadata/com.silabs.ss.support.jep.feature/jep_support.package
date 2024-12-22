@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package id="com.silabs.ss.support.jep.feature"
+  label="JEP Support"
+  description="Simplicity Studio Python3 Support using JEP"
+  changelog="changelog"
+  icon="icon_jep_support.png"
+  types="tool"
+  version="4.0.3"/>

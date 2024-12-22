@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Created-By: 17.0.11 (Amazon.com Inc.)
+
+Name: Resources/uc.icns
+SHA-256-Digest: CvAd7/9U09EsOv9alW9RA6pWkh95hb1GwSaMSoPOfMs=
+
+Name: MacOS/slc-cli
+SHA-256-Digest: MOHrZ9MV/+3Y6R31EZOss11iGGUlxtPLWwYmkfEKvp8=
+
+Name: Info.plist
+SHA-256-Digest: a6GpbxVV8O3JPLDOft9qlN6k82KPwTe4DkoOJB9dgZo=
+

@@ -1,0 +1,59 @@
+Signature-Version: 1.0
+Created-By: 17.0.11 (Amazon.com Inc.)
+SHA-256-Digest-Manifest: gi6pM21ozIJBYJWLYO1BsP+5ppJl8QeN7u+oWV/kIx4=
+SHA-256-Digest-Manifest-Main-Attributes: W/dpVSAbQC1gawgPEVtk8MVBgjiptJU
+ /DtR9hFpy4H4=
+
+Name: plugin.xml
+SHA-256-Digest: FDcmMUp88aH1nquageAqcehAEh0OyINtKBUVwmrfMRw=
+
+Name: com/silabs/ss/framework/project/internal/generator/template/Python
+ JinjaTemplateGenerator.class
+SHA-256-Digest: SOaMFYJlu1+oOi2PqpRLK2sMQG6plyJzjVk7vnCiN+w=
+
+Name: com/silabs/ss/framework/project/api/generator/template/ITemplateGe
+ neratorFactory.class
+SHA-256-Digest: dsa6b5bNV/fLAO/4Ft6eKprdoY4toeWoJ7SIAwnZ31A=
+
+Name: com/silabs/ss/framework/project/internal/generator/template/ITempl
+ ateGeneration.class
+SHA-256-Digest: 4HzzhtEu+64SPKzicStPAqsR0p56U2RS1j1Qof4Ou9s=
+
+Name: com/silabs/ss/framework/project/internal/generator/template/JinjaT
+ emplateGeneratorFactory.class
+SHA-256-Digest: jtNQlnCdnSRDNyRc0wrlstsJz3SEGABtWYnllTcU8vU=
+
+Name: .api_description
+SHA-256-Digest: cLYcNIYujWfQhMW/psWpNbO6gb8/yx5rueqORL8jOQ4=
+
+Name: com/silabs/ss/framework/project/api/generator/template/TemplateMan
+ ager$NamedFactory.class
+SHA-256-Digest: 4mgZ9rruskw4kE/l0TnI3PchBu++5eW6sOhx/5zwbKA=
+
+Name: script/jinja_uc_interface.py
+SHA-256-Digest: RN5vFhVnw4TIYWRRP2gO2HBRtofq1Jj3DGW/OxJ8zt8=
+
+Name: com/silabs/ss/framework/project/api/generator/template/TemplateCon
+ tribution.class
+SHA-256-Digest: dTyWdbX7kvVpoQiTUSh0R/N+Y5iOfXKZeRpSaE7l6DQ=
+
+Name: com/silabs/ss/framework/project/api/generator/template/ITemplateCo
+ ntribution.class
+SHA-256-Digest: sGYvdK2Snu606eX6mqIEoIHYQtOTqVjluJ/oCLUk60Y=
+
+Name: com/silabs/ss/framework/project/api/generator/template/ITemplateGe
+ nerator.class
+SHA-256-Digest: W8eNBYJfpROavxPTYW+SmwDSbrHHXk5WzxdV9I8ZCAY=
+
+Name: com/silabs/ss/framework/project/api/generator/template/TemplateMan
+ ager.class
+SHA-256-Digest: Zh+1rRga/J7zf72O0WemTpUvPWzSA7qg/3tNkyai87I=
+
+Name: com/silabs/ss/framework/project/internal/generator/template/Templa
+ teGenerator.class
+SHA-256-Digest: sta0HcshnTPoWWzywCl/jNE4GxWWEziOeA69ogfP4F0=
+
+Name: com/silabs/ss/framework/project/internal/generator/template/Activa
+ tor.class
+SHA-256-Digest: f0B7kuGbAxyNjZSPTqW9MSVwhJceasngBbhH/vAkxZg=
+

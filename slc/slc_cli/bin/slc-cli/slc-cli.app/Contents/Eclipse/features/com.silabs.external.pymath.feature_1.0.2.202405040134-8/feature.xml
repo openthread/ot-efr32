@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.silabs.external.pymath.feature"
+      label="Bundled Python Numpy/Scipy Support"
+      version="1.0.2.202405040134-8"
+      provider-name="Silicon Labs">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="">
+      %license
+   </license>
+
+   <requires>
+      <import feature="com.silabs.apack.python.feature"/>
+   </requires>
+
+</feature>

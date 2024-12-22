@@ -1,0 +1,42 @@
+{
+    "$id": "https://silabs.com/schemas/uc/slcw/metadata.json",
+    "type": "object",
+    "properties": {
+        "project": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string" },
+                    "id": { "type": "string" },
+                    "output": { "type": "string" }
+                },
+                "required": ["path", "id"]
+            },
+            "minItems": 1
+        },
+        "label": {
+            "type": "string"
+        },
+        "quality": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "post_build": {
+            "properties": {
+                "oneOf": [
+                    {
+                        "profile": { "type": "string" }
+                    },
+                    {
+                        "path": { "type": "string" }
+                    }
+                ]
+            }
+        }
+    },
+    "required": ["project", "label"],
+    "additionalProperties": false
+}

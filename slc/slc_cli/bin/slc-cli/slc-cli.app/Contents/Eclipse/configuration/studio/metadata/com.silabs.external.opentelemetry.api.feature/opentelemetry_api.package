@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package id="com.silabs.external.opentelemetry.api.feature"
+  label="Open Telemetry API"
+  description="Lightweight OpenTelemetry API for Runtime on OT Aware plugins"
+  changelog="changelog"
+  version="1.22.1"/>

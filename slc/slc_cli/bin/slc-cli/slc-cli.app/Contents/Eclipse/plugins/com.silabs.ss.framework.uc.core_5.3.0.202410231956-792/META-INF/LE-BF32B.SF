@@ -1,0 +1,3679 @@
+Signature-Version: 1.0
+Created-By: 17.0.11 (Amazon.com Inc.)
+SHA-256-Digest-Manifest: tuzFFw9qTKLf90twTUSGVkzVRE2PVjLd6DuQ6NjXyXo=
+SHA-256-Digest-Manifest-Main-Attributes: tXzver6MnEuRo8OuUY3PG0SAAtm8DCa
+ v8V9WaRa6G3k=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/ImmutableRecommendation.c
+ lass
+SHA-256-Digest: tWpK6g/Ia9Pwo00GNw4lHn1ECbXjvWv2P/GDzaB1ed0=
+
+Name: com/silabs/ss/framework/uc/core/api/editor/UcEditorFile.class
+SHA-256-Digest: I7y5twSZJ9XvRmoTsm1MHTKfmPxzBrUjuztNZentMkk=
+
+Name: com/silabs/ss/framework/uc/core/api/ImmutableUcMacro.class
+SHA-256-Digest: pLP0Bzi8BjHbvXTIU2ToV9IpQlJsDoRjzhJGyaZxBUw=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ bomOrBuilder.class
+SHA-256-Digest: SQxDW1sdDmCTroJ/Ra/TxB5ufPaXqB2LdEJUkcqwUFQ=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcGenerationContext
+ .class
+SHA-256-Digest: ZbTV6oMAxwW0E3qEjGfZpMBTJTdMqJ36pz2wPpIE5fY=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IPostBuildScript.class
+SHA-256-Digest: iynvV7SbKO+loLx9mnfpCiHNxUXALwroYkO246S2ifE=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyProject
+ ValidationModel.class
+SHA-256-Digest: k83A4LrjrJ7WEnoyJ7mJiy8aLhEcuuvOTnfyTOKFKtI=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/KeilProject.class
+SHA-256-Digest: C+J/esQsie2q30na2uTKmVCgtsElInsnTwV44tQdhNQ=
+
+Name: com/silabs/ss/framework/uc/core/api/project/gen/IConfigurationGene
+ rationLogic.class
+SHA-256-Digest: gO6FcF/WE39jUwy2wF1fqO066N1cFndu435qLdss/o4=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/solution/Sol
+ veableBlueprint.class
+SHA-256-Digest: g2Sy4LxQJNc/0kTn3gXljI1v67SwQbXIXh6N3IY/aZk=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/ApiPartaker.class
+SHA-256-Digest: zDiPuJHEVbSoahccpTb22QO3JbMOQIR1shAH6Eo+19k=
+
+Name: com/silabs/ss/framework/uc/internal/api/project/setup/UcConfigurat
+ ionValidator$HandlePython.class
+SHA-256-Digest: Ti1vaMX+6WvdziUcbSnqAvNMpE+kn6RUrfpqcsRKB3A=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$R
+ esolvedInclude$1.class
+SHA-256-Digest: //Qx+Ro9XRQjQk1+u0/R6I2qZv1jtiVU0SWWX/e4KKw=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/IUcProjectState$
+ IHardwareSetter.class
+SHA-256-Digest: 03EeuFaaPsTTgvNEdFwN+Zx3AU2ak+J08tyd3qzDm24=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/UcSbomProjectUtils.class
+SHA-256-Digest: 1tVo4hU8J2Lybfs5PdauUmE3el1tQjSfQdf1kQJ3Uw8=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/IHighlightHint.cl
+ ass
+SHA-256-Digest: JgPuVMzW4Z0Ut16BZxm3TnKMFGFCM/3ottboyR/O1wQ=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IMetaParseEngine.class
+SHA-256-Digest: QS1Q1TUgt5Epmrjl1sEvKVc9JnasNA8E8zu9EZXOaAw=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/UcWorkspaceInc
+ ludedProject.class
+SHA-256-Digest: dyZ26RM09eSvIYUjuQPoZXQMXlwf0BkGD+HWP5Wj8j0=
+
+Name: com/silabs/ss/framework/uc/core/api/IConditional.class
+SHA-256-Digest: BybTDqWQzX22DgvlyTFF4vs29EJBftVflJdd1sqQ6EU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcvKey.class
+SHA-256-Digest: OmdjPHpMKdeOctXNl5PVVjLr64atwfNkeMUmJ9cncTI=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/ParseEngine.class
+SHA-256-Digest: braRdsj9ydlJ5zsvIPPMEjgLNZN5khItikBfsV5IU9I=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcWorkspaceGenerato
+ r.class
+SHA-256-Digest: mjJl22tiCBQ9ZEDgIfh8wOdne0BbM38IyWvBIcw0tso=
+
+Name: com/silabs/ss/framework/uc/core/internal/toolchainsettings/UcToolc
+ hainMappingValue$UcMappedToolOption.class
+SHA-256-Digest: HhI77nfS5vFtWl4JTMp4OlArPXIKSsCqEdLJ2Sc3KAo=
+
+Name: com/silabs/ss/framework/uc/core/api/exception/UcSdkNotFoundExcepti
+ on.class
+SHA-256-Digest: 7A1H0cL+9CXD+8jbyarrcWB1aagjTlUfuv6WfYCa07o=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/CommonParseAlgorith
+ ms$IdType.class
+SHA-256-Digest: MkLfYDec1tNGXrR4JTt756oK3E8vUqY0CVI3WS5Weyw=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/package-info.class
+SHA-256-Digest: BF/ut4Onc0+NZzKkJuPmmLN15UfylD2jzYdgoKh87Xw=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IssueMetadata.class
+SHA-256-Digest: CNhFde8YwCNPnavXT1gd2kz9AJvalhYiYlfeqq6XiTU=
+
+Name: com/silabs/ss/framework/uc/internal/project/setup/ProjectDependenc
+ ySetup.class
+SHA-256-Digest: VO6UbGqdXmr84+VjttahynCR7kdiy6CwskVOz++rjGQ=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IAcSetup.class
+SHA-256-Digest: 9IzbWmiBdBv2299GLsolUZWyL0ZGLAtlbJKsgFzqdCQ=
+
+Name: com/silabs/ss/framework/uc/core/api/IComparableId.class
+SHA-256-Digest: ytFtz3cewBVKP4rtfT4GO9dcc7cr5sMT7JHZOWlfIuw=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IConflict.class
+SHA-256-Digest: M0A+ruNADvDxxRd/IlmBJJBsa4I0HkcEa17elJYa7pw=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$R
+ ecommended.class
+SHA-256-Digest: mHK/AVV/UDVASBZuYSzdKKV3xN3XKjFtvKpPAmpGTTc=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/model/slcw/SlcwRegist
+ ry$WorkspaceHandle.class
+SHA-256-Digest: JRyABDxLL7ACYLJLxd00xL4+9Fba0CM8iDjPrGsgiyI=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcu/IScriptedRule.class
+SHA-256-Digest: sJjznRbgUq2l5Ok/7cXfmCUXw/9jUhzFEM3yNKsdY4A=
+
+Name: com/silabs/ss/framework/uc/internal/api/project/setup/ScriptType$C
+ omponentUpgrade.class
+SHA-256-Digest: VzIh5EUk/JnTSomSkLH/NU9hP1M/21v2atHuZauXMnU=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcPostBuild.class
+SHA-256-Digest: aMUIoQCULUfDOycAATF9kbLz4EX36nb0qHjPCJXsOaM=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IUcSetupExtension.class
+SHA-256-Digest: cwKv7O5SQ4F2D5DF250OFvm8bnp8KOQgm1Sv8s/CwfM=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$R
+ ecommended$Builder.class
+SHA-256-Digest: hj4vYHieQLLW3VWbA8IpESRG3n5crmTA6A9sl2EVFGI=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$6.class
+SHA-256-Digest: s1iEEoZPVBBW4u0itjGdJQ5pV9tdGbnqM8MJTGOZSxs=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ oolchain$Builder.class
+SHA-256-Digest: /q81mLuEcTqW/8r4VOg7oF9anRw3fgDqhCyhaoiSbq8=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$7.class
+SHA-256-Digest: E5ICzgAOr5KufJ8qZEZNZjVCDoqPAQp+CyAGXRhiy+8=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/DocSilabsComLink.cla
+ ss
+SHA-256-Digest: VZKo8jfE0KaJYBZtHqvJaXrdllN5Sr/Qh01mUkyzxmA=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcAutoSolverSettings.
+ class
+SHA-256-Digest: GMxw7qjADcIcvW80pSdlmIURzTwqduyczQc5maekGe8=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/UiHintIdVisibilit
+ y.class
+SHA-256-Digest: aVDqJR1AETMicVoXPdyThKfC2icJRS+hY+9nZw5p5ew=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$R
+ esolvedIncludeOrBuilder.class
+SHA-256-Digest: Y7xAfJ9x3rDa/jP7XuhfbFafUAukRgfSyfhv1GuOneE=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyQuickFi
+ xApi.class
+SHA-256-Digest: 7Rwp2L//F/K6ZFW8RmGUsuSGGKBcqMmR3z46ZGdlPl8=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/IApiTypedIssues.class
+SHA-256-Digest: Tdb6HJ2dOl9y1sSJmYc6IZEYiozZwL25uWKrPZsDjMk=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/UcSdkDescriptor.class
+SHA-256-Digest: UMTHR9fetvWkdSFUCeZkbhxSCuRbGBu2d0GAh2D6tsY=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$R
+ ecommendedOrBuilder.class
+SHA-256-Digest: LwOhWJAUYliYzhxoCL+U3fd9uorVgqT2XU/FBexD3Xs=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IMetaWriterCustomiser.cla
+ ss
+SHA-256-Digest: eeutqETHrO7t7KYTp4ZvqfH7lcWi5fItfLK38/jLTQQ=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardwareHandle
+ r.class
+SHA-256-Digest: nsWouLhCx7vTuONktVmD1aBM612ZsHJFWTXnhjUdd5U=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IMetaParseStatus.class
+SHA-256-Digest: YveLdZcYgpfLgc7dM33sb31ZaNi/QEx+OkJI4NnKFu4=
+
+Name: com/silabs/ss/framework/uc/core/api/tree/NTreeMutable.class
+SHA-256-Digest: ZRe2b5r4IrEe6weEUHHx1ryaWmCLbsNBvk6ruAoP6cU=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/PostBuildScrip
+ tSlcw.class
+SHA-256-Digest: cYxMCLn1B7KcYyh02vuk537b35aTOgopQPcFv0fk6EA=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/ParseStatus.class
+SHA-256-Digest: Z8qtcS3AAwcyzUkqsv9tUmA8sp5BhP22tSl8OalwIAs=
+
+Name: com/silabs/ss/framework/uc/core/internal/upgrade/exception/UcUpgra
+ deException.class
+SHA-256-Digest: 4L6cpsLfXzzFjXB+h+f1yc8ogUW0VJLA0UDl29LX/V0=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$A
+ piRule$Builder.class
+SHA-256-Digest: 7ywxYspi6Nsw/BN3nRkL++9qP0RsabHCQbD0nfovZp8=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ omponent$1.class
+SHA-256-Digest: pJ+So9GKrTvRJqRBlHEcCLV27z4bfKm+ybiw/nGo62U=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/ValidationContext.cla
+ ss
+SHA-256-Digest: gEsfHL8OUy5/4Sr+wip+yekTJiEB+DgB2xXdcq216bM=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/python/ConfigChange
+ .class
+SHA-256-Digest: tsSZHUNkILXku7+n+7rfBpRaOYLEeKb+R9NMl1797NA=
+
+Name: com/silabs/ss/framework/uc/core/api/internal/project/gen/MergeCmsi
+ sOnly.class
+SHA-256-Digest: oPaVkCnhcP5B0Ps7PUhJBzfXpPLidNOkdK0kFUVd3F8=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$26.clas
+ s
+SHA-256-Digest: 6x0KrbiPV3ILQwXEx2XSmcI+y3dj8EvEMAVFv7T/t2Q=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$U
+ pstreamSegment.class
+SHA-256-Digest: ZiCVzHD9687xgpZryrK/FfPrVO9+9v0cPcGXlhL8BqE=
+
+Name: com/silabs/ss/framework/uc/core/api/ResolvedInclude.class
+SHA-256-Digest: p+miwgOEEMLO05XMjULTL9GDt+uUL5HrdDAZIDA0kh0=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$1.class
+SHA-256-Digest: afrERC4X2XrgB5nXPZXrtm3quF/6yH+MNYo1OlYiEcY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slcu/Slc
+ uParser.class
+SHA-256-Digest: dp43b70qsa4R/Bagsm+ocCrNQyOlOFpWYQFm9rjj/sY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$2.class
+SHA-256-Digest: R1yw3oRpcickfdgATt4tkhJtRkCKSS/btrjdihlCT4k=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/CategoricVisualis
+ ationHint.class
+SHA-256-Digest: D5K1B1zcHM86u2FxaWs5ivpvpEpVXN8IRjwWqFAcd8s=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/ucmetada
+ ta/UcMetadataWriter.class
+SHA-256-Digest: LTzcHrdJxXlSm5DLlWI2xiyiDwEww0hL+SKcT2gIV5w=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/JinjaSbomOutput$1.class
+SHA-256-Digest: 7JQomdPRnOGznuD7bWz1goloLzYu7eVwFNf2dMYDPgY=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ oc$1.class
+SHA-256-Digest: 26S/KoVY4sJcVZeHCccw2/o6AhpKuU+0hriM6t8MdIY=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/UcFrameworkContaine
+ rImmutable.class
+SHA-256-Digest: Qq8uI7pOmJJWy+4wyMiqkGNNG+DhHeApXciT8a0M0W4=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/ConfigFile$Builder.class
+SHA-256-Digest: TUgymINIS42MGTs1hbG6CttEJqbV+XtsNCVp6DkivyI=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IOverrideable$OverrideRes
+ ult.class
+SHA-256-Digest: LREpAGvzyz3SvBr0TgaFkHaqpXLyC8OJsPSSpHtP1W8=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/CommonParseAlgorith
+ ms$ParsingFunction.class
+SHA-256-Digest: h3NGbFbw/BV2EhBClLWziIGSEgyhhgLQaooasw8AFoc=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyScriptL
+ ibrary.class
+SHA-256-Digest: 1WN+a1izQ2sJ+52FmTHMBgXIZ9GmQIJzwBgsZTSzOZY=
+
+Name: com/silabs/ss/framework/uc/internal/project/setup/SlcToolchainSett
+ ings.class
+SHA-256-Digest: rzakNHGSrJ931lUHXS12yutjTWFitylM8xXTOU2IWd0=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/Instantiability.class
+SHA-256-Digest: OiAvoNcbkdUfvDPnDKQxEM749Si8o7keaqnUyLNf3p8=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/ParseTaskManager.cl
+ ass
+SHA-256-Digest: cyrJbPEsdN2Bt5S4Bge5t8m/X8fufEfk4vUXW/P7jjQ=
+
+Name: com/silabs/ss/framework/uc/api/core/IAdapterPackAc.class
+SHA-256-Digest: A9Aki+wQFMetP3CeMgoOc5BBWhai0VT0hYuNN1DW0Ew=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/DefaultMetaPathResolver.c
+ lass
+SHA-256-Digest: +k2+BTNxiJICbLWX1CwG95zcaZ2olbEBT/DZtzWlSQo=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slpb/UcPostBuildCon
+ stantVar.class
+SHA-256-Digest: 8whWmgy5lqVKiGaF3oquSQnWUbtdfXKM17wWNVxJ6Jk=
+
+Name: com/silabs/ss/framework/uc/core/api/context/IUcContextSnapshot.cla
+ ss
+SHA-256-Digest: DccD3ReIF14O9/aLJZoaxpDZCfwyDH0kx2uLui+hfUw=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$30.clas
+ s
+SHA-256-Digest: isT1rekF/wj8myNcKDcL75XbgtwvJUcfgUKkYCsj0gg=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/ComponentRule.class
+SHA-256-Digest: CLmdT/Yr756bI/rQHaXUUWOqQELU+0urnLGvpBsNgWA=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcExtension.class
+SHA-256-Digest: z5Ar7hUbnPh1LbKNgJvynbZecjaJch1rti96GjO/gw4=
+
+Name: com/silabs/ss/framework/uc/core/api/rule/package-info.class
+SHA-256-Digest: wM027aV4BN10p9Vr9+ItDTskWuNR/jY5VS53nnvufrE=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcw/ISlcwRegistry.class
+SHA-256-Digest: eXY0Z1A9/seuEHlomKeWGTA5TsEwWummab1N1TedY9Q=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcCommonPersister
+ .class
+SHA-256-Digest: Kzu8GhSjUZAHWZlUUmvUQJkofmbUddjfcl/UHfrPN+o=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/SelectionMeta$Who.class
+SHA-256-Digest: uyGvw4HG1LbVl2mQfUeIDSMR/SXFqcIhHANqDQ95r9w=
+
+Name: com/silabs/ss/framework/uc/core/internal/validate/AdditionalPartak
+ er.class
+SHA-256-Digest: hL3EbuLYgfN0frhvz4UaL/OqZkicsDRqR1tPOhwn6Mg=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onfigFile$1.class
+SHA-256-Digest: E7Tdy4t5hd7K+Z9z6QBl6VPJXpmEaD+TicF9VmaTAKA=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/UcProjectTransferOpt
+ ions.class
+SHA-256-Digest: wk71ZeIu+BzUJgcURfoVe3o4gWKvSg/Xu0vHocYRxx8=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcw/IUcWorkspaceInclude
+ dProject.class
+SHA-256-Digest: tj+Kfe0Wu1IE3vX2pGUPbZ5XjL2uaZv+vL1mdailrw0=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/ApiExpression.class
+SHA-256-Digest: knRG3XbQiixbKScgpa4h1aBVt3n9dIQRY5k7NDpS7CQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ ourceEntry.class
+SHA-256-Digest: GBD2FAEVLeCrWlmLvl00Q5amLYe3GfPGvKXi/Ou1/sM=
+
+Name: com/silabs/ss/framework/uc/core/internal/meta/CmsisAnnotatedFile$T
+ ype.class
+SHA-256-Digest: oKZmtrKw8TWFZtTFpLIiCTyDnQfVFXKRFDrKscTc/Aw=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcProjectDelta.cl
+ ass
+SHA-256-Digest: Q3MmUyBXixcLXqHmCEYOQ69Dg1opQyy8rYYa7JlJ+0c=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/RequirementL
+ ock.class
+SHA-256-Digest: VUu63WI+fRum3kWx810r2XXdwClIzJP6idFco6nzfmE=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/MultiComponentInstan
+ ceData.class
+SHA-256-Digest: 6u6cG3DZA6DwB+oWYkk45YJTSr2Nxj7yV/aHTFls5Y4=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/context/IUcContextExt
+ ension.class
+SHA-256-Digest: qOfy8NCOJGCYdrY8BN/BjsVGUjBecsZyoUehy7jOCHw=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcu/ComponentDualU
+ pgradeRule.class
+SHA-256-Digest: h07barmd0KeSfHt5E8hm6jYkyyCYH5Brz4PqsuH0V3o=
+
+Name: com/silabs/ss/framework/uc/core/api/gen/IGenerationContext.class
+SHA-256-Digest: UzpIopkb2/jpbK8/QDihwsi4r3KF0fskHKtPt6Yz1vM=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/UcConfiguration.clas
+ s
+SHA-256-Digest: hMkY00WMF2ETEBhF8n7rJ+mjnG9SR5X86Yd9VgK0VWw=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardware$KitMa
+ pper.class
+SHA-256-Digest: VulY0kPCFXxWLw/RWOWXAf7ZSF02cFSruluS03Mo44w=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/ComponentRootMetaRe
+ solver.class
+SHA-256-Digest: Lv8BAL48MtvGobsFwqrHC2mp52iZ8zn6qLcjLqcXfCo=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$18.clas
+ s
+SHA-256-Digest: mF94puRA9qa2WsROWrsSVKhQx02pX+u/A/REs/GI2kc=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ evice$1.class
+SHA-256-Digest: 733Fhps5AGsL1VXATiEQT/IqJIDKX+1xYoSl/4bROrQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slpb/UcPostBuild.cl
+ ass
+SHA-256-Digest: Sw7whvp0U5+O08urk6GePEoJ9RH3EiYN2HdZ+IqEMWA=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcProjectDelta$Bu
+ ilder.class
+SHA-256-Digest: ykmkLMFlT+Oth6amw6qKdzhYmfAaOFtlXN3y9p6WOtc=
+
+Name: com/silabs/ss/framework/uc/core/internal/validate/choice/NoKnownCh
+ oice.class
+SHA-256-Digest: 5IGfrhRzwRKt8qzyQaUx8+9COn0TcRtbAmI/FigOOUs=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$13.clas
+ s
+SHA-256-Digest: iQIPNMvn5N1WrhzSbJYWvT0wJiKMrzsbYl/WXsXEhWg=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccParser.clas
+ s
+SHA-256-Digest: Tg8HCsoqXD7sTu6FFNWM+YQs4IaL3Bx1nEkP+aUkxE0=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcProjectDelegate
+ Skeleton.class
+SHA-256-Digest: v43+Xk9WhZgQgyR2FFfQZwJhWLUb4AM1jKspnVRUGGA=
+
+Name: com/silabs/ss/framework/uc/internal/api/project/setup/ScriptType.c
+ lass
+SHA-256-Digest: 5aUdzRF9g+3SZMFTF9ZRVRPue0vj49wwPntXQ6/ra4I=
+
+Name: com/silabs/ss/framework/uc/core/api/json/JSONUtilities.class
+SHA-256-Digest: YbFcpeOkjP314jVLZD+rj08SNPRasapeCkC9CF7J+N0=
+
+Name: com/silabs/ss/framework/uc/core/internal/upgrade/ImmutableProjectU
+ pgraderSettings.class
+SHA-256-Digest: l9+NrbticsxwRh+a8SFS61WIEKJibhprEfTp1xYsTs8=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/UcAutosolveU
+ niverse.class
+SHA-256-Digest: RdrTRazqpP1K8Oszatw6Zv1dG1REfk+e4tQq3GdhX70=
+
+Name: com/silabs/ss/framework/uc/core/api/editor/IUcEditorMetadataStore.
+ class
+SHA-256-Digest: GaRo0fCgY7/XcH/XN7rmsshcmPzm/KIHkqkPJlrD8i8=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/ValidationIssue.class
+SHA-256-Digest: I805ReNNlCAJStgL14XXsyaKYLOhSPuzMe8do48dBnM=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcDocumentableLibrary.cl
+ ass
+SHA-256-Digest: ObooUui0z4FVLQmyRjqQjW3+52lWZrzpsfrxdtvWtck=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$E
+ ntry.class
+SHA-256-Digest: w+jBecAHH4oyxTryPHI6GN83jzwG7k6Y2eDNQ8DHsXs=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/IMetaSearchable
+ .class
+SHA-256-Digest: H8b5LKMv+yv335ApIds6JPv13aLA7LFku8hnnpPcQfg=
+
+Name: com/silabs/ss/framework/uc/core/api/ComponentApiBaseEval.class
+SHA-256-Digest: S5rDyVUMDf2D2nb2FfpdBNIzRCXsz9xpul6BwMF3MYQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slcu/Slc
+ uValidator$SlcuInterpreter.class
+SHA-256-Digest: S1Lt1mBbrXjQA+klTdF6PlC0b6P5OEyD1V3q+L4q2Vw=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/package-info.class
+SHA-256-Digest: vjQXa+V6ldW7GYXK7T9gGYCh7eTsr7sCSnZUsODffIM=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/IUcMetaSbom.c
+ lass
+SHA-256-Digest: Xl2Q9MXeoXCKfY2cdeI6QVsiTYt8NhSCLFwl950ZWjM=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IUcUpgradeableSetup.clas
+ s
+SHA-256-Digest: 7RAn5+Pyr22tKW3lSM4pwjbLazM1KlbL70vUxVWHCc8=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/UcSetupModel$LazyInstant
+ iator.class
+SHA-256-Digest: KJB27HrbGc8SXEaKhFqv5sCPyMuM7kZp+lCL7OZJyoA=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onfigFileOverrider$1.class
+SHA-256-Digest: A0V0UvOn7Cva1/Bv542pE5IaYQ89GgYyfqASvLIumJY=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/python/ConfigChange
+ $RemoveChange.class
+SHA-256-Digest: bGy098Opi9rnw1nQZXQgHu8S09h0624UCVOPptgqk6c=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$B
+ oard$Builder.class
+SHA-256-Digest: g9twc0ZBM0Yz4seXe4O7OtSQvhbpXULC8KpAcIRGqBs=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/IUcMetaToolch
+ ain.class
+SHA-256-Digest: RnjQJL09LQ884cmxCR9ZqYKPVsYlduPVQEcv0W3s03Q=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ omponent$Builder.class
+SHA-256-Digest: 0/octptOSW9CvY3esVqjeh4MsfaXnRCcF/ZmtMSAUjs=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcProjectFramework.class
+SHA-256-Digest: K+vt955tW9GWjjeb42lYl5tFe+8NdjTvjPMgDhNtp8g=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$P
+ intool$Builder.class
+SHA-256-Digest: Ur9jJjacPPXtcG1izFVRaUE8HXmPAYtaNJl2a0HWNaE=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/SpdxJsonOutput$SpdxPackag
+ e.class
+SHA-256-Digest: +w8AwCio4j6rkxOU1qOqfFxdU5gyWHIXyZJUOl33dtc=
+
+Name: com/silabs/ss/framework/uc/core/api/upgrade/ProjectUpgrader$Upgrad
+ eEnablement.class
+SHA-256-Digest: i2bi1pX9GrV8nJdSZlJ5NFYs80wtj5E6b/K8yO2GAhs=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IMetaFileReader.class
+SHA-256-Digest: +Q13qatm2cXbt5tvjfT3IVV7QhGr16bTI96xLM5xJ58=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/UiHintIdHighlight
+ .class
+SHA-256-Digest: bOOiUU32a0FY4kuxsd7DoXbl7Brt32xWNl04AjCpolk=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ oolchain.class
+SHA-256-Digest: isdQEY+2QpXOpQiz4gnVbMWiM5bVL9nTkzmMvreohxg=
+
+Name: com/silabs/ss/framework/uc/api/project/IUcConfigurationChanged.cla
+ ss
+SHA-256-Digest: UiH5OUo+U5fA7OQAL4tBbzDu8s14GimM4NPeAMCL72Y=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$2.class
+SHA-256-Digest: x9n3G8ImEdDidGzWIZar6KdpxElgBMADODM9Os0OUZs=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/ProjectFileModelU
+ tils.class
+SHA-256-Digest: 3EqbDnhzLAVfW2A49EjxjfEZYrBDf5wCPUuc+w+FS38=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache.c
+ lass
+SHA-256-Digest: 4pwb8KW0uHRgYUi9JnTUAvMmt6ZprKDo57vtPFZLcs8=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/SourceFile.class
+SHA-256-Digest: OFDgrmCQJA+BVvAWo3XMpSkJcCQle2RgTjciMmY0xyg=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$E
+ ntryOrBuilder.class
+SHA-256-Digest: J4qJ89zZjhsdX1T/VsR26slChSPOBYAqnIG4b2jBDaI=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/UcTransferOwnership.
+ class
+SHA-256-Digest: 7ZWLg8HIhPxSncluTrGrGepGv4inLqClOl/Z/K9dx6g=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/ComponentQualityUtils.cla
+ ss
+SHA-256-Digest: iE5z0kMQ/beQ82t9WCroe64vTCBCwr5Lxol087tKJs4=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ acro$Builder.class
+SHA-256-Digest: zkXT6id6uSIvnES/NmGpe6tO4N+X4Kgtq9GLxN81r9A=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ ondition$Builder.class
+SHA-256-Digest: 6nP+tiruJbQfMqRGw4vxu8Vtd7qijjyI1+nSzrwWXnU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SdkKey.class
+SHA-256-Digest: pXqwHeEGmdCCUklcfxGQZ2Kj8iQbsyGuTWt5fRA+/c4=
+
+Name: com/silabs/ss/framework/uc/internal/api/validator/PrecisionApiVali
+ dator.class
+SHA-256-Digest: EPLHcj+fIEfQgOW1+RJH8cdcg1FEpopQx+rBEPVaxVk=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ ondition$1.class
+SHA-256-Digest: SFnLHXQw+BkbCCNO0UsyPULX/QXYGlJWW+TMCZ1bRlo=
+
+Name: com/silabs/ss/framework/uc/core/api/log/UcLogging.class
+SHA-256-Digest: kIWX0wKOymEs+HjsevE7LgwGIn4Tu3v630MZHfC8qcg=
+
+Name: com/silabs/ss/framework/uc/internal/api/project/setup/UcPythonEngi
+ ne.class
+SHA-256-Digest: tBursoy8Xv+8t9LdDIxkf2gQba2hYqBoUx1q1VcSvTA=
+
+Name: com/silabs/ss/framework/uc/core/api/gen/IUcGenerationContext.class
+SHA-256-Digest: xRouJwzuf5bxB5mT8KwOaePejAdcs8zdDROSZ5RHSjQ=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcThreadedGeneratio
+ nUtils.class
+SHA-256-Digest: kqZoRAX0l80SJ4dvWBL9vd/YJLiFvWjAqcIfjcNF8Hw=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$27.clas
+ s
+SHA-256-Digest: tW0i9arIb3Y9R+6+bDQ//nST51KF3wIZe7C+7cpUibg=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IMetaPathResolver.class
+SHA-256-Digest: zBiu5EZkfYZwHXf2bXbS6Jka4+Kr5+h41xauBkO6RTQ=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/UcSbomGeneratorModel$Sbom
+ Sdk.class
+SHA-256-Digest: ezV5tbJGPQOF2HBWGsHY/Hhoq/r6XxXxsuhBqu5e37o=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/IUcAdditionalFr
+ ameworkProtocolFinder.class
+SHA-256-Digest: vuc2xwyXnlsb1bPPwC36aA5vb0NJCwobAoW8IW/6RXY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$8.class
+SHA-256-Digest: 9ucejqwy94Fu7qtux7rHyvbwbZ5cl3140uFZxlgQqSg=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$F
+ ilenameOrBuilder.class
+SHA-256-Digest: Xr4/SehEDwEGNEkkGCGJ1iaEtCCbuUBB1cf+TSs3XwQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/upgrade/UcLuaUpgradeRunne
+ r.class
+SHA-256-Digest: aMmLrUyHnzsLaye5La35BeDMKc2oL6n4P/MJsvA5208=
+
+Name: com/silabs/ss/framework/uc/core/api/exception/MultiException.class
+SHA-256-Digest: sy17EWFjNvxeuxiRlKNBo1moz08bENkHLcK+fhb7YGI=
+
+Name: com/silabs/ss/framework/uc/internal/project/options/UcToolOptionMa
+ ppings$MultiOptionMapperFactory.class
+SHA-256-Digest: fxxmgTMynJNznzPUR8Qn7rylMgQ013s1zVGfRg4VIoc=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/uihint/HighlightHin
+ t$Builder.class
+SHA-256-Digest: SDr47dWyTrqvqaDkOSfn9K/euyX8qm3rkP1ODhvLufY=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/uihint/HighlightHin
+ tEntry.class
+SHA-256-Digest: gmqS8iObrOIVJFIYSo0TG6juKmCxSYyo+N47ezvs22E=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/DefineParser$S
+ tate.class
+SHA-256-Digest: 3N77yCZKdm6a4OlOS2Hm3YDB00n5tCTZGoL3s7EwtcI=
+
+Name: com/silabs/ss/framework/uc/core/internal/Activator.class
+SHA-256-Digest: E8pThc56alzX4VBdJfR0at1uMexaZYgYbF5RP0cloM4=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/DefineParser$M
+ ultilineCommentMode.class
+SHA-256-Digest: msW4YmF7avu58WtkY3C3RFBNLOmQD4ugIMDIBrYDBJk=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/UiHintId$1.class
+SHA-256-Digest: nRjSUcavRXpNNWHBwLVmmnr+RwgrPTyXP/Vh/uiRwSU=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardware$Board
+ Mapper.class
+SHA-256-Digest: 9RpDGrllmnubRhIggcbt1TFA2jaTquw6x44badGEzQs=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ ource.class
+SHA-256-Digest: apnOGXX4wF16B/1Il9opBFjwDhb6DvBm4KrwvvC0UJo=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcThreadingGenerato
+ r$GenerationTaskContext$GenerationContextContainer.class
+SHA-256-Digest: t720smSDDKLM3CcJ6lgfqJhNoRF43kOx8kfj+Mfr0co=
+
+Name: com/silabs/ss/framework/uc/core/api/tree/Tree.class
+SHA-256-Digest: Ea7xEE6P2EonOv3MC2/4wzvD0ilDqCH0SgdNV5p9BN0=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/apack/AdapterP
+ ackAcData$AcSystemState.class
+SHA-256-Digest: rS9CWtixDN2mNZdbhwPLaRs+DysNW641Smnd4+lu3/g=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/solution/Res
+ olutionMultiMaybe.class
+SHA-256-Digest: PUqZZ4xvpnZzzPO0feaLceIHOQ3Rb1+9+g1tUuwyTFI=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcp/SlcpProject.cl
+ ass
+SHA-256-Digest: RbBD9pXJnAlf3C0cQ9kw40gJUDM/f5j5276b+nCa2pQ=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IConfigHeaderParser.class
+SHA-256-Digest: lXfmSfVgr2qGEo5nTFyYH+GXIFqJvYxK1UroCA9EFeg=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/ManagedSetupExtension.cl
+ ass
+SHA-256-Digest: 7o5UTMEdh+ct1+WS/2vXl74ra0T7qR8AwCpTJG7dPno=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcRecommendsValidator
+ .class
+SHA-256-Digest: uOIpV+3b+kMKDTWthcuKdng+gjMDnnJqYbSqCcwjAig=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/UiHintIdString.cl
+ ass
+SHA-256-Digest: lJik4pZG0Vmry+r4IupImpRweA3nsXjWz3IY5srxtOg=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/UcProjectTransferOpt
+ ionsNone.class
+SHA-256-Digest: 8swl+d8rQMXAK+C4wmGzBSz1ysxOW8imAGmYLKpHdts=
+
+Name: com/silabs/ss/framework/uc/core/api/log/UcAnalyticsSettings.class
+SHA-256-Digest: N5a5JlLSVXc157r2WZTbq8kvmI8Fn97HYoHKQE5wM6Q=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/XideProject.class
+SHA-256-Digest: Vys+JSlrOyRZAbllLklk99yE3nlcyHuBLJvtHgSC1wk=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/sdk/SdkValidationResu
+ lt.class
+SHA-256-Digest: wNgi3LIIHFLyURe8GR3+Awi037Gi8IXQsfRv7ZIVtiY=
+
+Name: com/silabs/ss/framework/uc/api/project/IUcContextSearchQuery$DataD
+ irectory.class
+SHA-256-Digest: XXKJUKEoiJI1di0Z8lFOIJ/wounpZnGnRjvt5eiYtIQ=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/ConflictIssue.class
+SHA-256-Digest: JxJiPxngjPva9DrPsOlUrLXPfue8uqMf1G3VDwdh1Dk=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$B
+ oard$1.class
+SHA-256-Digest: ryAYy3RDzCyM9WSkTE+SRBcXEKbrxuI+Gb5VNtpU7f0=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcCustomBoardHan
+ dler.class
+SHA-256-Digest: 15jkoghI42mbyUyiMbpYdAoDmnM7fgL52kjhMJ4KkN8=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/UcWorkspaceSna
+ pshot.class
+SHA-256-Digest: M6scsATiotYNz2g/zwp2yoMNkp51uNbjle7vtdH62+U=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ResolvedConfigFile.class
+SHA-256-Digest: 8QkEP+n8G8p43yngeXpD5UK/Z7TwusCXBRJGFUwJvq8=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/UcAutosolveM
+ ultiverse.class
+SHA-256-Digest: I4ChB61G9Sfpfk54rmAYAV3z2g23XPiSPAI3Sy/LeBE=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/CompatibleSdkMappin
+ g.class
+SHA-256-Digest: mRMglifXU9XqJbiHM7VfRzla3IWc6w5jxcghGIptMEc=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/UcWorkspace.cl
+ ass
+SHA-256-Digest: RoBBblwXcz4gcNL4e8/QOd0BeBf2o3INUDEiv4VRIj0=
+
+Name: com/silabs/ss/framework/uc/core/api/log/UnifiedLogger.class
+SHA-256-Digest: 4a0XOZ/cKHatGspqpIclila2E92w8nK9vXVB/88hmzM=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ emplateContribution$Builder.class
+SHA-256-Digest: oZdLVoI/E2l9G7Bypl/ZaqDfMdYr5nBznZRUOXXVj2s=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcvParser.clas
+ s
+SHA-256-Digest: tblZCjS8q9MLVA6eKTqKEGhxHLijTcpwudtJqa2ljg8=
+
+Name: com/silabs/ss/framework/uc/api/core/package-info.class
+SHA-256-Digest: PCDmKluYE7NvNvVj1h9LqlHyrN3d5BxUMxOXHK6GfRo=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/SolveableBlu
+ eprintPlans.class
+SHA-256-Digest: OqEAf5jLFRhjR6r3wQqfrrGsBuCHQFiOFk38yOPGrAI=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/IUcAdditionalFr
+ ameworkFinder.class
+SHA-256-Digest: pxAlLt07Bq3XP5Bv3INBmKNNb51+jduF9OZHq/sO4WU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$34.clas
+ s
+SHA-256-Digest: T54FCjzYfLA3KENag1HKlrzuTt8l5KdcocGq4U3oglM=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IProvidedSetup.class
+SHA-256-Digest: OfDmbv3Dd7CBFHgbIgMMahRcXWgn/9iU9C1bYavCSMU=
+
+Name: com/silabs/ss/framework/uc/internal/lua3/LuaUcLoggerFunction.class
+SHA-256-Digest: 9uSDgL9eAUK5R1Uy4o/RuT1cSYq1Jw6/2cflzTnbjWw=
+
+Name: com/silabs/ss/framework/uc/core/api/UcFramework$UcFrameworkContain
+ er.class
+SHA-256-Digest: Rchr25K9pBJ1EJOjjgR24mEVMWAGe6s9W7V4hHICivU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/DefineConfigMo
+ del.class
+SHA-256-Digest: 5krqQNgJTPxD4DXJwyv+LzHdYt4ZyXlqRwCV4BlP4ag=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/SpdxJsonOutput$SpdxRelati
+ onship.class
+SHA-256-Digest: 4Gho5qbEZP14OdjiqgPfeOCmXp1AYNm8joyRgM8md04=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/CycloneDxJsonOutput$Cyclo
+ neDxJsonComponent.class
+SHA-256-Digest: V9Lwmi1CjjOhgMx7K6BXTrVArvS6AIwpc67YLQD8prs=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/ucmetadata/UcMetaDe
+ vice.class
+SHA-256-Digest: A4Sy1XZxPY2WotFqyoiTNR++Cus/0tVara2bmGYQkew=
+
+Name: com/silabs/ss/framework/uc/api/sdk/UcSdk.class
+SHA-256-Digest: 53xOFeU0oQ2HRXxHUrevSMmj24RRb35NVwQXurReL+E=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slcw/Slc
+ wWarningsValidator.class
+SHA-256-Digest: /VHxT4s1wFplcfV9G/ljn9EhXJt/iPFVfiB3/phxFB0=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/UiHintId$2.class
+SHA-256-Digest: pATMjLY2IxRfFC1Iyw445jswB4MUm4BH3g7jEka4Pq8=
+
+Name: com/silabs/ss/framework/uc/core/api/pintool/ABRequirementMetadata.
+ class
+SHA-256-Digest: OmL4eP35YB2i623bpD1+w4H1d0DicYyN9B7EXDWY8I8=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IUcSetup.class
+SHA-256-Digest: graAxDRSJtUCoKuu2x1i+DT2v0bL7k7WaQGXtuSHQio=
+
+Name: com/silabs/ss/framework/uc/api/project/IUcContextManager.class
+SHA-256-Digest: QzAp2GYseofEShE2wrUtTBIDfcN+ShVocidsRzLnNjU=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onfigFile$Builder.class
+SHA-256-Digest: Xj+A4mXmWDgLnhb0SJDEtiDy8aVNucj0ocVgaCEgkec=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/JinjaSbomOutput.class
+SHA-256-Digest: kJm2TwmN/KQogyqj2wDYWIs6NSAy1Mo1tQsNaSg73fw=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/UcAutosolveU
+ niverse$RecommendationTaken.class
+SHA-256-Digest: yPHEZ4karSFG3pJT5JNfk1vjh2l5J8UPHJCBpKRn0u0=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/UcSbomGeneratorModel.clas
+ s
+SHA-256-Digest: WBiMPIltv4D3QfaS3R6yxME9e0K+V/5FbQYFs9Bfcv8=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IExpressionInterpreter.c
+ lass
+SHA-256-Digest: g4LAjUQOTr6+HgmPrP70aUo+waCI9fhZ2vJbI1akQIY=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/SpdxJsonOutput.class
+SHA-256-Digest: 2pBKHLtlzN0uYzPwO2YVH1CYTiDGDX6wo11H7IqJFtE=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/UcSdkProtocolDetector.
+ class
+SHA-256-Digest: lqyQPgtaXWD+22942CL9grQBnRTd0y0OqnQlucr3z/A=
+
+Name: com/silabs/ss/framework/uc/api/sdk/IUcSdkManager.class
+SHA-256-Digest: +iAootamy7bFQcfnnkunJv0jIWCTKwz6rPLQJ/KB3vI=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyProject
+ UpgradeModel.class
+SHA-256-Digest: wljETKrJNt2JFSyKbW4dNL5jaIOB7hDfpty/tFV8Tc4=
+
+Name: com/silabs/ss/framework/uc/core/internal/UcAdditionalFramework.cla
+ ss
+SHA-256-Digest: unk8DMRvGGW8m1PzqjnqBfF1GKsyI/JBKNi5bqKw9Lw=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/SdkDocumentationTable.cla
+ ss
+SHA-256-Digest: eY1Y08IPfQQFvwjWTmDlwE3TqNWLDmvQhXhCUL40F3I=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyProject
+ Model.class
+SHA-256-Digest: Eo465S2iw22MDFmovSR5KcwP2ImUChYX/enwTWQvSzo=
+
+Name: com/silabs/ss/framework/uc/core/api/internal/project/gen/UseSdkFil
+ e.class
+SHA-256-Digest: DNdM4PWZ81YeQFY08n14koy6bFnEIlqVVQKTWkJrliU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/ucmetada
+ ta/UcMetadataParser.class
+SHA-256-Digest: xS8G9TsHSG6D6F5yfib3KD8sU2CC5FVzKnpaKe8Nbhw=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcComponentConfiguration
+ $SplitSelection.class
+SHA-256-Digest: CV5/a6WEvR6dYy0ADs0tkM/YOHFCI47FfC0O7cMh96w=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/ProjectFileReader
+ .class
+SHA-256-Digest: 6E+eL0NHeLBNMB0OLgOn0gU3Z5sOmsxj9Aaa9U6UlDU=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcw/IUcWorkspace.class
+SHA-256-Digest: zkd7Nf/nUclDj1xfZk3mlrEWUNi34BVhgqyQUUbX3TQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/validate/ApiTypedIssuesIm
+ mutable.class
+SHA-256-Digest: XffeGuC1xiMCvGnutwtv2QEXKPdiOYC2JZgqHgFUT8M=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$17.clas
+ s
+SHA-256-Digest: hRzFWwtSted6zhMgFX8do8tmrDLKKR1kMvWtg1Ars5I=
+
+Name: com/silabs/ss/framework/uc/core/api/UcProjectFramework.class
+SHA-256-Digest: rkuK0wTXfYOimbQWU7DmvDhfl5qgA9PMgqVazRttXrA=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardwareDelta$
+ Builder.class
+SHA-256-Digest: 0eoTVwaVvMUussR3zNPk1OX17lrpMvBz0he2EyB0B6w=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/UcRegistry.class
+SHA-256-Digest: 12iHV3vzkzcrRn9YtHIAiV7yP4FiIn8gm3GrBqRMzUE=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcw/IUcProjectExportedD
+ ata.class
+SHA-256-Digest: sEddPyL/C2jLDXnQowhSknzytIVv7YbhFepwotXEwnk=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/validate/ToolchainApi
+ CalculationMutable.class
+SHA-256-Digest: mFKY8cEy2vKptVa9nHA21/kPwGFMELNgJtgFp/gFGq8=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ ache$1.class
+SHA-256-Digest: u910oT7QsUPfAWKNi41B1OUUE6t1doUkveuq542DQQM=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ emplateContribution$1.class
+SHA-256-Digest: ilAlZDQlf2+azTHE+Q59UhwZupLE4Q1O65+vDU8YD2c=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/IUcSbomOutput.class
+SHA-256-Digest: EFytiRmKpKfaI4rlK4h86RW6FwNB7XngbvAW0Q+RhH4=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/CommonParseAlgorith
+ ms$YamlConditions.class
+SHA-256-Digest: 6phVQTkz0fDH6iTOI59yGf21ol412zmiYWLh9XlMeA0=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/DocSilabsComLink$1.c
+ lass
+SHA-256-Digest: /jqJXZN6qujt5d3FIX/4PQO9DUB5ccxSShFuDN0mmVQ=
+
+Name: com/silabs/ss/framework/uc/api/trace/OpenTelemetryContext.class
+SHA-256-Digest: LU75ob6O1zHpfneDBtnEY7SrdGrbDREPUkDUvlpMfwI=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ICompatibleSdkMapping.cl
+ ass
+SHA-256-Digest: O1NdBnNA8pZJurkszCpDGjbImCAKy6ADrUyqLzIF+OQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slpb/UcPostBuildSlp
+ b.class
+SHA-256-Digest: su3xSaD4As1Q7lmAcKFlD6KMwFJFxOFX7gGrYHNDJrI=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcThreadedGeneratio
+ nUtils$GenerationError.class
+SHA-256-Digest: wetgBqnYIl9+wdv8DbWh83vSxxD5idZ+0Hh6T3vXB7E=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$17.clas
+ s
+SHA-256-Digest: NQDtrdlc/DsQ6sJa8ca13DrGfaUzwPTManYxE1DfzzQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ emplateContribution.class
+SHA-256-Digest: EcvbHpQHuRsWJ0B9xhksaIOhpB1RW/80zc2zd1RLciU=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcProjectTransferOptions
+ .class
+SHA-256-Digest: kliebETd7q+6DXwW3YPM4ZGDEQyO3jqzUzG1XK0BjoQ=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/UcSdkProperties.class
+SHA-256-Digest: k7DYmXN3NDcac3FfIEkddle5uL3HQ4Wu1O1ABQqnLhg=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcFrameworkContainer.cl
+ ass
+SHA-256-Digest: SF6m9KFtT+SOj2Lc3uYOH4cLl3ehxIeVM/P4er0g0uQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$U
+ pstreamSegment$Builder.class
+SHA-256-Digest: 7bnUATyGGpqJA0TKKB5b4Cio5GsMdS8Iyjiw371eGHw=
+
+Name: com/silabs/ss/framework/uc/core/api/editor/SlToolFileParser$SlWrit
+ er.class
+SHA-256-Digest: +/g3CnrEnXHatr82E8dVBsbTnJtFa8tUolaRKIrkKPo=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/UcComponent$Builder.class
+SHA-256-Digest: WyHL7gHnX2YvAKmxXfapLHY1rPTaKJ5j8imRTitnLhw=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcFrameworkExtension.class
+SHA-256-Digest: l1VhnrTQG0T291j7XoekE/4HpVzuIEyZNou/WUmd7yM=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/upgrade/UpgradeCataly
+ st.class
+SHA-256-Digest: tZ92TcX3wKuhTAXjFRJOMmd4IAU4ckav6KAyQD4bOP4=
+
+Name: com/silabs/ss/framework/uc/internal/lua3/package-info.class
+SHA-256-Digest: yXy4+B1fj523TNnExIofGRZGTiISjlB5k0p8vOmi+ZE=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/PropertyBackedPer
+ sistedCliConfig.class
+SHA-256-Digest: 1Eb5fWf7owZKfMDfsXR9HH6aSqpKBNWE62w2ZnkP9EY=
+
+Name: com/silabs/ss/framework/uc/internal/project/setup/package-info.cla
+ ss
+SHA-256-Digest: lZ6CMqH/QSDF2gG+EFGosqHipDZ+bu65Gy6n0pGnEIQ=
+
+Name: com/silabs/ss/framework/uc/internal/context/package-info.class
+SHA-256-Digest: UMV5hC1naNQaJoYZyGbYHbPd7p8SzC7jKml/pIdsLhc=
+
+Name: com/silabs/ss/framework/uc/api/cli/WorkingDirectory.class
+SHA-256-Digest: zL9AC1TwdCRKnk3TaygD3PZWKMUmfQk/e0AfWtI3fa8=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/undo/Chunk.class
+SHA-256-Digest: JIo/cOijl4WMQ27ufsmSEaKgSfdcL/Io/vqNMl5Z+LQ=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/Overrideable.class
+SHA-256-Digest: 7C+V+KEFsXM18v6GyaPJlD0rdQD4Jtz5G85DFjLuJ38=
+
+Name: com/silabs/ss/framework/uc/core/api/ILibrary.class
+SHA-256-Digest: Hksrg/bNWl1pDk5zs3JsLOH6ZRLRBkDeWwgthODswA8=
+
+Name: com/silabs/ss/framework/uc/core/api/LibrarySdk.class
+SHA-256-Digest: IPrEc9fHKAXz3zn8WE3isPVTRe3KnTDgaRFUOSp18GQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ ynamicValue.class
+SHA-256-Digest: 5LDO2kBdV00uvLPFQpde2GA+P69ivRLyMHLMDD/wuQw=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcComponentContainer.cla
+ ss
+SHA-256-Digest: /pRaSCZDrVnpq3y5RJM7nTEqUpTQCoSEyRqa/qn91oU=
+
+Name: com/silabs/ss/framework/uc/core/api/rule/ApiRule.class
+SHA-256-Digest: L1tCDANdaEPKj14jMhFi4AkcXegqDkrWMwZrue49S9I=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$31.clas
+ s
+SHA-256-Digest: zDkaT+6y12jwBGWVjcaFBg9KdWQaxJuhdZYsNQyZm3Y=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$F
+ ilename$1.class
+SHA-256-Digest: QdjAGlxewfShQv43M0jZIWv5YrRQdSxLYkRkSBBKvAA=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/ExclusivityIssue.clas
+ s
+SHA-256-Digest: 8EiaYzqGuxl+rsL5OhQ1CX+ND5M/dH1E+lSEbxqT8bk=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/IProjectFile.clas
+ s
+SHA-256-Digest: EQ6tnhQYpGQXcrGbon/eqN7tij0hw5eXZR6Ipf0fFIg=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onfigFileOverriderOrBuilder.class
+SHA-256-Digest: aklS6Hs8yoLbByIPR19oE6VKsN/cXFwnAoeQZIM0xt4=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcGenerator$Project
+ GenerationData.class
+SHA-256-Digest: b0LkTbiPsjOTt2fc8NGgvZaMNY5tUMhl/ECwe6jI+Hw=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/AutoselectionCach
+ e.class
+SHA-256-Digest: yEVuUKhNglGhGuFa3zz+4EcGVDkxVD3fQgZeQehmic4=
+
+Name: com/silabs/ss/framework/uc/internal/project/setup/UcConfigurationG
+ enerator.class
+SHA-256-Digest: Fzyh+rcqkU+9QETzXyZQjzmuLb+JDquR4sHlsUec1zo=
+
+Name: com/silabs/ss/framework/uc/core/api/context/IUcSdkContent.class
+SHA-256-Digest: Re+9fYn8X31cutP+ataDEbKu/QCy7TX0eVhpqaWwM9M=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/UcWorkspaceSlc
+ w.class
+SHA-256-Digest: tHzsWNDMtfx9t3skC84geBq3LMCSZzRl/ycD3pVlY4U=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/ManagedSetup.class
+SHA-256-Digest: ZYNHWzODFjw87ShmGxD8U0CoGkeuySFXKhwqUjtQpF8=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/comp/TransformableUti
+ ls.class
+SHA-256-Digest: klF5O8j2KdcJ11tQePfE5Do4eC+tRd+1q9jDp/ggYJY=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IMetaSource$1.class
+SHA-256-Digest: dTCShaUDJHcHBGDeZkuqpo3DyqX/N8m7ycYaz01E8M4=
+
+Name: com/silabs/ss/framework/uc/api/sdk/IUcSdkProvider.class
+SHA-256-Digest: +unXzZOdoCLZybNDkJO4QBbna+MOnPP4VXDffUNTqjU=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/ImmutableComponentContain
+ er$Builder.class
+SHA-256-Digest: 9OxwvS/2Hdft2RHllj+vr/mdIIXiyBQQYjCM1dXlcgw=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/UiHinter.class
+SHA-256-Digest: 7LijZHwuDXsgyJpvGKgjMPo4x4ObpFVqsnmZkJssXlA=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/DefineParser$S
+ tateContext.class
+SHA-256-Digest: rh8B6r+ICsZi22Io0T+8niYDqlQyu76p7/hhdgM9gu0=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/solution/Res
+ olutionUnobtainable.class
+SHA-256-Digest: rd5sTcLWsmRNVeJQWr5G7dNVrC0IFOdbQqDKfpkDB30=
+
+Name: com/silabs/ss/framework/uc/internal/project/options/UcToolOptions$
+ Toolchain.class
+SHA-256-Digest: YES61jheiA1u0J0OpvpddaTHU/hut6oPYlIogTtEGSo=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$10.clas
+ s
+SHA-256-Digest: mFq1HGyGVeY1WlUjjfZjXillNMrRW9UNsCeLWeaf9E0=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcProject$RequirementsB
+ reakdown.class
+SHA-256-Digest: YD/XMfAs0kdth4VQgLX82k6zqrVc/4rhsXVsW+jSmNw=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$P
+ intoolOrBuilder.class
+SHA-256-Digest: naMUxffo+uzLoVcDgMBb+bRZxEm717ndJ548/zS66J0=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/python/ConfigChange
+ $Action.class
+SHA-256-Digest: n73l2ADaFALUtcNEY8X93ZnvCPSc63gzY/+mtXYa778=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/VisibilityHint.cl
+ ass
+SHA-256-Digest: RMCSemuno5IkMfApAEL3gEPGHzucSRuoVtK9Olvd9Pw=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$19.clas
+ s
+SHA-256-Digest: tElmWNWX+fqvlCibXjx1cvblAAbjNihb8QRmKdfe3M8=
+
+Name: com/silabs/ss/framework/uc/internal/project/options/UcToolOptions.
+ class
+SHA-256-Digest: xYoH4Yiw7Go5wMRQghGLypXsuWnv1E7yb1s2xPqsXDw=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcGenerationContext
+ $UcCompatibilityKey.class
+SHA-256-Digest: 7+kYjEYkbGGWsMSlkxiMsj+L432I5FkGFUf+gmtNumM=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/DefineWriter.c
+ lass
+SHA-256-Digest: E5W8qpQg8xkzDOdEmUDroSJ+55IK4bH0Y/vm548AeLU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/model/slcw/SlcwRegist
+ ry.class
+SHA-256-Digest: tPUOgHmRRbeVatRUn2sJH40yLApwH9ViF6eTHdKQtN4=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ etadata.class
+SHA-256-Digest: TDG2mMfPX2kZqbxWcwBWx4ReBllzIVsG/uLzCLOncX8=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcComponentConfiguration
+ Header.class
+SHA-256-Digest: spC3Yd/IiYIh1OGsTSDSdCw5KhxTHt5nt8sOeCr6NMY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/UcProtocolExten
+ sionFrameworkFinder.class
+SHA-256-Digest: KmBRskodhxGZU1o8Rebw6uRLgznqODRuBdlY9WevSN8=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/python/ComponentCha
+ nge.class
+SHA-256-Digest: hucpzL6BflYFK4WL2CKZ74Jdodbm2A8sgy8CoKaIv2A=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/ParseIssue.class
+SHA-256-Digest: /uYALXGzeuodwfAZE+/KzizQoc41uF9z+P/01fo2SdU=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcBuildSettings.class
+SHA-256-Digest: 51ZIrI0ApFE0zzvRhNubhRurxnkUHH8WzGb8sp8VMTA=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$E
+ ntry$Builder.class
+SHA-256-Digest: FyAl40ixKgFlXqjf7xombRCGBrJJvGrLDZSFPj2eaXM=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/UCJsonSc
+ hema.class
+SHA-256-Digest: 6fPiiNtIYHNSm0VSnqrT11SZL25U51+6cqnZjGHdRfE=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/package-info.class
+SHA-256-Digest: dCUH6X9Df40d2dqiev/mkaPhbRbZI02S4mUH8UgxW50=
+
+Name: com/silabs/ss/framework/uc/core/api/UcFramework$DataKey.class
+SHA-256-Digest: kUyQ0m8Lr+WS2lv2G6O8FSxVgHkl0FrxuE5ExeESDQ4=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/apack/AdapterP
+ ackAc.class
+SHA-256-Digest: t6Aa3vZZYBT7jUQ3vYertGCeiuB2SgGTpODUPPvvOuw=
+
+Name: com/silabs/ss/framework/uc/internal/validator/LuaScriptValidationR
+ unner.class
+SHA-256-Digest: fkk94jyIF0H7+oB8NyBW9rHNRUTV1TKWXw8DjTaaUY8=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/UcWorkspacesUt
+ il.class
+SHA-256-Digest: 0lt6zFLNaYjLXB2osLEEMuMgq8FABZy3Ia8p6qm8JW8=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ emorySegment$Builder.class
+SHA-256-Digest: OGHmyA15guV3fnuVk7yXlo2yM9TOxqJ6Nnulh/VR0Pw=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/UcSdkReference.class
+SHA-256-Digest: Z1qKYW8zMMMWZGoXy1WE9PyoGWPM1qcrfODvXMIN0KI=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ acro$1.class
+SHA-256-Digest: euHgZtK/1Ok9U5OwCOLk9ewi1nn8fhQnP5aTnGM4vB0=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ emplateFile$1.class
+SHA-256-Digest: ME5mFsFPnhoGzkXtOrE/D9PtDSNXTn3H1Q1bgSDI0gI=
+
+Name: com/silabs/ss/framework/uc/internal/lua3/LuaConfigurable.class
+SHA-256-Digest: OdGFYgW+K6E3x0olKlBEW+56JmzTZOukeOGzpQGqA20=
+
+Name: com/silabs/ss/framework/uc/api/sdk/IUcSdkDetector.class
+SHA-256-Digest: rWcUfd4g1Y3uUiS34bDCa6dWz7pFnXINILvt5iZ4JLw=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcu/ScriptComponen
+ tRule.class
+SHA-256-Digest: GD+j2k8Zjj9z5TaS2OJKphE1tYvotm7tBjI5JBHV6R8=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/UcSbomGenerator.class
+SHA-256-Digest: H02mGSZCyZ8Ip21RfQXfhmpiCfWBrzrRBS4VKF9SshM=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ ourceEntryOrBuilder.class
+SHA-256-Digest: te/5eCidYSzj/mbqJq3ElWGMflX32QuAVfh6FKPjcJk=
+
+Name: com/silabs/ss/framework/uc/core/api/context/IUcContextChangeListen
+ er.class
+SHA-256-Digest: gLMMrzXLbNSIDggYehK5FQ4BRl5RqEMLkUrcyXYwuFc=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcTransferOwnership.clas
+ s
+SHA-256-Digest: vb5OZscO48kix5zF2YZ8kuaSme1DvrYPBlcfVOPgTcA=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/IUcMetadata.c
+ lass
+SHA-256-Digest: aQQIpPaQuY0i+kfxIEecUMJTNV4Lbd+lvYDPB343hp4=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IMetaFileParser.class
+SHA-256-Digest: u05spMHfmAeuctFTKmueI/o+giFO1VWuh7qivhpGEN4=
+
+Name: com/silabs/ss/framework/uc/core/api/ConfigOverrideMap.class
+SHA-256-Digest: HA4Nbret2DcOBOZGwHSbOhY4CJyr+vHJpYUZqzqFtNc=
+
+Name: com/silabs/ss/framework/uc/core/api/project/gen/ConfigurationGener
+ ationLogicMutable.class
+SHA-256-Digest: v8nZvsfz8wohFHhyfqZux+KdLBRDe5Td4CurpZX5wDM=
+
+Name: com/silabs/ss/framework/uc/internal/api/validator/IUcScriptValidat
+ ionRunner.class
+SHA-256-Digest: FBZc/eOg+dQjf86XDJEJU0MGrhujAdvbz0jWcS1ugfg=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/UiHint.class
+SHA-256-Digest: yZ81kPJk/6/Q1AUuZHnzIIL9co/lmB6oEmKlnxMbYUo=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyProject
+ Validation.class
+SHA-256-Digest: PXrEd0/6SrR0KYn5w/mchJKFnSeSRT4kzj/wiyqmOP0=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcThreadingGenerato
+ r$BaseUcGeneratorJob.class
+SHA-256-Digest: GN/Sa+u4xavrrku35Wrf8ZnY80r7w5TivUfPi/m1AVk=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/ILightWeightSetupData.cl
+ ass
+SHA-256-Digest: NRg8Lp/876LaY62w2N2VpfefFpYoGCxm9MEHZuLNFdA=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/IUcSdkDefined
+ Metadata.class
+SHA-256-Digest: bOUbQ9Uyi7AtTYO16k5jaKMpLFwKaJ/2Q1VKSBjm1+w=
+
+Name: com/silabs/ss/framework/uc/core/internal/toolchainsettings/UcToolc
+ hainSettingSchema.class
+SHA-256-Digest: fbPSX2OjQOJ1lJBi7czTZkAwW0a/NqowSNBDGt2Z41A=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/package-info.
+ class
+SHA-256-Digest: yN6xSqnvt4jaZ4JcEp/ejk8nrrOwW7RKACV/zCqsleQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/validate/choice/Unfulfill
+ edChoice.class
+SHA-256-Digest: 7nMaSaZDD2xGxcFl6WwX7oWabm/dHMsRF+PEOCN0Zto=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IUcSetupData.class
+SHA-256-Digest: 8r7VCdUk3Y1Ox2GQ77c/+kgYUYfqY8xQsq6FdoSXLms=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/BaseUcSdk.class
+SHA-256-Digest: On0emqhOzCzrQsmq/7JSI4SIekUkESAizU7WxfIdlbU=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcu/IScriptedConfigUpgr
+ ade.class
+SHA-256-Digest: mhj4V4tRRVp18YXWmTo7NzFWWzE8VrcE9TKVJsVmJj0=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/DefineParser.c
+ lass
+SHA-256-Digest: X4WRFQAFTRHqt9xodBXZh/Fs0KhLKBQZJSEmCyXZDHg=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$12.clas
+ s
+SHA-256-Digest: QG71Y2QihN9655ySWP71qtNsuCndkx+kbHFeSHFOHXY=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/YamlReader.class
+SHA-256-Digest: cTJIozHteKeIL3PKn6rzlDkDXU6+8UW1UE/N/78vL+o=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ acroOrBuilder.class
+SHA-256-Digest: hdVyC73lIuY4C8WGNzIXDnvFPQ0ByFVF02I75GZ4X/E=
+
+Name: com/silabs/ss/framework/uc/internal/api/project/setup/ScriptType$V
+ alidate.class
+SHA-256-Digest: PLYCCFHDJpRDYJ3NPJXrHwcAgYtrj+nh05o11E/jQEc=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcTemplateFile.class
+SHA-256-Digest: vAJolekiTuwzQQEMdRv0bdBBWOH2tZGd/hDf2gGgTik=
+
+Name: com/silabs/ss/framework/uc/internal/lua3/LuaSlcGlobals.class
+SHA-256-Digest: pjZQRI0/cjrZj/7vZ0y5/SQX/A8nplpwvKCMt26/Tlk=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyCompone
+ ntId.class
+SHA-256-Digest: 7vusjrQMo89tqXVGeC9ir9HL9v3uPr/Kwv8mOk6pDQ4=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/UcWorkspacePro
+ jectsModifier.class
+SHA-256-Digest: DIfujKo1ZSVihN4vre/cNaJzxhxlmr1leuQzRupNh3U=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcComponentConfiguration
+ Mutable.class
+SHA-256-Digest: Nszossm4JA4EWEHG48CFFKenGhj9mO4bzFBQw4nvkpY=
+
+Name: com/silabs/ss/framework/uc/core/internal/upgrade/UcUpgradedProject
+ .class
+SHA-256-Digest: +5+zPCr2P6EpUfhnsLP3ftC7PrGZRVG8AsinYsWRD9Y=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/ISetupId.class
+SHA-256-Digest: AMdsLG4b1vcOdzOHnqJQ4EAAPxgoq+rvMwZoRS20pi0=
+
+Name: com/silabs/ss/framework/uc/core/internal/toolchainsettings/UcToolS
+ ettingsContainer.class
+SHA-256-Digest: Muc8g0QYMB0D6dWaoUF5Z5/n8jriw4+iTBK7C4QlfsA=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/ComponentQuality.class
+SHA-256-Digest: 7ETNq3zhuHjjTKxYuyZvNqm0SHLTHLqV64U/brWRmgI=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ etadata$1.class
+SHA-256-Digest: EGolLpXRx6qgIoffFbZ/vknOBqnpKnH2Y+cZWW4aTb0=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/CorePersistables.
+ class
+SHA-256-Digest: UZEHC9gj10TnYkfW3tmOGU+xeaPnHhbGENrgL6SUrNQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slpb/SlpbWriter.cla
+ ss
+SHA-256-Digest: UWOd6TLEY47oCTC5YlEyVXmI2MHmRz8qYerDlzxchuQ=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/Customisation$Builder.cla
+ ss
+SHA-256-Digest: Lscxb/Gufh0gB3ueI8yzldnCeV5WngpsNhxxCQRmLos=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/EmptyPersistedCli
+ Config.class
+SHA-256-Digest: B+76HqAMP+Svt6WF5yuUi14fPeUIuT8bKoT3an57rkI=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/MappedUiHinter.cl
+ ass
+SHA-256-Digest: FuMtI80PqTPajS08vPJm205EIeEz/1B35CNl/blG1xE=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/IUcProjectMutablePa
+ rser.class
+SHA-256-Digest: C36ROV9hd5q/ITg6+mxdKYOOIFJu2Q0onqGKXGSAch4=
+
+Name: com/silabs/ss/framework/uc/core/api/internal/project/gen/MergeCmsi
+ sAndPintool.class
+SHA-256-Digest: BNw0M/ZU28638IfpsLn+kS0bgzgWVrjb0SKk+ONtZJ0=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/validate/UcApiUtilsIn
+ ternal$ProvidedApi.class
+SHA-256-Digest: 0KCy263JPhCh/wFT33j7MaD6vUjBe2CslXo9RXgAlpc=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcGenerationContext
+ $MapKey.class
+SHA-256-Digest: 7iEoWg5ImjvB2WTtvmoCBjs7ExcbodH0yAqMCI9nr30=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/IUcApiWhatIfValidatio
+ n.class
+SHA-256-Digest: IBGH31BGLPiWaA2WjLgB55+8jPoALu9GFNye75jbb3k=
+
+Name: com/silabs/ss/framework/uc/core/api/ConfigOverride.class
+SHA-256-Digest: tsjaGZurcI1Uom1itBwpROaqcRQBZMJwmUpExWssQjI=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/UiHintId.class
+SHA-256-Digest: /HWTpKa+Hc4OowSZ3rMfmYryaQAo4FC96/Ao5n9EY/Q=
+
+Name: com/silabs/ss/framework/uc/core/api/project/gen/ConfigurationGener
+ ationLogic.class
+SHA-256-Digest: uLbPUnF/FQ8JvwCzwj2L5vCtPTkpLJGBRtneE7pm8UA=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$K
+ it.class
+SHA-256-Digest: MFLYE6bwW8Sk9heQe/kNx1mXHQkz3/h5AyMRD6X5QIM=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcu/IDeclarativeCompone
+ ntUpgrade.class
+SHA-256-Digest: qeq5YzFkbKoPRMQ7K/m99P7gtpKj55Z0ug+b6wfYv0w=
+
+Name: com/silabs/ss/framework/uc/core/api/upgrade/IProjectUpgraderSettin
+ gs.class
+SHA-256-Digest: 4h6P5yc1On8mgYpRM+gK/iNa+wFuEx3B9pn2QzuTRHI=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IComponentInstanceData.cl
+ ass
+SHA-256-Digest: HCXlmXLW3i1Pm0Y62CsnGLxX44XcOJY0TryNt+MBiDg=
+
+Name: com/silabs/ss/framework/uc/core/api/gen/IUcGenerationChangeContain
+ er.class
+SHA-256-Digest: 7fPhMuBE6+iorLY0gUun/WWJJwcBMRF0wGUiT3vRlMg=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/package-info.clas
+ s
+SHA-256-Digest: Jpo+OyjSFIrusTLAzE0GHGw7SFXEgNTTZvUhGlK4C1A=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/model/ImmutableShared
+ Export.class
+SHA-256-Digest: p28xGVwKV496lYQSbQpf0NqyhVQOFDsFGKU6EgJ4qOI=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcThreadingGenerato
+ r$GenerationTaskContext.class
+SHA-256-Digest: 8fg94taOdBBNFc8wxZXCW4noMA1XE9PusO369P3V72Y=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/UcSetupId.class
+SHA-256-Digest: Wq5KTQaJ6RZanDwb/8A5XuABRvZ8hjsP11tW5fNRLr0=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/UcFactory.class
+SHA-256-Digest: 32u7c13dt3EaB9k5iAQtMAGv91GeGkd1CCV0lxLmi1Y=
+
+Name: com/silabs/ss/framework/uc/core/api/context/IUcContextChangeListen
+ er$ChangeType.class
+SHA-256-Digest: 1vLt2NaaWzqijXzwijF8F/qmWWW2mfESnQ9qgmhDYog=
+
+Name: com/silabs/ss/framework/uc/core/api/gen/IUcConfigCrc$ConfigChange.
+ class
+SHA-256-Digest: Zur8emomsdRT+9rmcILM59S0rNnB6DVEeCBl0FQlEp4=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/UcProjectComponent.class
+SHA-256-Digest: ZUc/e4104qQJAd1YnCA3d9kNJ8QADyVTHZUMeJvllJ8=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$O
+ verriderOrBuilder.class
+SHA-256-Digest: KtSPILNad7fnOhCfGOE5Qou84aLbu9J/5GoIT5h72zA=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcConfigResolver.class
+SHA-256-Digest: chSv/G2RF6/GE79vE8LuCBfUmpW/lOf43rad5QnwL7Q=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$14.clas
+ s
+SHA-256-Digest: 0Za88cC9BO1oCt/P1J07YtgnBrS5kxBVz3WNBanAhx8=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyProject
+ UpgradeApi.class
+SHA-256-Digest: msCfHwGVvL3nn+0Plmu1rF5J1Q+92LtKK45rFN+veL8=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcu/UpgradeRuleCol
+ lection.class
+SHA-256-Digest: 2URdzC1oQ3R3CpSPJtl7ff/bEeWF6jA847ctHtCR9Oo=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IImmutableComponentContai
+ ner.class
+SHA-256-Digest: ncVBMAWz+Ai4g6j+VpkmE/hqM1YmI9NPhSM5qu8UhAE=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/CycloneDxJsonOutput.class
+SHA-256-Digest: rJCZQl4882pFkQXrs10zC+d/1ggR12265PQTNH0ROQ0=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcDocumentable.class
+SHA-256-Digest: hCzB8L9Ek8riqdgA8OdpEtCqPqpcE5SC+7c3GJZXmEM=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcp/ISlcpProject.class
+SHA-256-Digest: C5Ur70E2oNlal0Z+SS841dD7zZtoaw/rtMghQ2O07Po=
+
+Name: com/silabs/ss/framework/uc/core/internal/validate/ApiCalculator.cl
+ ass
+SHA-256-Digest: UVLGdhPz281msQI4x2FOVbHFwWh222URCizM8orwlaw=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcPostBuildConstantPath
+ .class
+SHA-256-Digest: qdrpz+of+q3d1rRynr4DcRkhzzx+V/niomEV7wM2570=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IUcSetupModelListener$CH
+ ANGE_TYPE.class
+SHA-256-Digest: 9tht5+5myhUVs2z5XqJR82gdv8CjbyaSGev2reFaXNg=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IExpressionInterpreter$B
+ asicInterpreter.class
+SHA-256-Digest: OHt/Dcwwts6FqbCDatG2GnTZWoU2hO5fK3IWksyolgo=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcw/IUcWorkspaceProject
+ sModifier$IUcWorkspaceProjectEdit.class
+SHA-256-Digest: qSlZiLwAl6R3m7U6aEzzIDJ0qVmS713uF21SoAqwyjI=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$Project
+ Parse.class
+SHA-256-Digest: l1X6JBNs65ToE8uIbukBa/AOs/XgJ+Xr0su1tlGJwLA=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ ynamicValue$Builder.class
+SHA-256-Digest: VDteI1lxKBlkBzLd7xW1N7tTH4UoOpujZLNOb8tijnQ=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardware$UcHar
+ dwareData.class
+SHA-256-Digest: pKlLRvb4GiTli44O38MPqjcsaXI+enfaTGxc2Sr7FQ0=
+
+Name: com/silabs/ss/framework/uc/core/api/log/IUnifiedLogger.class
+SHA-256-Digest: cjTfgg9Q//DUC5UsE8fiyibGVo21tK4ILiTToJcbgOE=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$15.clas
+ s
+SHA-256-Digest: qJQuen5vBxGb7c+TDaFfCTMLCqVgUDDHnY8HHw2l7Jk=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ omponentOrBuilder.class
+SHA-256-Digest: NKH75Eo/Vmfl7amniY2LcICYlnu8fqoqIaiP2vTNuA4=
+
+Name: com/silabs/ss/framework/uc/core/api/project/gen/TransferTypeManage
+ r.class
+SHA-256-Digest: jj8PEY+KN7y5WzCOQNCrh0LMD0hSwtj2s5oDuKudBLw=
+
+Name: com/silabs/ss/framework/uc/core/api/gen/InMemoryCrc.class
+SHA-256-Digest: /iLM/TYzO+dHH9ccJfyeHyqMS1nLBGmjneabx0vw878=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcContextManager$
+ 2.class
+SHA-256-Digest: jbT60IHJqHcHr0qsIpSJzLJq8n69xn6Z1Ube0WKDUhY=
+
+Name: com/silabs/ss/framework/uc/core/api/UcFramework$UcFrameworkConstru
+ ctor.class
+SHA-256-Digest: IR+vnwH4fH9RtjCQGfCOt8SMnist+xn1bhQ0XvRWtmg=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcMacro.class
+SHA-256-Digest: lhx4CeXwGsdyQ2MDS8je0aipaPrvO2Mi1KpxFOu+AtA=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ etadataOrBuilder.class
+SHA-256-Digest: ePQFdOdLXYhvi6gqdKTuTGLOLoeKvdOM7cR++gJ8Yac=
+
+Name: com/silabs/ss/framework/uc/core/api/gen/IUcConfigCrc.class
+SHA-256-Digest: kG5yqrTvkJYhmYfy2aBvSXSxkJi4pMaNzeZyCOXrImQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/ComponentApi
+ Tuple.class
+SHA-256-Digest: niPGgzNmGmM4w7SrR+4Lfdz5YiA9FMlcdZthGfvQ/LE=
+
+Name: com/silabs/ss/framework/uc/core/api/tree/Trees.class
+SHA-256-Digest: ZMLH69O6IH2N47n21vdII1rdJ4mq6PEsQiH4X+3H//Y=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$14.clas
+ s
+SHA-256-Digest: tkJylnxLPArh5mEEQkWjjIRlRvv9UfUIIt/W+nZpzo0=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/BaseUcEmptySetup.class
+SHA-256-Digest: hkOLn6qjyWRjPxjSS0a8yNt66+cPvTTy+f6KAVLbZbE=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/Makefile.class
+SHA-256-Digest: Zw3XtxC35A5/pPKjMCSisSOI5+Qd/UFCW8Xg4OfXQXs=
+
+Name: com/silabs/ss/framework/uc/core/api/exception/SlcExitCodes.class
+SHA-256-Digest: MSUDqEmJyah3RI6tXYsKIL6+BvWke3d9C2UPw6wMEis=
+
+Name: com/silabs/ss/framework/uc/api/python/validator/PyTarget.class
+SHA-256-Digest: fXaPGT+RIQTb4v9STfcpF+5mGIqCrMt4wdnjVDvkMgI=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcFrameworkCommon.class
+SHA-256-Digest: U5snSxt+FBjwIlLGahj/hBMERKPbyBKsm41QW3yjv8s=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/UcTransferOwnershipN
+ oDirectory.class
+SHA-256-Digest: zi2hSuxThug4QAMdD7eGDDNVKIxvXndWHzXfbDtMn9Q=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/ParseIssueGrouper.class
+SHA-256-Digest: urh0xtjIbt9pu5tNTJ67BGYgo13aI29BGtSB+e2J8kU=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$O
+ verrider$1.class
+SHA-256-Digest: GQqQkQXSgyUKNmQEsB2sSWQ73BgE7xgqXCLyXeci/s4=
+
+Name: com/silabs/ss/framework/uc/internal/project/setup/UcTemplateGenera
+ tor.class
+SHA-256-Digest: 5csftAyLb7TKX3Gl0tROpLJ8qJG2A1l9K/6IgqFhSXk=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcContextManager$
+ 1.class
+SHA-256-Digest: hrICLUb4GwcJ+dYau0F2Y81XlbdpS0b1N2amIPjlSGU=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/exception/UcParsingExcept
+ ion.class
+SHA-256-Digest: 72TvAct/c8HgHEgcU7j+/MhNm71lAUlQ+Vb9WwwG13s=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slpb/UcPostBuildPar
+ ameterSlpb.class
+SHA-256-Digest: kLcPRt1iU26s7tcBE9DuIHpG2YKyYVxsZumG3pwpA0w=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/UcSbomOutputTypes.class
+SHA-256-Digest: uVRZosM3IjUXAhNV6j//EqvXTZZ15me5HZEcucaRUTY=
+
+Name: com/silabs/ss/framework/uc/api/project/IContextCreationIssue.class
+SHA-256-Digest: mocSmN5f2zE8+2TVkExaMWGPtKnlved7Nvr0SL29x7I=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcProjectBackingStore.class
+SHA-256-Digest: cv0tDb9/TGqS8R2ObyDKjDJKoHHOvtAbmBrkMAbMcBs=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IUcSetupMetadataProvider
+ .class
+SHA-256-Digest: iFyzpWHOEfwwWkEpK0MeCUQwk++tW6R7Rr17bmUhJhc=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/UcAdditionalFramework
+ Utils.class
+SHA-256-Digest: atU5r1G+xlu0b71cJlv7tyzE+L5fHAgj6h4DIFuqH30=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$B
+ oardOrBuilder.class
+SHA-256-Digest: RyoFh1bl24M+ualuubFlWxZM2AVkAOHtqJKR7bYBGfo=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$15.clas
+ s
+SHA-256-Digest: oodPB+u85ETmFW11NApXVnCND542Fm6PZeeBI7YxBDY=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$F
+ ilename$Builder.class
+SHA-256-Digest: K2WnI6xhUXS0YPsqfP1wWW3MuflRoVSJY5CWWG5Rqqs=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/GenericDocumentation
+ Link.class
+SHA-256-Digest: pd4E9IXBf03FaNNSYMJPZ8oF3EbRIZijCmbRZRghahw=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/choice/IUnfulfilledCh
+ oice.class
+SHA-256-Digest: +t9Yvb3wwuZTawCApAxZkNF0gdsQFJnoP6xsbOWgVjA=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/ProjectTypeId.cla
+ ss
+SHA-256-Digest: n4iINrMNR8+/8LbfPSNMgSFI64xWZ4W+yWuhs5jXHiI=
+
+Name: com/silabs/ss/framework/uc/core/api/rule/ApiId.class
+SHA-256-Digest: dcjoRZoXMg5x1qHRxq9m8J34rOJla2Wj20eAeHbAZk0=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IComponentCustomizer$1.cl
+ ass
+SHA-256-Digest: V3SAzUTbvKovPP8MCL4bm7UjFy0ghyerZVRxnS0Vhl0=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/UcSdkProperties$ID.cla
+ ss
+SHA-256-Digest: 8XQS25k9R5tMHACx/WLPCTnP9wq+z+WdbVaR8XBIoq8=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcGenerationUtils.c
+ lass
+SHA-256-Digest: yCyRhFn+5xyyVIvyNNNDl5a6tyjNunNQDIHVvV3OH+0=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcPersister.class
+SHA-256-Digest: fcvKPHwOrb+KJjVIMQoIiczLOkOi8qN+FVJC+vMpbAU=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcProjectComponent.class
+SHA-256-Digest: 9Qda1B8/g4f/j6qa7gRVpbKh9p3p1hkkfOm88jME8Zk=
+
+Name: com/silabs/ss/framework/uc/core/api/servlet/WebConnectionUtils.cla
+ ss
+SHA-256-Digest: n8pEywRR4JoEqtZdBrFi+mao6XA8eZFKLWrwl0M5RO4=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/apack/package-
+ info.class
+SHA-256-Digest: qFCKFx0vPxBXjRvCDXVz5tuVvPorD4RK04dumSXnsrE=
+
+Name: com/silabs/ss/framework/uc/core/api/log/UnifiedWrapper.class
+SHA-256-Digest: /lsvGKVD8f7KXD9k8R+/u2tIYN6qbrrv6j5TARP7ZjE=
+
+Name: com/silabs/ss/framework/uc/core/internal/toolchainsettings/UcToolc
+ hainSettingSchema$Types.class
+SHA-256-Digest: tHYyPIbdg/LVcbUnNvWwPLunnd/dI6meeRL5poOcyv0=
+
+Name: resources/json_schema/slcw_schema.json
+SHA-256-Digest: 9DpHTKNKkIFzqeWLtPVn0Wl2PhGy2eA+vLmRuAIoOhY=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcWorkspaceGenerato
+ r$WorkspaceGenerationData.class
+SHA-256-Digest: nen/gZPqIGU56qSJqZGUX8xXQbXLrjycZdTX8sKgHUM=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$P
+ intool$1.class
+SHA-256-Digest: L2of9p1nwidw9SNoM7ghCTbLx2qdghbX7muX1gZ3C7k=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpParser.clas
+ s
+SHA-256-Digest: pw4wQUeZDTOtfG6JhcdWaSdBzPbPwfi4vA5GxBnNc1w=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$10.clas
+ s
+SHA-256-Digest: GdizHOmNjPmHz47EKF2QGHC2tQVBKywRvkmvf/5K8pQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/uihint/HighlightHin
+ t.class
+SHA-256-Digest: OjVrowtlQRmMZCFfj0mzh6YL0cQj5Rgj5ji98t1pn6Q=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcu/IDeclarativeConfigU
+ pgrade.class
+SHA-256-Digest: wWFOnxbW2NeTKPifs9oDSQZwNuTKnToZsZcHchRADqE=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcu/DeclarativeCom
+ ponentRule.class
+SHA-256-Digest: pQxwXOdHcecEdNPb2RSXMEZ0BfEXnJ9K8e125k7igLo=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/UcSdkManager.class
+SHA-256-Digest: P+n5GKIZHGRGoy2sfCUjhJOqLh2cJBMkIeOlCGz9yUU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SpecVersionMile
+ stones.class
+SHA-256-Digest: quchV3CWCnUqkQha+vIiDRe6CmCiNo4hZVQT7lo4DPU=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IMetaParseEngine$ParseRep
+ ortingLevel.class
+SHA-256-Digest: zlXFTUx18xn+WbLEg5qJ4XuV6/Vyjqn3PL4ZTc4iHT8=
+
+Name: com/silabs/ss/framework/uc/core/api/upgrade/IUcUpgradeContext.clas
+ s
+SHA-256-Digest: mNpZiqEpXIQXwT5dL/Z9nAGgFrrjcXeXKu1UR745ZlY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$18.clas
+ s
+SHA-256-Digest: i7ToDFXFQmRD71WGTp5dhYlDBPuvQI6+zCg1KHVuOBs=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$13.clas
+ s
+SHA-256-Digest: lOScWscTydqwxmAj7n/0uUgD0wJmrWPs2/L/llZmydk=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SdkParser.class
+SHA-256-Digest: lN231CLL0LYuOfii/wyZWKX6DwYfkW4x9uaVl0dKRUo=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/solution/Res
+ olutionAmbigious.class
+SHA-256-Digest: O5+oN5cVpIyqGACzXzCU9luOhBGA9hYLvTtYpAhEd9c=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/PathSource.class
+SHA-256-Digest: dCFHBVp45HkgX+jB1Nseylj7ew27QKI+l02EPh7uzg4=
+
+Name: com/silabs/ss/framework/uc/api/python/validator/ConfigValidationIs
+ sue$ErrorType.class
+SHA-256-Digest: EwzgKKDErPeToTbPy/b1W4UuBzW40dDjX9px7q08kaA=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/SetupParser.class
+SHA-256-Digest: 70Im8zt8A3t1jbpG4xniUwUGNg2IhJiql3dRPt9yiBg=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/EmptySetupData.class
+SHA-256-Digest: dYEGkjIObXWM6YsrKQITmAtD+CqWeVPgfrI2YgtS9Mw=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ acheOrBuilder.class
+SHA-256-Digest: 2piuSWyjgC2Pl6ebE7LXbrlUTQ/MjWD2xnWqJ/P664g=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcContextManager$
+ 3.class
+SHA-256-Digest: nxgI22LNJQ6w1JD1dBwQjnDdI6TRECrhjD64HY+W8kg=
+
+Name: com/silabs/ss/framework/uc/core/internal/meta/MarshalledSource.cla
+ ss
+SHA-256-Digest: quFr3IH3EYNOhv3tAzOvbwVUgmRMVqsQ1XWwSXb3C4c=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ ondition.class
+SHA-256-Digest: V49+dZebUxTjTkN/RSov2jgAHtc8P4gVH1onHYbECP4=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/solution/Res
+ olutionAbsolution.class
+SHA-256-Digest: da3RaJVsTt+3ZNn3G63EN+8kBBoM3CTw1vY4iMBv6ls=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcApiWhatIfValidation
+ .class
+SHA-256-Digest: IOYCaA+AOulWGKX0/w/5whde4qSqdofjzyHUAYpehtw=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onflictsOrBuilder.class
+SHA-256-Digest: pQXDXGAiz9KOjN90QA9FfgI1bpbbCYUoM923XRMBYNc=
+
+Name: com/silabs/ss/framework/uc/internal/context/UcContextExtensionSetu
+ p.class
+SHA-256-Digest: 4vLIzsZkDa5Ao7LLHdf+GG78UphuTgbTjaBTxGw2hvs=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcMappedToolOption$Acti
+ onType.class
+SHA-256-Digest: Jykim96W+MudmdqLLORCEixO8p1oVtvQMVEaw6GzeQk=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$31.clas
+ s
+SHA-256-Digest: InJttYYQbpVlKSgo5MG9IuN/tHFuIGLCOqNohkxqHDo=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/sdk/SdkValidationIssu
+ e.class
+SHA-256-Digest: 975W+l3u8crKev4+ro6oJU+ygFVIAXdVwQ9JzLy/+Nw=
+
+Name: com/silabs/ss/framework/uc/core/api/Recall.class
+SHA-256-Digest: lzK0j6thg2sAG6HoxD9sWs+oBQEuOnvZ0JC4G9tr7Yo=
+
+Name: com/silabs/ss/framework/uc/core/api/tree/Trees$DepthNodeIterator.c
+ lass
+SHA-256-Digest: 3iSSgsQ0e+BfOgV5rV0tr0FZIeslcWjgMoTK7z8v1Vg=
+
+Name: com/silabs/ss/framework/uc/core/api/exception/MultiExceptionContai
+ ner$Builder.class
+SHA-256-Digest: 4IPu75IcxlYgwijQu9EBS6jVgT/fbAjW0p7heJV3/Ac=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/FilterAccessibleResul
+ t.class
+SHA-256-Digest: mgB4MCeH9mhWAma2ep1dbKccb01snFx4/n++nbs0XOU=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/CycloneDxJsonOutput$Cyclo
+ neDxJsonLicenseExpression.class
+SHA-256-Digest: UhTcshbV7lrWdt2lVMLHlZvM0H52CGpjvSrs/uV9O4E=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/UcSbomGeneratorModel$Sbom
+ Upstream.class
+SHA-256-Digest: nuw7Th/Ps8YH7Wf249xOUrqZhNXJm4vUh4ZbgwPWPbM=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$11.clas
+ s
+SHA-256-Digest: csd22zqT1Y69LQ/B9JtAnJ2xdhpZVcRBMfT8n0+A3SM=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/uihint/ResolvedHigh
+ lightHint.class
+SHA-256-Digest: hc4uEklNYiAcuJ0EyviQTHzQcBED/yfhakfLAoUZPao=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IUcSourceFile.class
+SHA-256-Digest: o/wRI3Yr9L2izBsq9vZtNIvikclhaJoj+zxsvtgwfwU=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onfigFileOverrider.class
+SHA-256-Digest: r3t0hOnSWSY48H+N1CJp1FJJAjU1ledTqrsCRGq7sj4=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/ValidationScript.class
+SHA-256-Digest: ltyIspShEQDIWts1IUPypSysAIC9/rVfAy7WoFJqepQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$19.clas
+ s
+SHA-256-Digest: gZo4WTw0lea7JYC5v/fEyO20W7Kf7rT/FGHVBEy4e6M=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ emorySegmentOrBuilder.class
+SHA-256-Digest: ECS2j3VN8pbO6TFIAhmZG4VhTZnM/2Ef2ZULySUmANc=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$U
+ pstreamSegmentOrBuilder.class
+SHA-256-Digest: CzLJuSpJC0/ThX1zP9CYNz4ReL8X1B9PmDketZ7y5yA=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$K
+ itOrBuilder.class
+SHA-256-Digest: PZuKvBkuWRzg/ru+kPf10pNpYCbWdZgi2/iu1a5uPgI=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/cache/ComponentCache.
+ class
+SHA-256-Digest: db5C95vWcmgDSJ/f2HxtMttbJWRyV9zRj3y10zwSAQw=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/ConfigMetadata
+ .class
+SHA-256-Digest: lmPuQR/eqHYVcVXasqC4ScgSoZa7KWr3TBLgOcup5SM=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$30.clas
+ s
+SHA-256-Digest: nq7D5yQKrcOdGylPIUi7A+z//vF8Fl67HFTMWeOC0cw=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$12.clas
+ s
+SHA-256-Digest: 0YCA07nujgPkINjtyO0NxJX4pMgajJTtI2goO1cOitU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/model/ImmutableShared
+ Import.class
+SHA-256-Digest: EfGR6OO76jyfg0NBirISlNVmoZtq5OSS8WQF2KR2afQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/validate/AffectedComp
+ onent.class
+SHA-256-Digest: Nwu6lvY/oR9R/CyEawYEAjNxY6aEKd1MqUh3mOkaHf4=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ ynamicValue$1.class
+SHA-256-Digest: Twb2WRI/gWbj+VgxyVBAxvzIZTt6ASFBd2ajv51G2Lg=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$F
+ ilename.class
+SHA-256-Digest: Pqbo8uOJgFT04dBDczZGy3hFZ1aJ+PQyzXbr/QzCVs0=
+
+Name: com/silabs/ss/framework/uc/core/internal/toolchainsettings/UcToolc
+ hainMappingValue.class
+SHA-256-Digest: HvY7VImbEydCJ013N860L07hyOzMG0D3ibxhDzuBgyY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/solution/Res
+ olutionConcrete.class
+SHA-256-Digest: TMV7fctr4jG7NGCa3JgrwOKiJ1idjNhahXSXugXIECw=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcSharedMetadata.class
+SHA-256-Digest: CatxnX9uUywWnfqOtjNg+3tn3c3AFKv0JqxQXc3uCMs=
+
+Name: com/silabs/ss/framework/uc/internal/generation/workspace/SlcpWorks
+ paceSetup.class
+SHA-256-Digest: RlLr8+4S87dANWZtKFiSgCMjDFkBW3pYDZjOchpZYNQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ ource$Builder.class
+SHA-256-Digest: L3UMdfm1XAmRzwQYOKj4QGquRDKy8Lt/nFIyYMtMVAA=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey.class
+SHA-256-Digest: uBRRKfeMOTpVRkG/VZ3lMWpo7RCLnHroXa3IIgY2bTY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/IMetaWriteable.
+ class
+SHA-256-Digest: SpLhqOVqNGiVggNh1SHftOCOMgyloCrxaxszz94B6yQ=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IRecommendation.class
+SHA-256-Digest: 2gEowEqVEYVgoskwkuYidjjY0v20ll5zeuFATYM4KSg=
+
+Name: com/silabs/ss/framework/uc/core/internal/hack/autoselect/scarborou
+ ghfair/package-info.class
+SHA-256-Digest: T3YPELC4kynJZbnGp5HnDq0S6hGmnkHsKUyCNlJyd8o=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ oolchainSetting$Builder.class
+SHA-256-Digest: plOJ5yiLvSH5fptqDJpy1y16ZYyEoKKoMbT8lAKTdhg=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/validate/ToolchainApi
+ Calculation.class
+SHA-256-Digest: 5cX49MbQhG73itQ2BUL2JtpVPdkvgcdnWD7bmpBnK9k=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/apack/UcUpgrad
+ eResultJson.class
+SHA-256-Digest: z7rYTetnov7DOEQf734HWVIaAX9eeVwJAIVetHaFtaQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcContextManager$
+ 4.class
+SHA-256-Digest: L8pz3syZ4ceeuh+qMhXQYdsV/SWpf85Y3J/UZhN8bwE=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/choice/IApiValidation
+ IssueChoice.class
+SHA-256-Digest: A6qHAksvgi4o5tTdHeh43ngbOMRgvPqIeAkc8SxIYBs=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcw/SlcwRegistryManager
+ .class
+SHA-256-Digest: xlTZxqliP5TG2BAkey+woJFBnWxy5txkAIH4aaTXj6o=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/DefineParser$C
+ ommentChoiceMode.class
+SHA-256-Digest: VBp47/6pVpd1yROIUggU17kR0znDrnfdKHykQ/bX5p8=
+
+Name: com/silabs/ss/framework/uc/core/internal/IUcComponentInternal.clas
+ s
+SHA-256-Digest: iAjYArOwfAhRKFhK3oulhBGxDID2aqSR+xlkoxyyRa4=
+
+Name: com/silabs/ss/framework/uc/core/api/upgrade/ProjectUpgrader.class
+SHA-256-Digest: Vt6l2K1iTSEzmKh5PX1OOx/Pk/OAUqlb7X5apw2CdRI=
+
+Name: com/silabs/ss/framework/uc/api/project/UcContextRequest.class
+SHA-256-Digest: 6D2TFXH+f+1Lak2aQXEQdBPchiXcBnUTZUv4EFtyfSU=
+
+Name: com/silabs/ss/framework/uc/core/api/editor/SlToolFileParser.class
+SHA-256-Digest: nea0qN6917OlyISc2AkT0/qEZGq/nHkTWJ96lx3dcDY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slcw/Slc
+ wValidator.class
+SHA-256-Digest: YfSz+7VyhDDfZjNoegS8QmYmeuBXzHV7yBfkeFXI7qU=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcu/ScriptConfigRu
+ le.class
+SHA-256-Digest: JZK8BvuVJ6Chi+xNKdWMHbitbCNzf5DCUvHjrDJy5oY=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcApiUtils$ResolvedSe
+ lectedWithApis.class
+SHA-256-Digest: fj60NFuSF9aO96IfjB05SehMpDy6NDxe0N7WANEczCU=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/state/UcIncrement
+ alBuildSettings.class
+SHA-256-Digest: 755GIMg3Qq69Q6OsCaqwfAN0toCgh2sQjo9etmuiKig=
+
+Name: com/silabs/ss/framework/uc/core/internal/meta/CmsisAnnotatedFile$A
+ nnotation.class
+SHA-256-Digest: PXjb/qY/uyY1JJa7f5vnGlutUrOkEQldeLrPELAHRjc=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ evice.class
+SHA-256-Digest: Tik1aLxVibyKUuE9nQHzzwYIJKHKY4zpH+ssb82cbvU=
+
+Name: com/silabs/ss/framework/uc/core/internal/IUcFrameworkCacheable.cla
+ ss
+SHA-256-Digest: gvA/azXKRMC0PLPtDBcdczNvDKK3Pu3h4lPhAo5M33k=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$11.clas
+ s
+SHA-256-Digest: RoXMTSjSMwCKKi7+wHPpBHHvF0g8eG6N135d3I+Pp/U=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/SpdxJsonOutput$SpdxExtern
+ alRef.class
+SHA-256-Digest: FowiuGWbLhhUYRNehXLWyC7noIaxa2Pbj3s9C558iuA=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcThreadedGeneratio
+ nUtils$IUcGenerationData.class
+SHA-256-Digest: pK5xOc/o1VQRyM+MMfSbQY5z1DB8dUFMdAmnpGXWIfA=
+
+Name: com/silabs/ss/framework/uc/api/project/IUcProjectContextSwapListen
+ er.class
+SHA-256-Digest: /sn0zKdLi7mFTene4kmux3K4BSedsxnqzqRl4XVJtlo=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/ImmutableComponentContain
+ er.class
+SHA-256-Digest: B4Q6YOQU+g4x5hLrHcmxYsdL3TMLAN5wHR5eqiImSNA=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/log/UcCoreLogControll
+ er.class
+SHA-256-Digest: vyCrkaX9yOTzKaiECDrX8tEQ717Q/uiTML8tKSxZFTI=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyTargetF
+ actory.class
+SHA-256-Digest: qImUv36w4oc7KDbN1SB78v0Cj49q/jmtFab7QSqshSc=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/IUcIncrementalBu
+ ildSettings.class
+SHA-256-Digest: OWE/SNu9TaGApBRHPmdCFP/WhXp4NIxqgnFQB6qep2w=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/DefineParser$C
+ harByCharState.class
+SHA-256-Digest: 9PS0n39hPh+w2ob1ZfYqNpc7QDljOrKuW9nMVTPp4w8=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ ource$1.class
+SHA-256-Digest: lOS13i40DluZ/+iyrqovpys37RCbvu4/rug9UV0iwjw=
+
+Name: com/silabs/ss/framework/uc/internal/api/project/setup/package-info
+ .class
+SHA-256-Digest: ULNQXBdyOGu8WLPq3atokcIQuT0nUai8hx1vGxw6Odg=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcContextManager.
+ class
+SHA-256-Digest: 8S1CYPakZArmLXAsGdP6S9D+pNp1z2rUMStRxrhvr50=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ISharedImport.class
+SHA-256-Digest: ZMLIfi8Zw3rtGPat5/Zd2Yn379adfxlnbHY83t0NXFs=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcPostBuildStep.class
+SHA-256-Digest: 3r12T8XQbzuH0DJieAvI+/WSfaSG4Lj8IOTt1aG1gy4=
+
+Name: com/silabs/ss/framework/uc/core/api/upgrade/IUpgradeCatalyst.class
+SHA-256-Digest: itCGIXnN2IO2Z1qc4Oks++tlNz696v2L7nwCoHMTrOk=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ emplateFile$Builder.class
+SHA-256-Digest: Z2LrkNTsdT5+v3ImVUWIVrnbvITMMSATqgyVX1tmlck=
+
+Name: com/silabs/ss/framework/uc/core/api/IExpressionEvaluator.class
+SHA-256-Digest: v9K/pOxg3mF/EWRf3YQyd3Y+vhZxR6rcorAo3NhWAUA=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/IUcMetaKit.cl
+ ass
+SHA-256-Digest: 51+M82iNURhjfKCJe+S6OjysuLPjmFkbwWVfdFEQ/Zw=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/Overrider.class
+SHA-256-Digest: XY1cZWPhz5CJOSGJY7ig8ci0L3CcZ7Ag6b3PamDJwYM=
+
+Name: resources/sbom_jinja/cyclonedx.xml.jinja
+SHA-256-Digest: cyHW5uHG+Z5R+byKB9S1cYrr6BJdwwTSTVvpQl2B57s=
+
+Name: com/silabs/ss/framework/uc/core/api/ToolchainSetting.class
+SHA-256-Digest: bUKZwDAAPCHv2Mpdzs7RpH61Tzarj2R9DlG+8M3RZjc=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$32.clas
+ s
+SHA-256-Digest: JfriSjEcpSCEk8P+wX/K6sK/FOkm114eDL3dyd8DVWU=
+
+Name: com/silabs/ss/framework/uc/core/api/upgrade/UcUpgradeResult.class
+SHA-256-Digest: oxxCpzUkbCPteAOvJhGwzcAZa719eEKl5/PAKrsERMg=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/RecommendsIssue.class
+SHA-256-Digest: 9zzf8QIgoLpRgoHoZApjaHmXBDz+X1drmZpaJtepaIs=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ oolchainSettingOrBuilder.class
+SHA-256-Digest: FhZy3Q80j0vTxNVJ8PtOtEdzHSd8b/RmIL9hD3TUKV4=
+
+Name: com/silabs/ss/framework/uc/api/project/IUcContextSearchQuery.class
+SHA-256-Digest: RT5N6nL8rte8+GFfQq9aGf+2boGu0zvTuFyEpuMbWt8=
+
+Name: com/silabs/ss/framework/uc/core/api/gen/ProjectDataCopy.class
+SHA-256-Digest: cuD+73wcA7nYWjgANFlcU/zfu2w7PEEfvOldSjgaNvQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcp/SlcpExports.cl
+ ass
+SHA-256-Digest: RKJMaE7ogKI3aKeBbSC5V1D4XeT68q4pkhsmSZK8m+Q=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyQuickFi
+ xFactory.class
+SHA-256-Digest: L8G2Oyrx1N9JgBxYn+mGphGJQ3W/m3Nc1m2k1x+XzAg=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcBaseDocumentable.class
+SHA-256-Digest: Mvm3VNDeDHIvjsyr/1D1V50BxxIw4H2Pc27ojTHV3Ho=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/UcSetupModel.class
+SHA-256-Digest: azgfJ+cwaFe2ReiZ80oJq1A93DivEt1CH5IOxo4w1RI=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$16.clas
+ s
+SHA-256-Digest: pVAf99V/Nud/vJzTGGydKSN1eO60EVvRQfVn3bemfN0=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IComponentCustomizer.clas
+ s
+SHA-256-Digest: 5fUlD2gIbkNKAqOZB+E9mdLV+ZnGCvO0I4F/ozMV9Ls=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcThreadingGenerato
+ r$UcProjectGenerationTask.class
+SHA-256-Digest: r6lrGfGda2bNlwqc6xSC7Fx6ZV+rBKNLLA9qJlbe9D4=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/python/ComponentCha
+ nge$Action.class
+SHA-256-Digest: klqgnSiMMZT4/LNyXxCS7yA2Ne8S3bUCWs6fpWB4hkI=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$32.clas
+ s
+SHA-256-Digest: QWXFr6q0JdVCbMMSuRC1jQAuWVYoIZ9xgfZstNKtb80=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyProject
+ Api.class
+SHA-256-Digest: DLVDuZH0qlIoC0m7KtB9xlHEIB5+jBeYt1M24WeUcOg=
+
+Name: com/silabs/ss/framework/uc/internal/context/UcProjectState$Hardwar
+ eSetter.class
+SHA-256-Digest: ZpiWU3C9u7UJpmbTUy1nPSZsiS5gIDJDmCeD0HFLM5U=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcProjectMutable.class
+SHA-256-Digest: YpfPiStZR7n4yK7iNMHOZ9kR37YUK2KUZJYWe9GiTe4=
+
+Name: com/silabs/ss/framework/uc/internal/generation/workspace/NewWorksp
+ aceSaver.class
+SHA-256-Digest: Xx2awwHDX2Y51kwe2zACjFyV7+9aEcchV+M9h7xwhJw=
+
+Name: com/silabs/ss/framework/uc/core/api/projectfilter/IProjectFilters.
+ class
+SHA-256-Digest: +K8y5UV/s7L0igHd98TKmR7osOpBzMSZOL+EO+eFS1U=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/ComponentProtoUtili
+ ties.class
+SHA-256-Digest: cOcXYSci+lsgyywpn6GkdYdAgTfcBKi0rzldeA3dSYQ=
+
+Name: com/silabs/ss/framework/uc/core/api/editor/SlToolFileParser$SlPars
+ er.class
+SHA-256-Digest: TxNK1r2afLV+gafK9e+819rra/joWWvrKmxaUGd8hck=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/IResolvedHighligh
+ tHint.class
+SHA-256-Digest: poa+22du95HP6jwtshHmCu1aZ2lfOsNaKvcB7r4L4UU=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcPostBuildGenerati
+ on.class
+SHA-256-Digest: DD9q0sxSsbwV14w0WVIhyvNn1p//tr1IFjdxKgwgdDY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/backup/BackupFileUtil
+ s.class
+SHA-256-Digest: EBlzjr/8VtBT157v04lpg+04P9mCT31Kp7H2VkLGDUU=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcProjectChangeListener
+ .class
+SHA-256-Digest: FukRA7SXyutWXJt/it1fCX3PodDb1XIXCPJg2RQyeQA=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/ucmetadata/UcMetaSb
+ omUpstreamSegment.class
+SHA-256-Digest: awYE18W5M6eQkhblHgUL2qz9g8X7RpUiRnZy4XlDeHY=
+
+Name: com/silabs/ss/framework/uc/core/api/UcTemplateContribution.class
+SHA-256-Digest: 0u1crnCNaV2xGHK1uuYn5YWMV4pe3aKk9o0hWuC/Ylw=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$16.clas
+ s
+SHA-256-Digest: YeFmXDS3Ael4AR8f7ZUTK9IEx5Z9GSnO9/HT2CHQvK8=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ evice$Builder.class
+SHA-256-Digest: QFcrQIj49ckNoq/c3IU2U7sEWkXb3s1wDtALAMrS4Ps=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/UcSbomGeneratorModel$Sbom
+ Component.class
+SHA-256-Digest: aMNaMuUxU1V52buFGHjK7+E3lFk2Ovj/tI3pSLLdkEQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$4.class
+SHA-256-Digest: n4q3WtTXq6W2a7bwhh+TOGrp7TaUrT5I8bBntdNeLFE=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardware.class
+SHA-256-Digest: /H6Tf/uyJonifqV3VtCAQl/HgmmREm8yZxUMUTgZfDo=
+
+Name: com/silabs/ss/framework/uc/internal/lua3/LuaComponentId.class
+SHA-256-Digest: WKKPu6EjR27XklKG4Fo6/Nq6+twPf32nsjq83sK5BEU=
+
+Name: com/silabs/ss/framework/uc/core/api/project/gen/ConfigFileGenerate
+ Logic$UserChoice.class
+SHA-256-Digest: qF1wexTqajArUfLRQDdUDw0XPfa9ZkQpQAhj3KhO1tY=
+
+Name: com/silabs/ss/framework/uc/core/api/LibrarySystem.class
+SHA-256-Digest: R7gCAM1VXe+lCUKh6qref024lVOKPn686041V6oj3P8=
+
+Name: com/silabs/ss/framework/uc/api/generation/package-info.class
+SHA-256-Digest: COCYMdojYlQOKMB1ejWXiTyBsikeWZLr85bLHjPcWPQ=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/JavaProje
+ ctValidationApi.class
+SHA-256-Digest: 6OoeNgewxLqCwEL5/fzX+O0+bwXO5Vh23uTKkw/2CzY=
+
+Name: com/silabs/ss/framework/uc/core/internal/validate/choice/ProjectAl
+ readyValid.class
+SHA-256-Digest: n0W38DchBXj2eZvsoiCV8Aeo6nqYehoCsrIzHzuYusE=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$29.clas
+ s
+SHA-256-Digest: 0oOt4PVevonPngKp/fP8g6AsL2tX2ucrmfOwlOSDVJU=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcProjectContainer.clas
+ s
+SHA-256-Digest: fCLds0WSN8dFz0YSXaNqbxBgxAjEnjNLPkI8SFKAze8=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/undo/SelectionChunk.
+ class
+SHA-256-Digest: vXfPxml5eyLVI1t/5jac+Fd1r9bcEGSu5MAI7UYZD5U=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/UcAdditionalFramework
+ Utils$UnmangleResult.class
+SHA-256-Digest: N0eb28nA23kCssrblzHjnvDRFAF92+p1/wS8owRxUWQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/context/UcContext.class
+SHA-256-Digest: i6RpTK9oOf2CcA9cq9NSupy2Yk5vfAQftawMGfgnoTo=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$L
+ ibrary$1.class
+SHA-256-Digest: bW74I7vr4TwKeFQ89oH4s7W/4KetqSyjUJ3nnVSRHU4=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ ocOrBuilder.class
+SHA-256-Digest: 8T5G/n99nCN2l2dNw+//9//9toXxvdRvdRXGNN7Wb2w=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/ucmetadata/UcMetada
+ ta.class
+SHA-256-Digest: SLaEp/wUeYlkn14/2XkyIc0zpOM+rN8rAKRmdLkqgco=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/UcComponent.class
+SHA-256-Digest: eSxN727qRR0dLwzbbw3/vVGG4ETkEdaB2/kIgqVbKOM=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcp/ProjectCompone
+ ntReference.class
+SHA-256-Digest: f19gulq2CFbxHqq3cG51G8mQiD+x7K7KqxmJWrVnnu4=
+
+Name: com/silabs/ss/framework/uc/core/api/internal/project/gen/CmsisPint
+ oolMergeUtility.class
+SHA-256-Digest: LhoPgWhNeavoI0AZjMaZc6NEaAl03SK0qLqkubUGFb0=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/IUcMetaBoard.
+ class
+SHA-256-Digest: q+tZgUlUdUMYSId0UuOWMT/NMei8gGuHmjYgYkp3Z4k=
+
+Name: resources/json_schema/slcp_schema.json
+SHA-256-Digest: ACtRny+s05C9UlPSFjpJM/DvTbOxqob9a8KVo2zKu5M=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcApiUtils$ApiNode.cl
+ ass
+SHA-256-Digest: rMA1HFiFzQ0WaBq8KeELY/oytM1X1KuNnmIuip3GQv8=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/Customisation$CloneInfo.c
+ lass
+SHA-256-Digest: VWMNWrDj8mypFt1Xf6ECucNOzuR+3Skk/Pm0PJm4n6I=
+
+Name: com/silabs/ss/framework/uc/api/sdk/IUcSdk.class
+SHA-256-Digest: OgxdRgDozbOBsWj7QLSYQWxuyoYP/0U9IWsB/gKTo10=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/JavaProje
+ ctUpgradeApi.class
+SHA-256-Digest: j2GDPhW56AIpJ4cECjAVcpDtEGTBLxFUFVSZCiTQrEk=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardwareDelta.
+ class
+SHA-256-Digest: 4OMrVwAO1LqLTaPZxAbU0rw+zlwtsTGKp71+lyVTwcg=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/sdk/ValidationType.cl
+ ass
+SHA-256-Digest: kQLVF5w+XIHJ/fsaUyCAHBZx0DAMfLhqBQd3ADD3aH4=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/apack/AdapterP
+ ackAcProvider.class
+SHA-256-Digest: r3Qowrykd0UnpEuJhWVoI7EMmjYsV5ovID989mDdqiE=
+
+Name: com/silabs/ss/framework/uc/core/api/sdkextension/IUcSdkExtensionId
+ .class
+SHA-256-Digest: A4rirqqzDweEnyMSqcIhWVcbyJyBNgsbWCXp1Vp/XQ4=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/python/ConfigChange
+ $ValueChange.class
+SHA-256-Digest: u8/lAthY0nO9QITs12iDP7hrDLyy2MOFcr/856WDicY=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ ynamicValue$ValueType$1.class
+SHA-256-Digest: F9ZBmDjokoL5/nlCWZ3wfRAA4VsyqmnL+EsCaMhxaTE=
+
+Name: com/silabs/ss/framework/uc/internal/project/options/UcToolOptions$
+ CCompiler.class
+SHA-256-Digest: OjMaNQ7eQR8IMBdoNjaL1BWvu7UB9FR/WabMyE1BUeQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slcu/Slc
+ uParser$ConfigurationUpgradeDeserializer.class
+SHA-256-Digest: KHhClOaaMEOQKyAmC3Dxo22kZBh65dBMzXkqBf/AMlI=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/Customisation.class
+SHA-256-Digest: xFJqbWqzPQfIY2vz5mY+XpgTLdeEwUhzqls85AEA1iY=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/choice/IProjectAlread
+ yValid.class
+SHA-256-Digest: AsEouVB5yGAmxKgYv9adVS08x+8XxGSONq7//PyT8fY=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcComponentConfiguration
+ .class
+SHA-256-Digest: R1Vi1b46KjjJFNx6Wldzce7XVrkSMC0PBd27pZ0J7F0=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onditionOrBuilder.class
+SHA-256-Digest: wPG4AJ0q1bf0shkSZGYum3nHAfAZUiccqpPCuiP9j20=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcComponent.class
+SHA-256-Digest: kKZWN4FJjEpg47fpC9nUVNjcgxOiCmkFeFHiCc6Dycg=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcContextManager$
+ SingletonHolder.class
+SHA-256-Digest: +9JDM/CFIHE1lMKCLuaqNajmjGcBSUtJFyrFx9vlH8o=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$24.clas
+ s
+SHA-256-Digest: aexZdR+dErYnFJkqHEZfOl1DgCEqo83sFol+EdtHnVo=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IMetaFileWriter.class
+SHA-256-Digest: rBAAkUMe/yYScXl3/IZwSqH8VE9U0051AHZcL0dwHfY=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyQuickFi
+ x.class
+SHA-256-Digest: ohkeR9kpDOb1TZwIgQtJ/O+kjSRsuJLNnRdd0J4QbaQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$R
+ esolvedInclude$Builder.class
+SHA-256-Digest: 3pJjTcgvuUC1OqmLLfnlCTZFkxaFN/6wZA/7rfmfyko=
+
+Name: com/silabs/ss/framework/uc/internal/generation/package-info.class
+SHA-256-Digest: QXVI0/gZNfMOISnPiWU4qJKCHJAXwjMOh50V9BPygdI=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/SetupExtensionId.class
+SHA-256-Digest: /c4ASoIecSVLJYzbwbMTWaq++eeCIwnbDt6tWU4CqMQ=
+
+Name: com/silabs/ss/framework/uc/core/api/internal/project/gen/CmsisPint
+ oolMergeUtility$RequirementBlock.class
+SHA-256-Digest: hRKyBe3jVjKp+bWvw1wZ4DLljQ9BmQ6NCE5RARp/9BE=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SdkParser$1.cla
+ ss
+SHA-256-Digest: RvkSaP3XKC+kGwZxJP/2vMIoM+ip1VG+5gM4KJ0WXlg=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyProject
+ Upgrade.class
+SHA-256-Digest: hW72/uTInAQI8aIos3q5ME34HiBEO4HNAeNd3HyhA7Y=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$5.class
+SHA-256-Digest: pL+5q0seImlA2120kwfTcTBbQ30eF+ieb4EK2cyy6KA=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/choice/INoKnownChoice
+ .class
+SHA-256-Digest: UJ1YogrcvUZ9bvibuRRwRSz3jGTVZKZyivZonysPpv4=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcApiUtils$CheckCondi
+ tionals.class
+SHA-256-Digest: QOvP9XJNvr3d+Dr7Vb5ePnS4jbNTghPSlRuAVGgkeRI=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ bom$Builder.class
+SHA-256-Digest: M4MOt8eJW2TXPau+MW822fDrsj+xGmyW4QgLosgJLNU=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/CycloneDxJsonOutput$Cyclo
+ neDxJsonAuthor.class
+SHA-256-Digest: KDqLQecpKcLiX7Gox1Ip+9y4vcB3pslWxEZfLDdH2vQ=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/ComponentId.class
+SHA-256-Digest: bO551pAFsELPVqDfiIO2RMq6I1PjPriRdA/I5yx9SIA=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcu/IScriptedComponentU
+ pgrade.class
+SHA-256-Digest: Y6w7b/5lMePcNuAm0Sef9nAFkd5sXNbDchHyM4G/SDQ=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/ApiChoice.class
+SHA-256-Digest: yCe8biJ/GJOPAxY6f4wszDHnojUs2Mduvik5P/5jILk=
+
+Name: com/silabs/ss/framework/uc/core/api/project/gen/TransferTypeManage
+ r$TransferTypeProviderImpl.class
+SHA-256-Digest: mnp7YLi+1qcoRPQdd3atZWyEshpU73XU6XL+Qugw0+o=
+
+Name: com/silabs/ss/framework/uc/core/internal/upgrade/UcUpgradeContext.
+ class
+SHA-256-Digest: 96/u3R4f1YLNVJX1PWsSHVZ4bLVPyGE8jIb6UcM41d8=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/SingleComponentInsta
+ nceData.class
+SHA-256-Digest: igVFzyrgMEJRub130YitbGZGKjTeEhxUaKwlbwVPBzM=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/PersistWarningEnu
+ m.class
+SHA-256-Digest: sKTFuyUCRXIZBjjmCpLCUd6SZhN/OBrfc0dABKDRaJI=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/package-info.clas
+ s
+SHA-256-Digest: a1QUTeDHTYCDRhRbt0knKM9oLxLueMJy+S6gPeZgobc=
+
+Name: com/silabs/ss/framework/uc/api/generation/UcGeneration.class
+SHA-256-Digest: tn1RoRdfk5n8FcMULSOHkfEhjgIqIBS0I0lrx4TpjRs=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/IUcMetaPintoo
+ l.class
+SHA-256-Digest: A/voqoKtVXnbicAGLsI2KGRVh2N9Kc/7VGwPcy7IirM=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/Identity
+ ErrorInterpreter.class
+SHA-256-Digest: ytUVzqPslYhB+7PY9/MprChbhYtNOzH3+xXuHbFAXaM=
+
+Name: com/silabs/ss/framework/uc/core/internal/hack/autoselect/scarborou
+ ghfair/ScarboroughFair.class
+SHA-256-Digest: 11aTFM7JY3FBlowzX4+9z4PvJ3SPoCPXVuOzfuQejcI=
+
+Name: com/silabs/ss/framework/uc/internal/generation/workspace/UcWorkspa
+ ceTranslator.class
+SHA-256-Digest: +F+44u4XeWXzQbnZuzPEMBFvefHXnGR+C0psTmZO8PU=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ ache.class
+SHA-256-Digest: XFhyxRtLji2p6qv110CtHOuClbIZMIujx1vNKY4cKKQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$9.class
+SHA-256-Digest: DSLBKQjMdV0+/TNE8gjVEGr2w52kizXlIovavHwsmM8=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/undo/ChunkGroup.clas
+ s
+SHA-256-Digest: Uo1OksCtZGiarNhrWu2fNv+fB+bST1eBY2WlIUPoqVQ=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/IUcMetaDevice
+ MemorySegment.class
+SHA-256-Digest: DfA3Lo2SFnCusIQZN3LoO7QmSfAADBn3fv+CoT4aT5I=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/component_cache.pro
+ to
+SHA-256-Digest: 5v0TeXP5I3YKLQKXoRU5/UMCCcZ5l7Ksc9aFx6y2YFc=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/sdk/SbomComponentVali
+ dation$SbomReference.class
+SHA-256-Digest: oZTM22XH0T+ES+srTrXQZkAS0V90dWv22xj7IzJN24c=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcw/IUcWorkspaceMutable
+ .class
+SHA-256-Digest: RuPP43hwetPoGD4xpbHdxvtcGHUQ1RsDtYJ/n+8xVX0=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcComponentExtension.cla
+ ss
+SHA-256-Digest: u6tfz1AdAk3I46h3TpmAST81RMrhYK7cHI/zYJOw19U=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/choice/IExclusivityCh
+ oice.class
+SHA-256-Digest: fmcxyFbF6Jc9RcDmyEBYY4VgQSzeYG0vbAuFU+Vm/N8=
+
+Name: com/silabs/ss/framework/uc/internal/project/setup/UcDefaultGenerat
+ or.class
+SHA-256-Digest: 4nJy33G1mTRg82QAIfcIdMkX80zpw3oP4MIDGAdto7k=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey.class
+SHA-256-Digest: s6ILEXfUOSJjKKj6+PGVVcEyD3h6GA6+pwVagSlQVDQ=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/UcSbomGeneratorModel$Sbom
+ Data.class
+SHA-256-Digest: bAn1IMd0Mq5MNc4SZ4tr3eBkiFCqIbJRAVwxpwkM7d8=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcThreadingGenerato
+ r$UcSetupGeneratorTask.class
+SHA-256-Digest: ZqpmSzrYNBZ9QH8U7EceS1ea73I/wTWxzQidgRrpk9U=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$28.clas
+ s
+SHA-256-Digest: eqy3AM0cdz6Ckz72HCO9HCVlhnJMjrT4SxjozzAp2W8=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcMappedToolOption.clas
+ s
+SHA-256-Digest: 7x6qwR8L8Fy6YA0peCjpbD5jjbnuKeXqyRYSIe5UCoc=
+
+Name: com/silabs/ss/framework/uc/core/internal/meta/CmsisAnnotatedFile.c
+ lass
+SHA-256-Digest: qIKJ6kL7Ur0PosRR6jwGYOf4x8KoKuLUieoXqI/0Zi4=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/CommonParseAlgorith
+ ms$UiHintSource.class
+SHA-256-Digest: IZmvloC/1Wxgu5+oj/F5ye7q+uCnUSwBnn2rKp7lQ/c=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcu/IUpgradeRule.class
+SHA-256-Digest: xGDagkHB/dEO8bJrjQME0DDWdNJKINBvmC5Vh2hNYxY=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onflicts$1.class
+SHA-256-Digest: UHp+t12xirmLh7f30XvTZBN0XOwM5VG5hjva0O/uerY=
+
+Name: script/py_runner.py
+SHA-256-Digest: TC9FSuWc2qScM1dS48j7DollG4zioQnUwTuD7rHvdzw=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcAdditionalFramework.class
+SHA-256-Digest: QvAT0dxSdDSus7w8QX93uH7i4GUBkzVaboQbgWnB8iQ=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcExtensionHolder.class
+SHA-256-Digest: n8EAcfg1D0TT6K9JLVniZrxbLJXMeW4y2k6bIP7I9yQ=
+
+Name: com/silabs/ss/framework/uc/core/api/upgrade/ProjectUpgraderSetting
+ sBuilder.class
+SHA-256-Digest: c4JuROKJ0DuirjMZ6GljcL9yAnk1cglxA7fnbymcTjA=
+
+Name: com/silabs/ss/framework/uc/core/api/exception/UcException.class
+SHA-256-Digest: ttH+7AL/gycrZloLVBUs3CjquTzs50ljqHurWzO9KlQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ ynamicValueOrBuilder.class
+SHA-256-Digest: AmPaU4wBV+aYOe6Ik53CdwCrMIYyDEq9xA8K6BfHhVM=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcp/IProjectComponentRe
+ ference.class
+SHA-256-Digest: N7Wh3cIDlNfvm365CNmZwggMkqRnVw0JQmn56ae0WDA=
+
+Name: com/silabs/ss/framework/uc/core/internal/validate/choice/Exclusivi
+ tyChoice.class
+SHA-256-Digest: 89bebR0c+yJDsb9atSqsCs/FwxxwKvYEHdKIZZxzKlE=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/choice/IApiValidation
+ IssueChoice$SealedInstances.class
+SHA-256-Digest: vRC8/27MNCm867hb3JHPlyNx3HvxKRxKhp2ooRrUzjg=
+
+Name: com/silabs/ss/framework/uc/core/api/editor/EditorMetadataStoreExce
+ ption.class
+SHA-256-Digest: PX11hM5s7DyzWhzALSe81+VYD48Z/DioTtywU9zb21E=
+
+Name: com/silabs/ss/framework/uc/api/project/UcProjectUtils.class
+SHA-256-Digest: 38qYN0vM/1hCQs9fZWmklIwvdKJHXdOuOmmV4L+a/lQ=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IOverrideable.class
+SHA-256-Digest: 8WiY2XTp35fLzktxLYfYTbpZhxL9hPFzgD2N12PxAmM=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/ucmetadata/package-
+ info.class
+SHA-256-Digest: FSWay4VM06RLbQ1FHpZREhsghDhzAUuEeZtzho0OVGA=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/Recommendati
+ onSource.class
+SHA-256-Digest: VmPLesaDqkMbb6Is//7o3ByR21rc3MFv7oeZUCXQJ2M=
+
+Name: com/silabs/ss/framework/uc/core/internal/upgrade/ProjectUpgraderIn
+ ternal.class
+SHA-256-Digest: 5uGHLJM5FXWe7XcIVR2+m1oTUUgloJ1HuWq0V8w+Ss0=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/ucmetadata/UcMetaBo
+ ard.class
+SHA-256-Digest: YEgfPjMHf6Ka2TIxAaB6Ul1oAC6zwltWCuyEmDp4WQ4=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcComponentContainerMuta
+ ble.class
+SHA-256-Digest: DKm5642hUOI9n2Yap/qn0vNmEqFAHtiVSlSRvtN9ZC0=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/SelectionCho
+ ice.class
+SHA-256-Digest: YG4T3J4+uJD0eHkDss//WZLYZvBvAcmCx+ZbHflR2JM=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ emplateContributionOrBuilder.class
+SHA-256-Digest: yQKIxs7ZsQJZBq3o2NZA5pVTSuJaUv8HEIGFIwAkuHw=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ oolchainSetting.class
+SHA-256-Digest: wWWmGc1D1Sn6QLk2DrMr/jRpwsMmQgWxMw8NC+1pc4k=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcApiValidator$UcApiV
+ alidatorImpl.class
+SHA-256-Digest: /Ri2gOOSL8hgefADX+R1OayMtM9if520sBTNOWaJCiY=
+
+Name: com/silabs/ss/framework/uc/internal/validator/PythonScriptValidati
+ onRunner.class
+SHA-256-Digest: HBs4ND2HoiJGfZBhw5zHXOhPw6tskpENId/ouJyRjO4=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/validate/ToolchainApi
+ CalculationMutable$AffectedComponentMutable.class
+SHA-256-Digest: hoPC5PFoUurYUtA6TKGDzWd7yzASaC8DX8DLE0/ELD4=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ ourceEntry$Builder.class
+SHA-256-Digest: QczYQBnujpy1SI528pLzPpOEGeqmXW4Crk9iv0Of+yo=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcw/ISlcwRegistryMutabl
+ e.class
+SHA-256-Digest: lfuMmgJSP1Pi/tk/86Usl48U4xea5C9bCJWDvKK+RKI=
+
+Name: com/silabs/ss/framework/uc/internal/project/options/package-info.c
+ lass
+SHA-256-Digest: XWhKU7OFbHdfhJJngYYIffwxCjqxDEthGm62D4E0uY0=
+
+Name: resources/json_schema/slcu_schema.json
+SHA-256-Digest: rSTbG/3T+iFhKPPLpT6bqdqFLTbArqyjY9akL8BseU0=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ emplateFileOrBuilder.class
+SHA-256-Digest: +d0Aq+pJEgpKmA0Vv0jhmqSdu802dGhnCqe+bXAoP1I=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/PersistedCliConfi
+ g.class
+SHA-256-Digest: zbiVgTa08uQst0pdVNt+NVxw45WrQIAoWUHJQR/l45o=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyConfigu
+ rableProjectRef.class
+SHA-256-Digest: GOq+WGLvd+0sZasBD+frpGMq0xryNlG9iDY64Cj7KLw=
+
+Name: com/silabs/ss/framework/uc/core/api/project/gen/TransferTypeProvid
+ er.class
+SHA-256-Digest: JLuX+y1+pk0sC1kCy4vtu5qigod8ULqTF8ik9CotqSM=
+
+Name: com/silabs/ss/framework/uc/core/internal/toolchainsettings/UcToolS
+ ettingsContainer$UcToolSettingsContainerBuilder.class
+SHA-256-Digest: W9OEKbHIEf4WHL7H8yGWCaMDp5qMfumq6McpaaUeBuQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/upgrade/IUcScriptUpgradeR
+ unner.class
+SHA-256-Digest: JRd+EPp1yG6rK1Vogxla7qbP/Tk0F2t+yJvY/2JOquE=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcu/IUpgradeRuleCo
+ llection.class
+SHA-256-Digest: +R3IFN6tLmHafhJJLpDoPE9B4gi9b88gqDwWFf+5qbI=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$29.clas
+ s
+SHA-256-Digest: kdkGiwsf4OV1cJofFvRLFb8GAbGKET55fZENmPgA2Hs=
+
+Name: com/silabs/ss/framework/uc/internal/api/project/setup/ScriptType$C
+ onfigUpgrade.class
+SHA-256-Digest: PuyGRH5PE5KoIkW/ejyQll92OWAHYZ2B5iqJYHquqh8=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/SpdxJsonOutput$SpdxCreati
+ onInfo.class
+SHA-256-Digest: eCUbKOQaHui9ZT+2wIdekOqt+QVz4E1cDywdwLlb6bU=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcu/DeclarativeCon
+ figRule.class
+SHA-256-Digest: T8wKwz7JSynUBJh/jOoLm7kTEvTJRHpOd9JoVPrQwZQ=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/IUcMetaSbomUp
+ streamSegment.class
+SHA-256-Digest: GrhRNxaGv0lLNc/a8k7F8XsWpdH3GHk6yYyX/IVjI2M=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$33.clas
+ s
+SHA-256-Digest: HXM1e4y2hKxyprew9G06s1v/SuHD8j6k63SWrC4TQcg=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ emplateFile.class
+SHA-256-Digest: y21bx5Hx1dRo/cW25fhtSY0Fp/SZKWFgjpYA98460r4=
+
+Name: com/silabs/ss/framework/uc/internal/project/options/UcToolOptions$
+ Linker.class
+SHA-256-Digest: Ssp33iv3gsv7p+7Ym954LaDdweh3GF0Dh44HDB9qyvc=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$O
+ verrider$Builder.class
+SHA-256-Digest: gyXL6P9mfQMULkIsGarsGdd1n8FEOGQtR73sKuaa9eo=
+
+Name: com/silabs/ss/framework/uc/internal/context/UcProjectState.class
+SHA-256-Digest: IBsa/aGkpruOQE0MqpzAaLKj+RQIO6JHOTxIuyfVKfM=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcApiUtils$CallApiExp
+ ression.class
+SHA-256-Digest: KoQBvG3MYy6qWjusyr7U5WWVGbfXY1B5WjMPPTJ6l34=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/projectfilter/Project
+ Filters.class
+SHA-256-Digest: WNXU1b/1g0p5oUgnjlQcPqwx0Y9ynpjYKzO2W25QKFE=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcThreadedGeneratio
+ nUtils$UcThreadedGenerationTask.class
+SHA-256-Digest: pcmmoME2urk45xhZ94NpGrt5FavmsKR0z/PuXm0sNSw=
+
+Name: com/silabs/ss/framework/uc/core/api/ImmutableConditional.class
+SHA-256-Digest: O5uEbcqMDFOb68GyozyFxJw7KyzrHAvOgCmcmLAOdWI=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$E
+ ntry$1.class
+SHA-256-Digest: G5sqxvZam7VS1bRyOlVRXWTw0ghp6ImToGinQ/jY/LY=
+
+Name: com/silabs/ss/framework/uc/core/api/exception/MultiExceptionContai
+ ner.class
+SHA-256-Digest: Ywis0Ik0YGlbKyiV5SbjdBHj8ulj8zBDw/cEiCzHBKs=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/CycloneDxJsonOutput$Cyclo
+ neDxJsonSbom.class
+SHA-256-Digest: qf4vgAMmlTqNF82HC4VsoFCY+cG1ayNPd37/Xp9XDd8=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/UcWorkspaceInc
+ ludedProjectSlcw.class
+SHA-256-Digest: LB0FQZKhRXrAWvSD1uTZc9K2tlbJ4Gs3v32BAaRVVyE=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/ucmetadata/UcMetaKi
+ t.class
+SHA-256-Digest: ffCNtnvfrbge3sO3RYIewngoiwAsNOhZSFcKm9XJwjQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/apack/AdapterP
+ ackAcData.class
+SHA-256-Digest: 0LM5sI2Gnb2IZL75Fw5V8OD/YW+c5PwtIcBYxjaBCwk=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onflicts.class
+SHA-256-Digest: /dE5T5jgvUNFxe9xfJUsR06R5AXxJfCeMceZUubbN9g=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/IUcProjectState.
+ class
+SHA-256-Digest: mNKj6rDoW+Slf+QU0u7hBsF8fCiKNtgZV2VxdVED/Og=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/RecommendedInstance.class
+SHA-256-Digest: emIpCfoYNr0Q8nxztf6aXYr7Dok/sBEIrzpSAAqsFqA=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/SelectionMeta.class
+SHA-256-Digest: a+lWBO0wydhU/B6ARZLYB0l3maSWunjXITpaRLnoxaE=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ bom$1.class
+SHA-256-Digest: RUpUVuQBu0uQllaRRWgzcVgmom80P/yvH86P2Pr9ick=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/UcInstancedComponent.clas
+ s
+SHA-256-Digest: hrTmmuKPNdnIUT9XBO6J1alosl3FS0lwwhwCluYlco0=
+
+Name: com/silabs/ss/framework/uc/internal/project/options/UcToolOptions$
+ GeneralCompiler.class
+SHA-256-Digest: q1t/SUVUAo/lcG2fuCXXYYNLzcrgOSn52mOFRDiAAgg=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/SingleComponentInsta
+ nceData$DefaultState.class
+SHA-256-Digest: qSHI4AxQ21L34uSXCkuEK4U11maSA2eWzN/24CKKDTc=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ emorySegment.class
+SHA-256-Digest: w/glwEOp5YsDokIK8/ItWWVLezM6hsK6Ib1WzhXvjrU=
+
+Name: com/silabs/ss/framework/uc/core/api/Condition.class
+SHA-256-Digest: 5upk6KdI50/Urt5ftGgB7FtV8NmaM/mD/K8FSyfbVvc=
+
+Name: com/silabs/ss/framework/uc/api/sdk/package-info.class
+SHA-256-Digest: UZbE1TF81kJLCsUGuBgaD+8CD5Gorm2zHdTZpUYZbM0=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/JavaTarge
+ tApi.class
+SHA-256-Digest: IkLSqt5+Zr3iOhxkQdfAsi69qXmjKWAlBwHRtYRXokU=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/ParseTask.class
+SHA-256-Digest: HxtC7MvIZF/BUdpdqLmTCG1RvmCvaLV/ZkzXBIW2MsM=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IssueMissingInstances.cla
+ ss
+SHA-256-Digest: GjnU4NhnMVvnOYM2xfNh9t832Nv1DxJiG9UOj7euNtk=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcBackingStore.class
+SHA-256-Digest: wS4uZS++8Pqc46q8cSbNdtE4HEYyhH1NlmbdcmVc3bc=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/UcJsonSc
+ hemaUtils.class
+SHA-256-Digest: FCMNQpnPkjJsBSDiyBQUdC89NJscBaEPHXfGPmY4Iy4=
+
+Name: com/silabs/ss/framework/uc/internal/lua3/validator/LuaTarget.class
+SHA-256-Digest: Xx983D6WJUMb16QTxcIH6mZzcaTcH9WarSvhJCHyjig=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardware$BaseH
+ ardwareMapper.class
+SHA-256-Digest: jbEMD8jQw237ZV6TYetM4+y27gFGnmCApRaNc2mSTZo=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/SetupId.class
+SHA-256-Digest: Ak7rzfCXBzHnPdEDTOFYB9JqNjVw9Cg0Kjc6KrX85g4=
+
+Name: com/silabs/ss/framework/uc/core/api/context/UcGenerationStatus$UcG
+ enerationLogger.class
+SHA-256-Digest: LSrHRvGsRZVn1Ad91U+a5d8KGn4sGiyNbakf54FzAaQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/validate/UcApiUtilsIn
+ ternal.class
+SHA-256-Digest: /+lXHjfO4S1+OrefCo2h5K+nCcYOBpkLA1gQQ1WVfjs=
+
+Name: com/silabs/ss/framework/uc/core/internal/upgrade/UcProjectUpgradeS
+ napshot.class
+SHA-256-Digest: i/ssx/4Js0RtNtLNkEgnMq5QUJINolxyEnu3H4VG030=
+
+Name: com/silabs/ss/framework/uc/core/api/project/gen/TransferConfigFile
+ Exception.class
+SHA-256-Digest: s8BWD/OXYAP0xVNVVZO/xCQOiwb9B2g/JSF8u8jxtbY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/log/UcCoreLogger$UcUn
+ ifiedLogger.class
+SHA-256-Digest: ofY5Qr7ni8kLThdTUXe/GaxwkZeM/UzFFG4psTCksV0=
+
+Name: plugin.xml
+SHA-256-Digest: htCXFS51TByp3Hfx6tEiYG3n4BJzy8EpOmAs0OTecs4=
+
+Name: com/silabs/ss/framework/uc/api/sdk/IUcSdkDescriptor.class
+SHA-256-Digest: QdwR10E0H6tGdFmKslMnbSKPCENSAnu2RLjJbujZ+RY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$6.class
+SHA-256-Digest: z+qVEdwykhkTFpwYfw0L/HzBPbaATGKQBfGygZLe1Rs=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcu/UpgradeRule.cl
+ ass
+SHA-256-Digest: Ps1RxDtGF6fVttcW/4i2esjrwCB3j8BYBPJgZcoMoBo=
+
+Name: com/silabs/ss/framework/uc/api/validate/ScriptValidation.class
+SHA-256-Digest: atojP/ShruNYu9KAlVCLQf7N24UbD9lrU9jLEAhKQ1g=
+
+Name: com/silabs/ss/framework/uc/api/python/validator/ConfigValidationIs
+ sue$Severity.class
+SHA-256-Digest: cGCAWydeq2zzAon7bJO0U3bOdUv3lzFaHYvoKyJfuZw=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcProject.class
+SHA-256-Digest: CNXMTcpFwklBS0w7Zfe+l9ZgzhrrfN3rdscHRVJpCO8=
+
+Name: com/silabs/ss/framework/uc/api/project/IContextCreationIssue$Issue
+ Type.class
+SHA-256-Digest: r65i13HFGAeJ2r75fbCXXpUD+pGF/T4GfsjbaJ5Bl8I=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ ourceOrBuilder.class
+SHA-256-Digest: BnGkfpY9J+HAJZ+rnSw6FsXD76Tu+3vZSrrf9cd4kS0=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcProject.class
+SHA-256-Digest: IGzQHifVWIRv0huEGsTEv5aeZ1OfT961XAFIQjU1nbQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ bom.class
+SHA-256-Digest: 16VVnRkyzIRH4ocWTGvjjRKtszyVNgWzoCA/hyAQ3zE=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/ucmetadata/UcMetaDe
+ viceMemorySegment.class
+SHA-256-Digest: mw0HX4jq10kLXD4EG69uLkl2iMZHFROsG49OTF4fKCU=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ oolchainOrBuilder.class
+SHA-256-Digest: p7XzBAusAxX1uAigyvSMv6URxhsQ6i2kQBZv0SEVBiU=
+
+Name: com/silabs/ss/framework/uc/internal/project/ProjectSaveResult.clas
+ s
+SHA-256-Digest: gDssvF4E4wswSZKE3PQfBndwUJE60fajSFXcDRKotUM=
+
+Name: com/silabs/ss/framework/uc/internal/project/setup/UcProjectModelTr
+ anslator.class
+SHA-256-Digest: O3z2qs1JTxJG6hUPUCplDX05i/weGooTPQ7/3iIK+Kw=
+
+Name: com/silabs/ss/framework/uc/core/internal/hack/autoselect/scarborou
+ ghfair/SolutionTemplate.class
+SHA-256-Digest: YlQcae2JH1J2aUcv54nDXObL0iPmaUGAeExZ7Q61egs=
+
+Name: com/silabs/ss/framework/uc/core/api/upgrade/UcUpgradeResult$Status
+ .class
+SHA-256-Digest: SgQmkLk+6isKi5BLnoK8bOW/63s2X44v75cLECYG2jo=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/solution/Res
+ olutionIndirect.class
+SHA-256-Digest: yr34rrpAQfYhb8K4l/xUNpZDOzYj/U5YSj8CURlibuk=
+
+Name: com/silabs/ss/framework/uc/api/python/validator/PyTarget$TargetTyp
+ e.class
+SHA-256-Digest: /sxahPtEQChL8wVLt/11z3xZwL3qENEq4s+mPg1Qxw8=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/validate/Dependency.c
+ lass
+SHA-256-Digest: QZ8Ya/ZNxfDyiCdLyfVTylAJwf2BNzx+CnEiayu8wL4=
+
+Name: com/silabs/ss/framework/uc/core/api/gen/IUcGenerationContext$IUcCo
+ mpatibilityKey.class
+SHA-256-Digest: 2MxlVHQ+YkoeRtqYRWsdKIp/r3Itt66kQvYrLd7fn4w=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$5.class
+SHA-256-Digest: 5uJMEHu2QBUK+l53pFprdOrDMPKnGjYVZ8jSWcTV/dI=
+
+Name: com/silabs/ss/framework/uc/internal/project/setup/SlcToolchainSett
+ ings$SlcToolchainOptionSet.class
+SHA-256-Digest: C5G8vLWr/1LBFct5LgH2W1oMNbkMI8XWYxpk29S305c=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ etadata$Builder.class
+SHA-256-Digest: CcDECJrh/K2PxP2ESiDBYRV+oYXsjHbOvOp18XSrRHY=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onfigFileOverrider$Builder.class
+SHA-256-Digest: N2ItFf9P2dy19Tj7To1USFlQyz1j21AyQMAHl7NOpA4=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/PersistEntryStrin
+ g.class
+SHA-256-Digest: 5NDpCTkcZUfCfOiRUYbENMXsod+huhjXr/VVXHAeAUQ=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcFramework.class
+SHA-256-Digest: MmTM0FjCNxj65c5zju9tzayc8o50XWkXjwEcxF63ZBs=
+
+Name: com/silabs/ss/framework/uc/core/api/gen/IUcProjectGenerator.class
+SHA-256-Digest: zROfBqTIKe5ja72joBPVDOH57KtdCHfCTJWhdRmy1qk=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/package-info.c
+ lass
+SHA-256-Digest: /BaED4TszvgA8uOJ30qSc9hd1QhfuEfbZLpqnuSqchg=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/UcSdkProvider.class
+SHA-256-Digest: lHr7TKnQriVPdPtP3wRH4HXWPvPBUj5PwsvLa6oEsh8=
+
+Name: com/silabs/ss/framework/uc/core/api/context/UcGenerationStatus.cla
+ ss
+SHA-256-Digest: aLsj12LseODrbWucqkG8Mk0eL8NC7Y58HsGnal22SwQ=
+
+Name: com/silabs/ss/framework/uc/core/api/FrameworkId.class
+SHA-256-Digest: T2auTGNi2h8SQ6Ivs2sbEo5VUkVQZOLDlUcvzbFlQoA=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slpb/UcPostBuildCon
+ stantSlpb.class
+SHA-256-Digest: cmZgOXQA+ksg4M7DxIcZzTD0MiqR1AJ5t70pn+jiSVw=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/sdk/UcSdkValidationUt
+ ils.class
+SHA-256-Digest: vl1wo2MIlAhULCfzdoi/sfMCZ6HHo6ElrOBSoGKT0bY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$25.clas
+ s
+SHA-256-Digest: VBOlHpxp8MOgFbS3t3al26AE/a3ppw/GWDiohC68D84=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onfigFile.class
+SHA-256-Digest: ueDu+mziBU6jAEDZd/39TCqg+T1JaJcRUYCTOsx6rkc=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/IUcApiValidator.class
+SHA-256-Digest: pLW/LrEAZrAGiYncMmEf7dUmmN2KtMZucshPVYuhrFM=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ oc.class
+SHA-256-Digest: J6RUkkLSvA6aOzLs3fsWQGzwko83kgh43TZrU/mrjZo=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/RichProjectFile.c
+ lass
+SHA-256-Digest: Y15502O47ok/7Gc6TPWr1fJ/76aNjDeTrvjE7zD6Mds=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$1.class
+SHA-256-Digest: drQ1BK1Edd7BVCHV0sIuopl+BxWj1JW8cOaArIke5Ss=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcu/ConfigurationD
+ ualUpgradeRule.class
+SHA-256-Digest: Vp2CEjX2wpGIGdI/NTkZCzsGPD5cOlPPalgXgYJl1e0=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/DeltaSet.class
+SHA-256-Digest: l6Xnr1H7rkn4QcftMBvKAMvg42MKsVc34dAHuf0DzRs=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$O
+ verrider.class
+SHA-256-Digest: d71fnh7bVM3fJZdgZGH5MZpHd1pqnshMZn/ZYRhgYJU=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$R
+ esolvedInclude.class
+SHA-256-Digest: TzVtcjrIgDNg/y7Rl4QQ6qNX8BUiXegva5W/vEF8Gew=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/CycloneDxJsonOutput$Cyclo
+ neDxJsonMetadata.class
+SHA-256-Digest: 44O8b9ubd1CRjmCucyfGrgeprVfK/zSczcb0HzpUYR0=
+
+Name: com/silabs/ss/framework/uc/core/api/tree/TreeMutable.class
+SHA-256-Digest: 8t+yLBfnDv3Crz4ufjRRDA6bgDefd2TqzbvhVfdhxQA=
+
+Name: com/silabs/ss/framework/uc/internal/lua3/validator/LuaQuickFix.cla
+ ss
+SHA-256-Digest: shvVXyXTtRV1sKtI0gXnG7JPKX16aF1B3cRoDzUgQDA=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/DefineParser$N
+ ormal.class
+SHA-256-Digest: UQF50YmBzrShUH7tNVOsZytYPTo6IgmgD1C9cqlAgUA=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcPostBuildParameter.cl
+ ass
+SHA-256-Digest: 6djTZ0xBW3nCJVWMAt+1fnHOKNs6nKC53EMf6Nz5Gjk=
+
+Name: com/silabs/ss/framework/uc/core/api/project/gen/TransferType.class
+SHA-256-Digest: bOSz6t7xyGM/NhapMItSU1KOoydOpp5e4c0zKhIVeyE=
+
+Name: com/silabs/ss/framework/uc/core/api/gen/GenerationCustomisation.cl
+ ass
+SHA-256-Digest: WGY8klm3mIFASWdsh5jol3dT2yZZEUaRdxAK2hNTOPs=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slpb/IUcPostBuildMutable
+ .class
+SHA-256-Digest: kuyTZZNiSvii6KojdueX5blOQtv5rWkXiQe3Cmm1gR0=
+
+Name: com/silabs/ss/framework/uc/core/internal/hack/autoselect/scarborou
+ ghfair/ScarboroughFairState$RequirementLock.class
+SHA-256-Digest: FcchCfheP3yo/OZ0l9COC1gjANCLSZS7552us5A9mzI=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$R
+ ecommended$1.class
+SHA-256-Digest: 41bbfoGFkV6zUkIaeZR2iWlntPm5y2Sjx0zdR9CEwI0=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardware$Toolc
+ hainMapper.class
+SHA-256-Digest: TL9JxV8cnwALR7DUCCZysP11CoFAh/Syxkx0Ws2ND5U=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/CommonParseAlgorith
+ ms.class
+SHA-256-Digest: /4AsMKEOqoiK2gK1mdMtrZpPwqsV17jRJNavub1B6cY=
+
+Name: com/silabs/ss/framework/uc/internal/lua3/validator/package-info.cl
+ ass
+SHA-256-Digest: Kse0x6zKWnsWEWI+4uT4gLJGkmQ0gxfKWjQy0Dmt1ik=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/ApiValidationIssue.cl
+ ass
+SHA-256-Digest: eZSDYz/9gDU8JmzvjRFBoTraa3iLOzhAqXAWN5wUpSo=
+
+Name: com/silabs/ss/framework/uc/api/cli/package-info.class
+SHA-256-Digest: oaqtF1PoLL7dzNSRBNTTLxdpyhvjMysVaz5cZXOO/JQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$20.clas
+ s
+SHA-256-Digest: LBzFoon2EcLGJkQfk7yDKP9BkOX7Nc4EtqcUQrSgmd0=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IUcSetupProvider.class
+SHA-256-Digest: YfCPdYQvbcgdiH8IFYwRVMHjJ6LBO1mAdn2IHuuV05s=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/SlcpWriter.class
+SHA-256-Digest: +7/OOhvLwjeFl04yKIIRWT6HZHZzl99VbsUS6199Xuc=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/ApiAdjacencyFunction.
+ class
+SHA-256-Digest: wisUs+q4tSmyrhVZURIhDLLFQ66LQ5qY9qklBD8mQZQ=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/CategoricVisualis
+ ationHint$Builder.class
+SHA-256-Digest: azPARkP9WfUvm9hLQirxJw+DztlbdtLE00OFO+P2HqE=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ISharedExport.class
+SHA-256-Digest: j8ZHyBk6X1/atwoly8kMfcmpWbAuC/W7xkHZv1EM0wI=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/PersistEntryWarni
+ ng.class
+SHA-256-Digest: LyDwq/gKW6gd5tCXWN1aOfmL7sBwWsx+uZCc2qjTRIY=
+
+Name: com/silabs/ss/framework/uc/api/generation/UcParameterizedGenerator
+ .class
+SHA-256-Digest: KHTz0xN73awOVsYg9gAXlH/zaJupnVgNQQPjTYTOpB8=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/SlsprojProject.cl
+ ass
+SHA-256-Digest: tdl6AaA2/c02qIyRjJk+p7gfOUDRww/dIA0XLj+QLOk=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$P
+ intool.class
+SHA-256-Digest: fJIeLPE2yqOB2ZlspezyRTnzlmK3XNIQOxGJ9iapR8Q=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcSdkReference.class
+SHA-256-Digest: S/Rlb/m7+f7rUS27ylf5ZrDUNc8v8RluJv1dSF/ixrM=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/config/DefineParser$I
+ gnoreRestOfLine.class
+SHA-256-Digest: C3fwDoHnQCMUlR0I4SUwJ2YWBt2O9/kSjGCe9ClNyFA=
+
+Name: com/silabs/ss/framework/uc/core/api/UcFramework.class
+SHA-256-Digest: SU8HTk9ChCsNc8SjDfGCA15+dnpOBreLXAs49ZkcL8s=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcComponentConfiguration
+ $InstanceInfo.class
+SHA-256-Digest: AKGzM+jMswtCTX5Df34zP3vvW0iUv4qz5g/mKlpPwd8=
+
+Name: com/silabs/ss/framework/uc/core/api/context/IUcContext.class
+SHA-256-Digest: aRDgOqlDT5wPdzjSyFZKe3l15Wiz7TEEFv/Yf65rhgY=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/PersistEntrySet.c
+ lass
+SHA-256-Digest: H6IVAFTMZq28ohnJzwMzBPXENUt591+NVT1xffcgDvQ=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcMProjectChangeCon
+ tainer.class
+SHA-256-Digest: PxPeCr6jBsdt8e5lW/xE5Q/kPxoiRNKuX1ivQD0X+8s=
+
+Name: com/silabs/ss/framework/uc/core/api/exception/UcConfigurationExcep
+ tion.class
+SHA-256-Digest: LajUz/GPrClRmm9jFUN8QqbRhA5opCqS1SnR3fsUCRI=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcAutoSolverSettings$
+ Builder.class
+SHA-256-Digest: EDn22ubZsU9UXJ7esdKAPmpj/LGcPVssD6S2qfJ/sbs=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$L
+ ibrary$Builder.class
+SHA-256-Digest: 6MZ2HZV4Ce2wEcUq2oDwqWeoYjMhE41OY240WOx/r58=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ oolchain$1.class
+SHA-256-Digest: 5znzBmsv2oiULFgr0dTmlZGVxhd+mndmxuVDSH7sI4Q=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/UiHintId$UiHintId
+ Skeleton.class
+SHA-256-Digest: IcUiGCAaxq1qVCT9/h0HyOFSrhGHXd/yaVidZY+Uuas=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/IPersistedCliConf
+ ig.class
+SHA-256-Digest: e+0VZYAJOHzjj0aHJOY1LkKqKJ1AZjw484t8Rl21Q+M=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcGenerator.class
+SHA-256-Digest: 7r00khZFIDCeQS3z8C8nRPTAtDFR6iBcjEf3lNLdy4M=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/ucmetadata/UcMetaTo
+ olchain.class
+SHA-256-Digest: 5oodw/gZTe28B8VzSDHIdveO6rYVzecLqiaWlk4OV0k=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/IMetaSource.class
+SHA-256-Digest: wHn1Uit80PsmTo9oCpkQW+KivZs/uE7g5rSuZlJH8pA=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcApiValidator.class
+SHA-256-Digest: fei9POoQF2lioBC4QLOLDkZdq23A9NZXf4Paam5c/Eg=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$20.clas
+ s
+SHA-256-Digest: UtmVqfctOmtGkho9znWMppbSWzb2qh+f9egzvpMH43c=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/UcProjectExtens
+ ionFinder.class
+SHA-256-Digest: YtGN80wV+n2RUN5+VGtYRyPSr0xr3j4QaXxxW723KjY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/package-
+ info.class
+SHA-256-Digest: YSn2pEChw8uPvpxj+cTjku97Js9Nw4h78gNWU9rGnvo=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/YamlWriter.class
+SHA-256-Digest: Gwi8h+PuSNkUc39sFmQv0AIKnHzhAp83IP5mDJpVqJo=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcProjectPersister.class
+SHA-256-Digest: h5Pcz/blTm/wXpPperuO2zYUUt+KBk6x7qfwyTarh/4=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/IUcContextManager
+ Internal.class
+SHA-256-Digest: VJSwEoI23Yg59xWHsfLtXUXOTO5NjieMfCTRRwrNrDs=
+
+Name: com/silabs/ss/framework/uc/api/python/validator/ConfigValidationIs
+ sue.class
+SHA-256-Digest: 4w7FJp8utj1G7vb+bx324adDf6vFmvTJEnlsJ4CM13A=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/comp/ConfigFileGenUti
+ l$NormalGenerationProjectData.class
+SHA-256-Digest: 6mwue/AKPA37+yClv/9gm62a3VJrG5T83zqFR1qcmKk=
+
+Name: com/silabs/ss/framework/uc/internal/context/UcContextSnapshot.clas
+ s
+SHA-256-Digest: TSjD4m1lKALVzaTa3Ochi+smKJmTjPZ4URbPwHrlAAk=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$L
+ ibrary.class
+SHA-256-Digest: gO8kLfdgg6gGfWMf84v6khiLlXUugznBe9vrshbZSW4=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/CycloneDxJsonOutput$Cyclo
+ neDxSupplier.class
+SHA-256-Digest: BAOiYgNjp9lu0ThpqNJSwIqk9SqZhz2fPUtbNgYFLxw=
+
+Name: com/silabs/ss/framework/uc/core/internal/persist/PersistEntry.clas
+ s
+SHA-256-Digest: NmtEkiQcLmuTS/rLi/S96CG0A1fnvL5iesaJQTYHzm8=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/ProjectFileModel.
+ class
+SHA-256-Digest: GQt97BDIERoZiBL57yWdWr/dVrdmHNUgj8umLqD7pj4=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/IUcWorkspaceMu
+ tableParser.class
+SHA-256-Digest: bxwQVbF9D4a0b0+g90YfwTJAqXpUvt/yjh8oVkMwgEc=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$4.class
+SHA-256-Digest: W2ONfWGZhnmz4DuSW8RAnWlmnPev64kXYN9+t/5TT70=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/SpdxJsonOutput$SpdxJsonSb
+ om.class
+SHA-256-Digest: iVRnDanl2FnNVhNYfExoaKxLE13x4PLH2UiE2+bV6JU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/comp/UcTemplateFile.c
+ lass
+SHA-256-Digest: 2s9vf8itoKfMAXcSvAazKPFTlxFiZ+torDd5rokTVdw=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/CycloneDxJsonOutput$Cyclo
+ neDxJsonPedigree.class
+SHA-256-Digest: eLF7HJ1CodW3S/TvExhEWqpcYj6KjhJXZujYHG6Q4iY=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slpb/UcPostBuildSte
+ pSlpb.class
+SHA-256-Digest: FrVQmWPqOGTWAyDK78JnOaTA/lOwgjl+hDJQLi7nsWs=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slcu/Des
+ erialiserUcSdkReference.class
+SHA-256-Digest: gjjPD5Yll1c3ls3hxSE3E5GZeUZvjrr/yoIrGS9EPuo=
+
+Name: com/silabs/ss/framework/uc/internal/project/NewProjectSaver.class
+SHA-256-Digest: g+ngPgsWrp5INeePjfUJNO33uZAQtUL1BmvHCX1QeAU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$3.class
+SHA-256-Digest: 5TXmZsxZJL6IRmr+SqrvXp5Wf9n5J9ySoEwsrn2XMx8=
+
+Name: com/silabs/ss/framework/uc/internal/project/options/UcToolOptions$
+ Assembler.class
+SHA-256-Digest: GBN/zWqkztpQ1qB0vNg+bWl5xJA25q6WcHaytnbvb/A=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/UcProjectSetup.cl
+ ass
+SHA-256-Digest: JFnS4ZeE1Glfg3qCIbNIQLT/3aFMTXPcDLvGZQPsxeE=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcProjectDelta.class
+SHA-256-Digest: pLBbC+yGzQzBKIkjYDJSbfOav7cquJ4895jZ8cc2OKI=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$23.clas
+ s
+SHA-256-Digest: Z9uT8kinJFdLcCNrCKlosNWoK4rhws6fB0qLhXlZEXk=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/JavaQuick
+ FixApi.class
+SHA-256-Digest: iiUjN5+au8FjCr2bAlIYHvH4Qip/o+iO50z3tClTywA=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$S
+ ourceEntry$1.class
+SHA-256-Digest: udPNmekdZJaS8fbffr34TxeuaYN/MBsiTJT3uLF/nTY=
+
+Name: com/silabs/ss/framework/uc/api/project/generator/EwpProject.class
+SHA-256-Digest: 8a54hYarHP0BIptnRzKt74xjrfIod3kG90eMPw9ZN78=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onfigFileOrBuilder.class
+SHA-256-Digest: GFA/Fn2vvlUY6i7nyD0IGccHVRGvq+MBY6dZOoyv4kY=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/SelectionInformation
+ .class
+SHA-256-Digest: uuP2jvwTY63aITzQ67xe7bE6RVLgVjTK7Q4wUzc23A8=
+
+Name: com/silabs/ss/framework/uc/internal/generation/UcThreadingGenerato
+ r.class
+SHA-256-Digest: WSuFHS8LMnsYMENrSn/Hk3XkiAi2On9w5khB/dkIvZY=
+
+Name: com/silabs/ss/framework/uc/core/internal/comp/undo/ChunkUndoManage
+ r.class
+SHA-256-Digest: vrvJXuYJZmB5nxWn+3lA2JVIdLjrNtwVHQgEWSMzCOo=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyConfigu
+ rable.class
+SHA-256-Digest: vQaHdGdPnRgIDro1Zs4OhT1Tl8IJiFxbCuVbqh8fdRk=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/ConfigFile.class
+SHA-256-Digest: OJdCT7VwoPCDEwfMLYc4jhJ1c13kH5HUzo9Mn6p9MJ8=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$T
+ oolchainSetting$1.class
+SHA-256-Digest: RH3liSBF0HzHqU+l7XqoODYkMyD6CY2iaVJDaXoPzkw=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyCompone
+ ntIdProjectRef.class
+SHA-256-Digest: Fk2sB/2oNmC7ik1BhrVkvCj6udVp0CVEQ3hv03U/WUo=
+
+Name: com/silabs/ss/framework/uc/internal/lua3/validator/LuaValidationGl
+ obals.class
+SHA-256-Digest: LwNhIypX6pM+qzql4p7uf939UhTLB/V4OFGOb+rKpkg=
+
+Name: com/silabs/ss/framework/uc/internal/context/UcContextExtensionSetu
+ p$UcContextExtension.class
+SHA-256-Digest: fmZIiplrDqr6HWI8nbDp32Ns8zfNoKWdZOUv9tllidY=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ acro.class
+SHA-256-Digest: TOr+PbwTNJ/dYyw0CePy/jsBycYqjy4v6W9A0CBslkM=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardware$PartM
+ apper.class
+SHA-256-Digest: RxeFNjY8w2O4iyALhrbf+rlKrYQbp7L3R3rDr5tj/L8=
+
+Name: com/silabs/ss/framework/uc/core/internal/security/SlceExtensionSum
+ mariser.class
+SHA-256-Digest: nD7QtrltUIYIOUnPywprFlkgfBAB5pv027xNmim7RoU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$27.clas
+ s
+SHA-256-Digest: Rk31bVuMOQGn2Mf0EZKFZWdgtCQLrN8BI4Ga97j8iV4=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcPostBuildConstant.cla
+ ss
+SHA-256-Digest: tsvZW/J4kzk3L2ldBBz8IMvRTYj04JbyrZD/mZfma6M=
+
+Name: com/silabs/ss/framework/uc/internal/project/UcContextSearchQuery.c
+ lass
+SHA-256-Digest: 0SY5UP304RMgHpB7Os3Pf0BMyVjJKqVQNeDm2/j0iTk=
+
+Name: resources/sbom_jinja/spdx_bom.spdx.jinja
+SHA-256-Digest: xHO4Ulpxyq0LVDdaj2Ero3F4LSgkfcnkc2yhk3LZ2Ag=
+
+Name: com/silabs/ss/framework/uc/core/internal/toolchainsettings/UcToolc
+ hainMapping.class
+SHA-256-Digest: lx80zy49OflN2bBhOvrKxzxG7WGuoQPVuw6Qe4uQGAo=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/ucmetada
+ ta/UcMetadataValidator.class
+SHA-256-Digest: na8uAjmZw+ki/03fW0XmM9XmencCHqbgy8b0B92mWow=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcw/exception/Duplicate
+ WorkspaceProjectIds.class
+SHA-256-Digest: V+ypa8m9oQ9sxxSo+eUVCFHxB0VfGiz4ADkMFcI1ZXI=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$8.class
+SHA-256-Digest: Zhm6iE0Q5er1L4km+QyuYUiqhmEtD2kd+VbbcIu3/fY=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/UcProjectExpor
+ tedData.class
+SHA-256-Digest: T6igNYGr5K8iy1Wb4HqaZ8bvb7MjqvgBjwrSYtReE30=
+
+Name: resources/json_schema/slcc_metadata_schema.json
+SHA-256-Digest: v3GPhUHD5qibqivDgVrDy0bR4qDSuxEG5f0sfBOuUOM=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$B
+ oard.class
+SHA-256-Digest: ZVNN5t/weAOsml/jdTrE0etw+5AlhWvAZPhVLEpwO+I=
+
+Name: com/silabs/ss/framework/uc/core/api/IUcProjectPersister$1.class
+SHA-256-Digest: lYXm0u9q5bHHCgyKueJc9uTugDjlHFsqEUPqQPgfLWQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$22.clas
+ s
+SHA-256-Digest: 8y+OzKagI74mTO/SE0w3iswYSqZy+rr6P2p2jpWt2po=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcp/PathWithFileLi
+ st.class
+SHA-256-Digest: J73HCMykJAjjwtZfdTvoVkP9eURzda0W4y8/UijTF54=
+
+Name: com/silabs/ss/framework/uc/internal/api/project/setup/UcConfigurat
+ ionValidator.class
+SHA-256-Digest: MAKLFQe+6wPuxCM1HcxVJ8FOx/I9JuEP2GTf7AW03y4=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/ucmetadata/UcMetaPi
+ ntool.class
+SHA-256-Digest: kXOlJGUHA7xibQKGOfjZg1y2YVsJNzMYdv3UHx6uYt4=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slcu/Slc
+ uParser$ComponentUpgradeDeserializer.class
+SHA-256-Digest: EuPBYbpG8XeRDpp+NRm5Z6+uQaJrxr3rZBnB/dwa7zY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$3.class
+SHA-256-Digest: VVl9Npq9cO8XYIfWjPwAGP2AZ0CeckVtvG4n1Nx45iI=
+
+Name: com/silabs/ss/framework/uc/internal/project/setup/ProjectPostBuild
+ Setup.class
+SHA-256-Digest: 3idQl7UxcRkqijZsnUzFxaPrxuGiIkimNukMGAMjkBA=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/log/UcCoreLogger.clas
+ s
+SHA-256-Digest: gjz3f8IxsxvFKoxpUpbG1OMeIpXy26kfQbVSd/zyodY=
+
+Name: com/silabs/ss/framework/uc/core/internal/toolchainsettings/UcToolc
+ hainMapping$UcToolchainMappingBuilder.class
+SHA-256-Digest: 91EO7evuEVgFIJU4aDTEjuRPyh4nU004ouP1BOnB6cI=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$A
+ piRule$1.class
+SHA-256-Digest: EAxNrB/26ixOPK8t2VEkiF4W6x5uoQD+aVS+BAzp/9k=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slpb/UcPostBuildCon
+ stantPath.class
+SHA-256-Digest: XvDOtsOH8XMm2OQ2wvl5KkmG5h94eGbWX9lp2waDCis=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/sdk/SbomComponentVali
+ dation.class
+SHA-256-Digest: nw4r/xFnnq7T1D7UzzuIwLP3svyER6MwFMhMx4QiHL8=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/solution/Res
+ olutionMayBeFound.class
+SHA-256-Digest: a9iCZl6kBjzwnaV9h6hG0VUl23LQnQEUSNnqsdxiAiY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$22.clas
+ s
+SHA-256-Digest: xPszaNFoVmVeUtXJsi3W9pQeU5zCigZgX7OEoPz3fsg=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/SetupExtensionParser.cla
+ ss
+SHA-256-Digest: gmUOdaYzgzrX6XjRgIb6VJB94iCuK2UREbmFuNA0rUw=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ ache$Builder.class
+SHA-256-Digest: Ln9USpCAdPRftsbpz4PaydhmtF5VHHXipwG4MjJCSww=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ eviceOrBuilder.class
+SHA-256-Digest: jA+EsSjQtN3IAVuU3fZZlLxUMvpsuNV9ISkpRuI5kpc=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlcpKey$21.clas
+ s
+SHA-256-Digest: T0yPcD8fRhbd9J5utX1xNNGnnq3ywi9Jfg8VVNjL/BA=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/AcContextContr
+ oller.class
+SHA-256-Digest: 3+OKBdbt+km9HzOD1EFWui8aT4f/L/r+w+4m+pAwiVg=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/comp/ConfigFileGenUti
+ l$TransformLine.class
+SHA-256-Digest: FOsBXUzyyMNImxTSRw7+u0vZeBKQdVvl+8Te56I+6ro=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/AcInputDirecto
+ ryMonitor.class
+SHA-256-Digest: u6mLmHqoyJPb25wzyAoPlNDlveXgcc5bmCCjDMl6Ygw=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/MetaFileHeader.class
+SHA-256-Digest: fUT1NwaeGeQsy7V5/SB++SEoLkxEyOxAMs38prYYt1A=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/project/IUcSortedProj
+ ectGenerator.class
+SHA-256-Digest: Gn+KQVJPrhlJUX2BtPXjKxjNLZU98aeMzV/nlLXKBZg=
+
+Name: com/silabs/ss/framework/uc/core/api/sbom/CycloneDxJsonOutput$Cyclo
+ neDxJsonExternalReference.class
+SHA-256-Digest: ph2T/KCaZNLyEQSPg2evHYtUZ3Dp20pFy98e9xHH42U=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$21.clas
+ s
+SHA-256-Digest: u9SoC+9qjdD+v2JYOd8HWf+d1P4pVIwo14rjx65VOe0=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/ucmetada
+ ta/UcMetadataWriter$1.class
+SHA-256-Digest: rUxWJWexio/IS4NItVMe6QdFsa3Cww67FU+SPrtsb+E=
+
+Name: com/silabs/ss/framework/uc/core/api/model/slcw/IUcWorkspaceProject
+ sModifier.class
+SHA-256-Digest: 4Ue9KDZyAIcD0jc3bGvwpRlYXS4XZ5uiZ5txwWzfK00=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IUcSetupModelListener.cl
+ ass
+SHA-256-Digest: oarQE9LWOb0LWo7335uGwu+BErmktaCr9DA30B9OBxw=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$7.class
+SHA-256-Digest: 0uRhCmvWiAxI9iTcamzjvd3WkO0oBxnPdV0HThkgmC0=
+
+Name: com/silabs/ss/framework/uc/core/api/project/state/UcHardware$Varia
+ ntMapper.class
+SHA-256-Digest: XG1sNzJfoYCtExcWLE/xdh3IAa0hh0pQEroL8mDulko=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UnfulfilledIssue.clas
+ s
+SHA-256-Digest: p7XAXFLPuW/cx6TGH+wistoIg7t5Pzeoh7JffjHZpdk=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/slcw/UcWorkspacePro
+ jectsModifier$UcWorkspaceProjectEdit.class
+SHA-256-Digest: PEar9AkaV5UOWtVl5ccubKAjnKKPTSPc12WG40RC05I=
+
+Name: com/silabs/ss/framework/uc/core/api/UcFramework$Builder.class
+SHA-256-Digest: MMrYWeBNPFGhSJL4lhQHADTx8gtwzaZ9u3Ebp/jpC/g=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/ParseIssueUtils.class
+SHA-256-Digest: c7qXN/uJjGnR1g/IRKvXRrqJCHXVG1SXC/xvcRInzkg=
+
+Name: com/silabs/ss/framework/uc/internal/project/ContextCreationIssue.c
+ lass
+SHA-256-Digest: Q10h8wChrd7YtoBC6BcNFzSMHnlDkzohv4qh4otMuSw=
+
+Name: com/silabs/ss/framework/uc/core/api/tree/Trees$DepthTreeIterator.c
+ lass
+SHA-256-Digest: gUbBxs1QzTqFR2rSIpZtfkpjyEjJM+44zr3ckbrkIjU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$28.clas
+ s
+SHA-256-Digest: TSlWojE/pEM1aB5seCWrHH7aGKd3uQWMPkTylkMIiRE=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/package-info.class
+SHA-256-Digest: A8ZKexu8Wpqa66dC84SKj7b6WFJ/NDRFyTURjav96lM=
+
+Name: com/silabs/ss/framework/uc/core/api/sdkextension/ImmutableSdkExten
+ sionSoftReference.class
+SHA-256-Digest: HpQpqU7XtktWWc0V+aDK/FMKqJxySz5shzqgsgP4eMc=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/PotentialSol
+ ution.class
+SHA-256-Digest: 7ZYvAy/OVNeP5Yn6HB3pW/TbgsUeAOINXawJg+Oa/OE=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ ynamicValue$ValueType.class
+SHA-256-Digest: QOv9dgiY4OLYYXLWSh7/l+Az9xH8aeYqfTt0cdJvP7s=
+
+Name: com/silabs/ss/framework/uc/core/internal/project/SlciFile.class
+SHA-256-Digest: EsVtp+S98Os7PaKZ2TM6KHphr0EpHKnUjhx33C26mL8=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slcu/Slc
+ uValidator.class
+SHA-256-Digest: ysrJTGxceo7mNGs8IzNxGzsjYnkqT8TTZDFxFaUyf1Q=
+
+Name: com/silabs/ss/framework/uc/core/api/model/IUcToolSettingsContainer
+ .class
+SHA-256-Digest: FIO/Uy9tIRH+0BDIr23xLtIOUqhzUW5gruIRYeKV4Aw=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$M
+ emorySegment$1.class
+SHA-256-Digest: blKvqWdv5fGdv/a8Eu6dq58evh71k3aQ3U85aK7ZdAU=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/UcDescriptorUtils.clas
+ s
+SHA-256-Digest: ttgffCxzvvtbQDeDCKiNoTxjHSwJbYtP9GBCaV4gtco=
+
+Name: com/silabs/ss/framework/uc/internal/api/project/setup/UcPythonEngi
+ ne$PyLogger.class
+SHA-256-Digest: DvpZPY4OlLK6hYh2whWnyJeizpSfXMfG1OZubqYcoEI=
+
+Name: com/silabs/ss/framework/uc/core/api/model/ucmetadata/IUcMetaDevice
+ .class
+SHA-256-Digest: FtuH0bQlQKzQQ64N1DwVJ2DSnr0FTebxCbWVt0h2C8c=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$A
+ piRule.class
+SHA-256-Digest: nGjkHXBVwGB2DkOnlBr2r5GGuke/9bHWL+3ajbBn3/c=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/solution/Res
+ olutionFound.class
+SHA-256-Digest: Z+G+VhEXWO+q9bZAr86Kvn4qaxM7sSm+nCqJJl5e0tQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/apack/SdkAdapt
+ erPackWatcher.class
+SHA-256-Digest: eEvdh+wH+2WgnKQbPdxlF1/KR39qaS1mraz+UoBEUhU=
+
+Name: com/silabs/ss/framework/uc/internal/api/sdk/UcSdkDetector.class
+SHA-256-Digest: 8fYrLTfUKsqnA4EnW9wFWbKVhx0GtenMC+fPonbceyA=
+
+Name: resources/json_schema/slpb_schema.json
+SHA-256-Digest: /3VJkgH2gV6ereYOnIXb90qFFq/yjaCEt95vicI6OYk=
+
+Name: com/silabs/ss/framework/uc/core/api/comp/IUcUriDocumentable.class
+SHA-256-Digest: PARaiTSF7u+fhiF2HN/bbeY/+BprKvfpceaafQIaT0A=
+
+Name: com/silabs/ss/framework/uc/core/api/internal/project/gen/KeepProje
+ ctFile.class
+SHA-256-Digest: hHT6DYbtS5/4hh6ODLVmHjLz/o+jgJ7ECDM+X9iT85Y=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/python/ConfigChange
+ $NameChange.class
+SHA-256-Digest: ipfaP2Ku+mHX7UT74sGai6cPUJvgxl1JLvsfrBUdRUY=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/ucmetadata/UcMetaSb
+ om.class
+SHA-256-Digest: e3bBH4QG09JT8q5GzqWtU8Ut1O771KXe4zpzJP+d7+c=
+
+Name: com/silabs/ss/framework/uc/core/internal/hack/autoselect/scarborou
+ ghfair/ScarboroughFairState.class
+SHA-256-Digest: n5T5kbd6LIt0LfvPu+xLV5v7hGYyIUoF86pn6lulQdA=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$26.clas
+ s
+SHA-256-Digest: DIWHIZP3BjBrjqPNe4uptDcxWluTYyXv/9Ynq190xG8=
+
+Name: com/silabs/ss/framework/uc/core/api/setup/IUcSetupLaunchable.class
+SHA-256-Digest: +n6kdNuI1noA9INjMHeWoDvprqe9cZ/r3+u1bZ4Gfps=
+
+Name: com/silabs/ss/framework/uc/core/internal/hack/autoselect/scarborou
+ ghfair/NewSolutionWithApis.class
+SHA-256-Digest: PaUjr+AbSGrei1wzh8JyzzilGRDTNkfQkb8LTHzMAYw=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcApiUtils.class
+SHA-256-Digest: CuU/CwXOKc7EgfAmwqxImjdLVL/F4wFxLyZgDCi/o/4=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcApiUtils$InstancedR
+ ecommendationResult.class
+SHA-256-Digest: v0ot4+vngImTHRAV8D/B99TkGcMMXKwCJ2SsgMezMCk=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/model/CommonPostBuild
+ Script.class
+SHA-256-Digest: fYdD0KmQbKk0VKuXRGh6iTVncDrO1WIzBeY1pG1QwqQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$23.clas
+ s
+SHA-256-Digest: DO8wh9k0wJRR+cFGFzkJCbetyCwHLlgGMayI7JohPr8=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlctParser.clas
+ s
+SHA-256-Digest: PPur7hQNOM/4FYFu0MpXSUevyKrVc6Dva/JNTO8AJQs=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/ApiChoiceResult.class
+SHA-256-Digest: 6N2DwMR6y1gGK7Ch07vxhCP4Rq1KvjX4DdZrAhlhmpQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$L
+ ibraryOrBuilder.class
+SHA-256-Digest: 7ahtQZceMuZkHzr8TKV6B0JlEYndQbw3763FYM47Fe0=
+
+Name: com/silabs/ss/framework/uc/internal/api/trace/SlcTelemetry.class
+SHA-256-Digest: 4bnOlzbqI7UNTAPbw/zAMWsilgE42k5bFrq+KpGF6EQ=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/sdk/UcSdkValidationUt
+ ils$1.class
+SHA-256-Digest: JrBVLYuAAOsIZSGAtWKpIXqcYcEC4/CKtrXKqsE69Yg=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slpb/Slp
+ bValidator.class
+SHA-256-Digest: MYSBxrPmvyxO1TUYIip+tUu/CBz4BEAR8BFlBuusQOw=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$9.class
+SHA-256-Digest: HRp1emi1aZAXoEwQCSI35aXAr+hEuJsJY+8Q8cr0UdY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$25.clas
+ s
+SHA-256-Digest: yuqF3XD09lqrQ2y+mDJmx6EI5wN4Ll8GfkPu8ypfErs=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$A
+ piRuleOrBuilder.class
+SHA-256-Digest: k4+PJDbzlHjE+KvwTp8XMXbfsaF5fpNbYGpsGB6OZuw=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/python/ComponentCha
+ nge$Action$2.class
+SHA-256-Digest: 0cAR0AZj+U0XrBXnGrNlSyMp2AwQXjniWhHeXxuWqLw=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ onflicts$Builder.class
+SHA-256-Digest: W/d4Sx2fZ8vYHKiOvLIFXYLRx+cMrWX6NV3aL4bMKwA=
+
+Name: com/silabs/ss/framework/uc/core/internal/parse/CommonExportAlgorit
+ hms.class
+SHA-256-Digest: 5z5Vh/2IjHXDUreaWuIMJ7E4UW2eO/bROR95r60Ip6s=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$K
+ it$1.class
+SHA-256-Digest: SdAHyVHF1kb1UIR5h2PAkd4m4UzuT+rKLV+PNztsS34=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlctKey.class
+SHA-256-Digest: RssoHjPnAU4HQ5F+lux57gPnnwaxDNjrAqvhP7JN7lE=
+
+Name: com/silabs/ss/framework/uc/core/internal/setup/acts/apack/AdapterP
+ ackAcUtils.class
+SHA-256-Digest: 2M09SJWqti8Q6kAUU82not5k6nt89PXa1tUZFsVTnmU=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$K
+ it$Builder.class
+SHA-256-Digest: YiadHaugC50UcN7YtQLDHqD+0d6gFUyoOSJI5tbvKII=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/nresolve/solution/Mul
+ tiverseSolutionReport.class
+SHA-256-Digest: OAmZTuSMtc5PKhC43i1zBO6DI5b70mCRbDR7RaMTg2U=
+
+Name: com/silabs/ss/framework/uc/core/api/model/uihint/MutableUiHinter.c
+ lass
+SHA-256-Digest: Pcx/DvpQKN+mXc3y1MyccRg1KaSHpnmIrOr2KbOw0d0=
+
+Name: com/silabs/ss/framework/uc/core/api/project/gen/ConfigFileGenerate
+ Logic.class
+SHA-256-Digest: xR6qLD8H+mPCfgsJmjMl1ST6t8W3MCc/4tFp/ToceSQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/core/Conflict.class
+SHA-256-Digest: mhe6Jgbny043CcDBeTSmfPxaB7BB8GTRAJXSqNP3VUU=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/SlccKey$24.clas
+ s
+SHA-256-Digest: izJFnt6F6T4+bnJ9bkoB9ytT3s8ZOOm9NyKVhDhcZKU=
+
+Name: com/silabs/ss/framework/uc/core/api/meta/SlccWriter.class
+SHA-256-Digest: 1bxU689aP0Wfp/ICQe1hNRJmB8XtOeIip00alWpvvj0=
+
+Name: com/silabs/ss/framework/uc/api/project/package-info.class
+SHA-256-Digest: qPsUayj7uXUbtjeFZidYIQSztevsVm3m+bISlMTMyEY=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$D
+ oc$Builder.class
+SHA-256-Digest: REP+5/cLeWxUNS7oioYIGDI6SKd3t5KGzww+HUVEpO0=
+
+Name: com/silabs/ss/framework/uc/internal/project/options/UcToolOptions$
+ CppCompiler.class
+SHA-256-Digest: ANAwPnYf7nHw7GNEIivZUgP0BCx4nAFFOBihjAycZ/E=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$U
+ pstreamSegment$1.class
+SHA-256-Digest: iGHQD9J9u+88J9sjE0GiBRc0oxVlZ59PEjK9uLorFJc=
+
+Name: com/silabs/ss/framework/uc/internal/api/python/validator/PyProject
+ ValidationApi.class
+SHA-256-Digest: /Cn8JMR0Zze5cojJt7ejGpJQ5p1aEJluXorm+vnJS6c=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slcw/Slc
+ wWriter.class
+SHA-256-Digest: nqMLfpm7Rq1jT7gXb/SnJvct32WoH/Ud7hikeFCzLOY=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slpb/Slp
+ bParser.class
+SHA-256-Digest: mxTLLp7p+wEWUScHvhoRENaDv9uGnlT0snXs1oEKLC0=
+
+Name: com/silabs/ss/framework/uc/core/internal/model/python/ComponentCha
+ nge$Action$1.class
+SHA-256-Digest: 4LwVTCtzBn41fLvXSx0P+rONTPxVRGZpSv4dQa7ScoM=
+
+Name: com/silabs/ss/framework/uc/internal/project/options/UcToolOptionMa
+ ppings.class
+SHA-256-Digest: FypJeKCQ6BV1zB7F02EPK0VReb6IDa3yFWTkp9t9m0o=
+
+Name: com/silabs/ss/framework/uc/core/api/validate/UcApiUtils$SelectedWi
+ thApis.class
+SHA-256-Digest: OR6Zz6Nz6yTzhyQvpeTi7ZB+runhGWVfEVrkKQ4lAAQ=
+
+Name: com/silabs/ss/framework/uc/core/internal/cache/RawComponentCache$C
+ omponent.class
+SHA-256-Digest: ISWPTOiaoMPzRJoKA7HmkyfXz2p73QnrwyPHMEF4eno=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/IErrorIn
+ terpreter.class
+SHA-256-Digest: 8tRT+dKevezjQm30wA8CGVrId5xDg8mkFcQF4l4sIbk=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/comp/ConfigFileGenUti
+ l.class
+SHA-256-Digest: w+48wPCI23xRjcus1Zp9ehDr9ufS46BoszaUr+bbELc=
+
+Name: com/silabs/ss/framework/uc/core/internal/api/parse/schema/slcw/Slc
+ wParser.class
+SHA-256-Digest: KbiRkPd24JEip4DGu2jxOJJewdj/KTvVcYQsdXcLLBQ=
+
+Name: com/silabs/ss/framework/uc/core/api/sdkextension/IUcSdkExtensionSo
+ ftReference.class
+SHA-256-Digest: 4Fqc6AgQLNGbPNNE96wbwMP3+aoQZc/RofHEAFnqgCk=
+
+Name: com/silabs/ss/framework/uc/internal/api/trace/SlcTelemetryUtils.cl
+ ass
+SHA-256-Digest: isZD926d2l4qa9PorAMO0VqyI6qlGRul0/tQmN+nNAU=
+

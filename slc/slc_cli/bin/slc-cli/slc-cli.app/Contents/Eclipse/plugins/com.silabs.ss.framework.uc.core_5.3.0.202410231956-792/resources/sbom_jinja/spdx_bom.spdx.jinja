@@ -1,0 +1,61 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: Silicon-Laboratories
+DocumentNamespace: https://silabs.com
+
+## Creation Information
+Creator: Organization: Silicon Laboratories, Inc.
+Created: {{timestamp}}
+## Relationships
+{%- for sdk in sdks %}
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-{{sdk.id.replace(':','-')}}
+{%- endfor %}
+{%- for sdk in sdks %}
+
+## Package Information
+PackageName: {{sdk.name}}
+SPDXID: SPDXRef-{{sdk.id.replace(':','-')}}
+PackageVersion: {{sdk.version}}
+PrimaryPackagePurpose: LIBRARY
+PackageDownloadLocation: NOASSERTION
+PackageSupplier: Organization: {{sdk.supplier if sdk.supplier else 'NOASSERTION'}}
+## Relationships
+{%- for comp in sdk.components %}
+Relationship: SPDXRef-{{sdk.id.replace(':','-')}} CONTAINS SPDXRef-{{comp.id.replace(':','-')}}
+{%- endfor %}
+{%- for comp in sdk.components %}
+
+## Package Information
+PackageName: {{comp.name}}
+SPDXID: SPDXRef-{{comp.id.replace(':','-')}}
+PackageVersion: {{comp.version}}
+PrimaryPackagePurpose: LIBRARY
+PackageDownloadLocation: NOASSERTION
+PackageSupplier: Organization: {{comp.supplier if comp.supplier else 'NOASSERTION'}}
+PackageLicenseConcluded: {{comp.license}}
+## Relationships
+Relationship: SPDXRef-{{comp.id.replace(':','-')}} CONTAINED_BY SPDXRef-{{sdk.id.replace(':','-')}}
+{%- for up in comp.upstream %}
+Relationship: SPDXRef-{{comp.id.replace(':','-')}} ANCESTOR_OF SPDXRef-{{up.id.replace(':','-')}}
+{%- endfor %}
+{%- for up in comp.upstream %}
+
+## Package Information
+PackageName: {{up.name}}
+SPDXID: SPDXRef-{{up.id.replace(':','-')}}
+PackageVersion: {{up.version}}
+PrimaryPackagePurpose: LIBRARY
+PackageDownloadLocation: NOASSERTION
+PackageSupplier: Organization: {{up.supplier if up.supplier else 'NOASSERTION'}}
+PackageOriginator: Organization: {{up.originator if up.originator else 'NOASSERTION'}}
+{%- if up.url %}
+PackageHomePage: {{up.url}}{% endif %}
+{%- if up.package_url %}
+ExternalRef: PACKAGE-MANAGER purl {{up.package_url}}{% endif %}
+{%- if up.comment %}
+PackageComment: <text>{{up.comment}}</text>{% endif %}
+## Relationships
+Relationship: SPDXRef-{{up.id.replace(':','-')}} DESCENDANT_OF SPDXRef-{{comp.id.replace(':','-')}}
+{%- endfor %}{%- endfor %}
+{%- endfor %}
