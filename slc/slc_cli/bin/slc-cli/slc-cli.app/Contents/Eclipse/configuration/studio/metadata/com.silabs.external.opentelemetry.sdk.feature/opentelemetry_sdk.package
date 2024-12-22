@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<package id="com.silabs.external.opentelemetry.sdk.feature"
-  label="Open Telemetry SDK + Support"
-  description="Bundled Open Telemetry SDK and Exporter plus Dependencies Support"
-  changelog="changelog"
-  version="1.22.1"/>

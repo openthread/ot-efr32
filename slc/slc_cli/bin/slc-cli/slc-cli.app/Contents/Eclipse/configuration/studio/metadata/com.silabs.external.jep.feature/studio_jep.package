@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<package id="com.silabs.external.jep.feature" 
-  label="Bundled JEP Support" 
-  description="Simplicity Studio Bundled JEP Support" 
-  changelog="changelog" 
-  version="4.1.0"/>

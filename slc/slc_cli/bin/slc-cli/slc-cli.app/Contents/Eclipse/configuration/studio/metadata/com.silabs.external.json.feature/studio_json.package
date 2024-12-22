@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<package id="com.silabs.external.json.feature" 
-  label="Bundled JSON Wrapper Support" 
-  description="Simplicity Studio Bundled JSON Support" 
-  changelog="changelog" 
-  version="3.5.0"/>

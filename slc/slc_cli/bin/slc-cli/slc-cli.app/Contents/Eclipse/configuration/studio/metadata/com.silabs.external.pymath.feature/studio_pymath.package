@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<package id="com.silabs.external.pymath.feature" 
-  label="Bundled Python Numpy/Scipy Support" 
-  description="Simplicity Studio Bundled Python Numpy/Scipy Support" 
-  changelog="changelog" 
-  version="1.0.2"/>

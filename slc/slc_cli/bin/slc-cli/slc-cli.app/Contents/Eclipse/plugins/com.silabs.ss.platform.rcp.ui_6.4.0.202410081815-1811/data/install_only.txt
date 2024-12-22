@@ -1,1 +1,0 @@
-This link refers to a file only available in an installed version of Simplicity Studio.
