@@ -36,7 +36,7 @@ set(CMAKE_RANLIB                   arm-none-eabi-ranlib)
 
 execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE COMPILER_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set(COMMON_C_FLAGS                 "-DRADIO_CONFIG_SUBGHZ_SUPPORT=1 -mcpu=cortex-m33 -mthumb -fmessage-length=0 -ffunction-sections -fdata-sections -mfpu=fpv5-sp-d16 -mfloat-abi=hard")
+set(COMMON_C_FLAGS                 "-DRADIO_CONFIG_SUBGHZ_SUPPORT=1 -mcpu=cortex-m33 -mthumb -mcmse -fno-builtin-printf -fno-builtin-sprintf -fno-builtin-malloc -fmessage-length=0 -ffunction-sections -fdata-sections -mfpu=fpv5-sp-d16 -mfloat-abi=hard")
 
 set(CMAKE_C_FLAGS_INIT             "${COMMON_C_FLAGS} -std=c99")
 set(CMAKE_CXX_FLAGS_INIT           "${COMMON_C_FLAGS} -fno-exceptions -fno-rtti")
@@ -46,6 +46,6 @@ set(CMAKE_C_FLAGS_DEBUG            "-Og -g")
 set(CMAKE_CXX_FLAGS_DEBUG          "-Og -g")
 set(CMAKE_ASM_FLAGS_DEBUG          "-g")
 
-set(CMAKE_C_FLAGS_RELEASE          "-Os")
-set(CMAKE_CXX_FLAGS_RELEASE        "-Os")
+set(CMAKE_C_FLAGS_RELEASE          "-Os -g")
+set(CMAKE_CXX_FLAGS_RELEASE        "-Os -g")
 set(CMAKE_ASM_FLAGS_RELEASE        "")
