@@ -40,17 +40,32 @@ component:
   - id: ot_mbedtls
   - id: ot_stack_features_config
     from: ot-efr32
-  - id: uartdrv_usart
+  - id: iostream_usart
     instance:
       - vcom
+    condition:
+      - device_series_2
+  - id: iostream_eusart
+    instance:
+      - vcom
+    condition:
+      - device_series_3
   - id: rail_util_pti
 
 configuration:
   - name: SL_BOARD_ENABLE_VCOM
     value: 1
+  - name: CIRCULAR_QUEUE_LEN_MAX
+    value: 16
+  - name: SL_IOSTREAM_USART_VCOM_FLOW_CONTROL_TYPE
+    value: usartHwFlowControlCtsAndRts
+    condition: [iostream_usart]
+  - name: SL_IOSTREAM_EUSART_VCOM_FLOW_CONTROL_TYPE
+    value: SL_IOSTREAM_EUSART_UART_FLOW_CTRL_CTS_RTS
+    condition: [iostream_eusart]
+  - name: SL_OPENTHREAD_STACK_TASK_MEM_SIZE
+    value: 4608
 
 define:
-  - name: OPENTHREAD_COPROCESSOR
-    value: 1
   - name: OPENTHREAD_RADIO
     value: 1

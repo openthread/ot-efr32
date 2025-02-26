@@ -37,48 +37,106 @@
 #include "sl_component_catalog.h"
 #endif // SL_COMPONENT_CATALOG_PRESENT
 
+#include "uart.h"
 #include <openthread-system.h>
 #include <stddef.h>
 #include <string.h>
 #include "utils/code_utils.h"
 #include "utils/uart.h"
 
+#if defined(SL_CATALOG_IOSTREAM_EUSART_PRESENT)
+#define IOSTREAM_VCOM_CONFIG_HEADER "sl_iostream_eusart_vcom_config.h"
+#define IOSTREAM_INSTANCE_HEADER "sl_iostream_init_eusart_instances.h"
+#define IOSTREAM_RX_GPIO_PORT SL_IOSTREAM_EUSART_VCOM_RX_PORT
+#define IOSTREAM_RX_GPIO_PIN SL_IOSTREAM_EUSART_VCOM_RX_PIN
+#define IOSTREAM_RX_BUFFER_SIZE SL_IOSTREAM_EUSART_VCOM_RX_BUFFER_SIZE
+#elif defined(SL_CATALOG_IOSTREAM_USART_PRESENT)
+#define IOSTREAM_VCOM_CONFIG_HEADER "sl_iostream_usart_vcom_config.h"
+#define IOSTREAM_INSTANCE_HEADER "sl_iostream_init_usart_instances.h"
+#define IOSTREAM_RX_GPIO_PORT SL_IOSTREAM_USART_VCOM_RX_PORT
+#define IOSTREAM_RX_GPIO_PIN SL_IOSTREAM_USART_VCOM_RX_PIN
+#define IOSTREAM_RX_BUFFER_SIZE SL_IOSTREAM_USART_VCOM_RX_BUFFER_SIZE
+#endif
+
+#include "sl_gpio.h"
+#include IOSTREAM_VCOM_CONFIG_HEADER
+#include IOSTREAM_INSTANCE_HEADER
+
 #ifdef SL_CATALOG_KERNEL_PRESENT
-#include "em_gpio.h"
-#include "gpiointerrupt.h"
-#include "sl_iostream_usart_vcom_config.h"
+#include "sl_ot_rtos_adaptation.h"
 #endif // SL_CATALOG_KERNEL_PRESENT
 
-#include "sl_iostream_init_usart_instances.h"
+#ifndef TESTING
+#define STATIC static
+#else
+#define STATIC
+#endif
 
-#define RECEIVE_BUFFER_SIZE 128
+#if (defined(SL_CATALOG_POWER_MANAGER_PRESENT) || defined(SL_CATALOG_KERNEL_PRESENT))
+#define ENABLE_UART_RX_INTERRUPT
+#endif
 
-static uint8_t           sReceiveBuffer[RECEIVE_BUFFER_SIZE];
-static const uint8_t    *sTransmitBuffer = NULL;
-static volatile uint16_t sTransmitLength = 0;
+#if (defined ENABLE_UART_RX_INTERRUPT) && (!OPENTHREAD_RADIO)
+#define WAIT_FOR_UART_RX_READY
+#endif
 
-#ifdef SL_CATALOG_KERNEL_PRESENT
+static uint8_t       sReceiveBuffer[IOSTREAM_RX_BUFFER_SIZE];
+static volatile bool sTransmitDone = false;
+static volatile bool sRxDataReady  = false;
 
-static unsigned int sGpioIntContext = 0;
+#ifdef ENABLE_UART_RX_INTERRUPT
+static unsigned int sGpioIntContext = IOSTREAM_RX_GPIO_PIN;
 
-static void gpioSerialWakeupCallback(uint8_t interrupt_no, void *context)
+STATIC void gpioSerialWakeupCallback(uint8_t interrupt_no, void *context)
 {
     unsigned int *pin = (unsigned int *)context;
 
     (void)interrupt_no;
 
-    if (*pin == SL_IOSTREAM_USART_VCOM_RX_PIN)
+    if (*pin == IOSTREAM_RX_GPIO_PIN)
     {
+        sRxDataReady = true;
+#ifdef SL_CATALOG_KERNEL_PRESENT
+        sl_ot_rtos_set_pending_event(SL_OT_RTOS_EVENT_SERIAL);
+#endif
         otSysEventSignalPending();
     }
 }
-#endif // SL_CATALOG_KERNEL_PRESENT
+
+static otError gpioSerialRxInterruptEnable(void)
+{
+    unsigned int intNo = SL_GPIO_INTERRUPT_UNAVAILABLE;
+    sl_gpio_t    gpio;
+    gpio.port          = IOSTREAM_RX_GPIO_PORT;
+    gpio.pin           = IOSTREAM_RX_GPIO_PIN;
+    sl_status_t status = sl_gpio_configure_external_interrupt(&gpio,
+                                                              (int32_t *)&intNo,
+                                                              SL_GPIO_INTERRUPT_FALLING_EDGE,
+                                                              (sl_gpio_irq_callback_t)gpioSerialWakeupCallback,
+                                                              &sGpioIntContext);
+
+    return (status == SL_STATUS_OK) ? OT_ERROR_NONE : OT_ERROR_FAILED;
+}
+#endif // ENABLE_UART_RX_INTERRUPT
+
+bool efr32UartIsDataReady(void)
+{
+    return sRxDataReady || sTransmitDone;
+}
 
 static void processReceive(void)
 {
     sl_status_t status;
     size_t      bytes_read = 0;
-    memset(sReceiveBuffer, 0, RECEIVE_BUFFER_SIZE);
+
+#ifndef WAIT_FOR_UART_RX_READY
+    // Set ready value to true before check if configured to not wait for data ready interrupt
+    sRxDataReady = true;
+#endif
+
+    otEXPECT(sRxDataReady);
+
+    memset(sReceiveBuffer, 0, IOSTREAM_RX_BUFFER_SIZE);
 
 #ifdef SL_CATALOG_KERNEL_PRESENT
     // Set Read API to non-blocking mode
@@ -87,19 +145,29 @@ static void processReceive(void)
 
     status = sl_iostream_read(sl_iostream_vcom_handle, &sReceiveBuffer, sizeof(sReceiveBuffer), &bytes_read);
 
+    sRxDataReady = false;
+
     if (status == SL_STATUS_OK)
     {
         otPlatUartReceived(sReceiveBuffer, bytes_read);
     }
+
+    otSysEventSignalPending();
+
+exit:
+    return;
 }
 
 static void processTransmit(void)
 {
-    if (sTransmitBuffer != NULL && sTransmitLength == 0)
-    {
-        sTransmitBuffer = NULL;
-        otPlatUartSendDone();
-    }
+    (void)otPlatUartFlush();
+}
+
+void efr32UartInit(void)
+{
+    memset(sReceiveBuffer, 0, IOSTREAM_RX_BUFFER_SIZE);
+    sTransmitDone = false;
+    sRxDataReady  = false;
 }
 
 void efr32UartProcess(void)
@@ -110,27 +178,25 @@ void efr32UartProcess(void)
 
 otError otPlatUartFlush(void)
 {
-    return OT_ERROR_NOT_IMPLEMENTED;
+    otError error = OT_ERROR_NONE;
+    otEXPECT_ACTION(sTransmitDone, error = OT_ERROR_INVALID_STATE);
+
+    sTransmitDone = false;
+
+    otPlatUartSendDone();
+    otSysEventSignalPending();
+exit:
+    return error;
 }
 
 otError otPlatUartEnable(void)
 {
     otError error = OT_ERROR_NONE;
 
-#ifdef SL_CATALOG_KERNEL_PRESENT
-    unsigned int intNo;
-
-    GPIOINT_Init();
-
-    sGpioIntContext = SL_IOSTREAM_USART_VCOM_RX_PIN;
-    intNo = GPIOINT_CallbackRegisterExt(SL_IOSTREAM_USART_VCOM_RX_PIN, gpioSerialWakeupCallback, &sGpioIntContext);
-
-    otEXPECT_ACTION(intNo != INTERRUPT_UNAVAILABLE, error = OT_ERROR_FAILED);
-
-    GPIO_ExtIntConfig(SL_IOSTREAM_USART_VCOM_RX_PORT, SL_IOSTREAM_USART_VCOM_RX_PIN, intNo, false, true, true);
+#ifdef ENABLE_UART_RX_INTERRUPT
+    error = gpioSerialRxInterruptEnable();
 #endif
 
-exit:
     return error;
 }
 
@@ -139,6 +205,37 @@ otError otPlatUartDisable(void)
     return OT_ERROR_NOT_IMPLEMENTED;
 }
 
+otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
+{
+    otError     error = OT_ERROR_FAILED;
+    sl_status_t status;
+
+    otEXPECT(aBuf != NULL && aBufLength > 0);
+
+    if (sTransmitDone)
+    {
+        (void)otPlatUartFlush();
+    }
+
+    status = sl_iostream_write(sl_iostream_vcom_handle, aBuf, aBufLength);
+    if (status == SL_STATUS_OK)
+    {
+        sTransmitDone = true;
+        error         = OT_ERROR_NONE;
+    }
+
+#ifdef SL_CATALOG_KERNEL_PRESENT
+    sl_ot_rtos_set_pending_event(SL_OT_RTOS_EVENT_SERIAL);
+#endif // SL_CATALOG_KERNEL_PRESENT
+    otSysEventSignalPending();
+
+exit:
+    return error;
+}
+
+/* Weak Function Definitions - Exclude from code coverage */
+
+// GCOV_EXCL_START
 OT_TOOL_WEAK void otPlatUartReceived(const uint8_t *aBuf, uint16_t aBufLength)
 {
     OT_UNUSED_VARIABLE(aBuf);
@@ -146,27 +243,8 @@ OT_TOOL_WEAK void otPlatUartReceived(const uint8_t *aBuf, uint16_t aBufLength)
     // do nothing
 }
 
-otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
-{
-    otError     error = OT_ERROR_NONE;
-    sl_status_t status;
-
-    otEXPECT_ACTION(sTransmitBuffer == NULL, error = OT_ERROR_BUSY);
-
-    sTransmitBuffer = aBuf;
-    sTransmitLength = aBufLength;
-
-    status = sl_iostream_write(sl_iostream_vcom_handle, (uint8_t *)sTransmitBuffer, sTransmitLength);
-    if (status == SL_STATUS_OK)
-    {
-        sTransmitLength = 0;
-    }
-    otSysEventSignalPending();
-exit:
-    return error;
-}
-
 OT_TOOL_WEAK void otPlatUartSendDone(void)
 {
     // do nothing
 }
+// GCOV_EXCL_STOP

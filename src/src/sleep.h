@@ -38,7 +38,51 @@
 
 #include <stdbool.h>
 
+#ifdef SL_COMPONENT_CATALOG_PRESENT
+#include "sl_component_catalog.h"
+#endif
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#include "sl_power_manager.h"
+#endif
+
+/**
+ * This function initializes the sleep interface
+ * and starts the platform in an active state.
+ *
+ */
 void sl_ot_sleep_init(void);
+
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+/**
+ * This function notifies the platform to refresh sleep requirements.
+ *
+ */
+void sl_ot_sleep_update(void);
+
+/**
+ * This function notifies power manager whether OpenThread will
+ * prevent the system from sleeping when sleep is requested.
+ *
+ * This function is only used for bare metal applications.
+ *
+ * @retval true     The OpenThread power manager module will not prevent app from sleeping.
+ *         false    The OpenThread power manager module will prevent app from sleeping.
+ *
+ */
 bool sl_ot_is_ok_to_sleep(void);
+
+/**
+ * This function notifies power manager whether OpenThread will
+ * prevent the system from sleeping when an ISR that interrupt sleep exits.
+ *
+ * This function is only used for bare metal applications.
+ *
+ * @retval SL_POWER_MANAGER_IGNORE  The OpenThread power manager module will not influence
+ *                                  power manager when deciding to sleep after ISR exit
+ *         SL_POWER_MANAGER_WAKEUP  The OpenThread power manager module will prevent
+ *                                  power manager from entering sleep after ISR exit.
+ */
+sl_power_manager_on_isr_exit_t sl_ot_sleep_on_isr_exit(void);
+#endif
 
 #endif // SLEEP_H_

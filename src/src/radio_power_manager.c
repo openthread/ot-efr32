@@ -108,7 +108,7 @@ static int8_t sli_get_max_tx_power_across_iids(uint16_t channel)
     int8_t max_default_tx_power = SL_INVALID_TX_POWER;
     int8_t selected_tx_power    = SL_INVALID_TX_POWER;
 
-#if SL_RAIL_UTIL_IEEE802154_FAST_CHANNEL_SWITCHING_ENABLED && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
+#if FAST_CHANNEL_SWITCHING_SUPPORT && OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
 
     if (sl_is_multi_channel_enabled())
     {

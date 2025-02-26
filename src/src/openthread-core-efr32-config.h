@@ -89,9 +89,7 @@
  * key references)
  *
  */
-#if defined(_SILICON_LABS_32B_SERIES_2)
 #define OPENTHREAD_CONFIG_PLATFORM_MAC_KEYS_EXPORTABLE_ENABLE 1
-#endif
 
 /*
  * @def OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT
@@ -229,7 +227,11 @@
  *
  */
 #ifndef OPENTHREAD_CONFIG_MAC_CSL_REQUEST_AHEAD_US
+#if defined(_SILICON_LABS_32B_SERIES_3)
+#define OPENTHREAD_CONFIG_MAC_CSL_REQUEST_AHEAD_US 15000
+#else
 #define OPENTHREAD_CONFIG_MAC_CSL_REQUEST_AHEAD_US 2000
+#endif
 #endif
 
 /**
@@ -374,7 +376,7 @@
 /**
  * @def OPENTHREAD_CONFIG_TCP_ENABLE
  *
- * Define as 1 to enable TCPlp (low power TCP defined in Thread spec).
+ * Define as 1 to enable OpenThread TCP API
  *
  */
 #ifndef OPENTHREAD_CONFIG_TCP_ENABLE
@@ -564,6 +566,52 @@
  */
 #ifndef SL_OPENTHREAD_ECDSA_PRIVATE_KEY_SIZE
 #define SL_OPENTHREAD_ECDSA_PRIVATE_KEY_SIZE 32
+#endif
+
+/**
+ * @def SL_OPENTHREAD_ENABLE_HOST_WAKE_GPIO
+ *
+ * Define to 1 to enable the host wakeup GPIO functionality.
+ * This feature allows the platform to wake up the host using a GPIO pin.
+ *
+ * Default value is 0 (disabled).
+ */
+#ifndef SL_OPENTHREAD_ENABLE_HOST_WAKE_GPIO
+#define SL_OPENTHREAD_ENABLE_HOST_WAKE_GPIO 0
+#endif
+
+/**
+ * @def SL_OPENTHREAD_HOST_WAKEUP_GPIO_PORT
+ *
+ * Defines the GPIO port for host wakeup.
+ *
+ */
+
+#ifndef SL_OPENTHREAD_HOST_WAKEUP_GPIO_PORT
+#define SL_OPENTHREAD_HOST_WAKEUP_GPIO_PORT SL_GPIO_PORT_C
+#endif
+
+/**
+ * @def SL_OPENTHREAD_HOST_WAKEUP_GPIO_PIN
+ *
+ * Defines the GPIO pin for host wakeup.
+ *
+ */
+
+#ifndef SL_OPENTHREAD_HOST_WAKEUP_GPIO_PIN
+#define SL_OPENTHREAD_HOST_WAKEUP_GPIO_PIN 0
+#endif
+
+/**
+ * @def SL_OPENTHREAD_HOST_CLEAR_PIN_TIMEOUT_MS
+ *
+ * Defines the timeout duration (in milliseconds) for clearing the host wakeup GPIO pin.
+ *
+ * This value specifies the amount of time the system will wait before clearing the host wakeup GPIO pin.
+ *
+ */
+#ifndef SL_OPENTHREAD_HOST_CLEAR_PIN_TIMEOUT_MS
+#define SL_OPENTHREAD_HOST_CLEAR_PIN_TIMEOUT_MS 10
 #endif
 
 /**

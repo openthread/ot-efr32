@@ -85,7 +85,7 @@
 #define GP_COMMAND_INDEX_WITH_APP_MODE_0 6
 
 #define BUFFERED_PSDU_GP_SRC_ID_INDEX_WITH_APP_MODE_0 9
-#define BUFFERED_PSDU_GP_APP_EP_INDEX_WITH_APP_MODE_1 9
+#define BUFFERED_PSDU_GP_APP_EP_INDEX_WITH_APP_MODE_1 15
 
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
 static volatile sl_gp_state_t gp_state = SL_GP_STATE_INIT;
@@ -183,8 +183,6 @@ bool sl_gp_intf_should_buffer_pkt(otInstance *aInstance, otRadioFrame *aFrame, b
 
     uint8_t fc = *gpFrameStartIndex;
 
-    otEXPECT_ACTION(gp_state == SL_GP_STATE_WAITING_FOR_PKT, shouldBufferPacket = false);
-
     otLogDebgPlat("GP RCP INTF : (%s) PL Index = %d Channel = %d Length = %d FC = %0X",
                   isRxFrame ? "Rx" : "Tx",
                   (gpFrameStartIndex - aFrame->mPsdu),
@@ -203,12 +201,11 @@ bool sl_gp_intf_should_buffer_pkt(otInstance *aInstance, otRadioFrame *aFrame, b
     {
         otLogDebgPlat("GP RCP INTF : (%s) Maintenance Frame match", isRxFrame ? "Rx" : "Tx");
         uint8_t cmdId = *(gpFrameStartIndex + GP_COMMAND_INDEX_FOR_MAINT_FRAME);
-        if (cmdId == GP_CHANNEL_REQUEST_CMD_ID && isRxFrame)
+        if (cmdId == GP_CHANNEL_REQUEST_CMD_ID && isRxFrame && gp_state == SL_GP_STATE_WAITING_FOR_PKT)
         {
             // Send out the buffered frame
-            shouldBufferPacket = true;
-            gp_state           = SL_GP_STATE_SEND_RESPONSE;
-            gpStateTimeOut     = aFrame->mInfo.mRxInfo.mTimestamp + GP_RX_OFFSET_IN_MICRO_SECONDS;
+            gp_state       = SL_GP_STATE_SEND_RESPONSE;
+            gpStateTimeOut = aFrame->mInfo.mRxInfo.mTimestamp + GP_RX_OFFSET_IN_MICRO_SECONDS;
             otLogDebgPlat("GP RCP INTF : (%s) Received GP_CHANNEL_REQUEST_CMD_ID - Send the Channel configuration",
                           isRxFrame ? "Rx" : "Tx");
         }
@@ -228,6 +225,10 @@ bool sl_gp_intf_should_buffer_pkt(otInstance *aInstance, otRadioFrame *aFrame, b
         uint8_t extFc = *(gpFrameStartIndex + GP_EXND_FC_INDEX);
 
         // Process only unsecured commissioning frames for Tx/Rx with correct direction and RxAfterTx fields
+        // A.3.9.1, step 12: the proxies (also in combos) receiving a Commissioning GPDF (0xE3), Application Description
+        // GPDF (0xE4), any other GPD command from the GPD CommandID range 0xE5 – 0xEF, any GPD command from the GPD
+        // CommandID range 0xB0 – 0xBF
+
         if ((!isRxFrame && GP_NWK_UNSECURED_TX_DATA_FRAME(extFc))
             || (isRxFrame && GP_NWK_UNSECURED_RX_DATA_FRAME(extFc)))
         {
@@ -239,7 +240,9 @@ bool sl_gp_intf_should_buffer_pkt(otInstance *aInstance, otRadioFrame *aFrame, b
                     // Buffer the frame
                     shouldBufferPacket = true;
                 }
-                else if (cmdId == GP_COMMISSIONINGING_CMD_ID && isRxFrame)
+                else if ((cmdId == GP_COMMISSIONINGING_CMD_ID || (0xE4 <= cmdId && cmdId <= 0xEF)
+                          || (0xB0 <= cmdId && cmdId <= 0xBF))
+                         && isRxFrame && gp_state == SL_GP_STATE_WAITING_FOR_PKT)
                 {
                     otRadioFrame *aTxFrame = otPlatRadioGetTransmitBuffer(aInstance);
                     // Match the gpd src Id ?
@@ -261,7 +264,9 @@ bool sl_gp_intf_should_buffer_pkt(otInstance *aInstance, otRadioFrame *aFrame, b
                     // Buffer the frame
                     shouldBufferPacket = true;
                 }
-                else if (cmdId == GP_COMMISSIONINGING_CMD_ID && isRxFrame)
+                else if ((cmdId == GP_COMMISSIONINGING_CMD_ID || (0xE4 <= cmdId && cmdId <= 0xEF)
+                          || (0xB0 <= cmdId && cmdId <= 0xBF))
+                         && isRxFrame && gp_state == SL_GP_STATE_WAITING_FOR_PKT)
                 {
                     otRadioFrame *aTxFrame = otPlatRadioGetTransmitBuffer(aInstance);
                     // Check the eui64 and app endpoint to send out the buffer packet.
@@ -275,9 +280,8 @@ bool sl_gp_intf_should_buffer_pkt(otInstance *aInstance, otRadioFrame *aFrame, b
                         && (gpFrameStartIndex[GP_APP_EP_INDEX_WITH_APP_MODE_1]
                             == (aTxFrame->mPsdu)[BUFFERED_PSDU_GP_APP_EP_INDEX_WITH_APP_MODE_1]))
                     {
-                        shouldBufferPacket = true;
-                        gp_state           = SL_GP_STATE_SEND_RESPONSE;
-                        gpStateTimeOut     = aFrame->mInfo.mRxInfo.mTimestamp + GP_RX_OFFSET_IN_MICRO_SECONDS;
+                        gp_state       = SL_GP_STATE_SEND_RESPONSE;
+                        gpStateTimeOut = aFrame->mInfo.mRxInfo.mTimestamp + GP_RX_OFFSET_IN_MICRO_SECONDS;
                     }
                 }
             }
