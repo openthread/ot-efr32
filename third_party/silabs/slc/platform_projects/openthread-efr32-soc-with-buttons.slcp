@@ -16,6 +16,8 @@ component:
     from: ot-efr32
   - id: ot_core_vendor_extension
     from: ot-efr32
+  - id: ot_serial_efr32
+    from: ot-efr32
 
   # SDK components
   - id: ot_psa_crypto
