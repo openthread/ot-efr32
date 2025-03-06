@@ -81,7 +81,6 @@ def is_mbedtls_define(define: str) -> bool:
 
 def is_openthread_device_type_define(define: str) -> bool:
     device_types: list[str] = [
-        "OPENTHREAD_COPROCESSOR",
         "OPENTHREAD_RADIO",
         "OPENTHREAD_FTD",
         "OPENTHREAD_MTD",

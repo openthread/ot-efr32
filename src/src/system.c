@@ -60,6 +60,7 @@
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
+#include "sleep.h"
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
 //==============================================================================
@@ -77,23 +78,6 @@
 //==============================================================================
 #define USE_EFR32_LOG (OPENTHREAD_CONFIG_LOG_OUTPUT == OPENTHREAD_CONFIG_LOG_OUTPUT_PLATFORM_DEFINED)
 
-#if defined(SL_CATALOG_OPENTHREAD_CLI_PRESENT) && defined(SL_CATALOG_KERNEL_PRESENT)
-#define CLI_TASK_ENABLED (SL_OPENTHREAD_ENABLE_CLI_TASK)
-#else
-#define CLI_TASK_ENABLED (0)
-#endif
-
-//==============================================================================
-// Forward declarations
-//==============================================================================
-static void efr32SerialProcess(void);
-
-#if (OPENTHREAD_RADIO)
-static void efr32NcpProcess(void);
-#elif (CLI_TASK_ENABLED == 0)
-static void efr32CliProcess(void);
-#endif
-
 //==============================================================================
 // Global variables
 //==============================================================================
@@ -102,15 +86,6 @@ otInstance *sInstance;
 //==============================================================================
 // Serial process helper functions
 //==============================================================================
-static void efr32SerialProcess(void)
-{
-#if (OPENTHREAD_RADIO)
-    efr32NcpProcess();
-#elif (CLI_TASK_ENABLED == 0)
-    efr32CliProcess();
-#endif // OPENTHREAD_RADIO0
-}
-
 #if (OPENTHREAD_RADIO)
 static void efr32NcpProcess(void)
 {
@@ -122,13 +97,21 @@ static void efr32NcpProcess(void)
     efr32SpiProcess();
 #endif
 }
-#elif (CLI_TASK_ENABLED == 0)
+#else
 static void efr32CliProcess(void)
 {
     efr32UartProcess();
 }
 #endif
 
+void efr32SerialProcess(void)
+{
+#if (OPENTHREAD_RADIO)
+    efr32NcpProcess();
+#else
+    efr32CliProcess();
+#endif // OPENTHREAD_RADIO
+}
 //==============================================================================
 // Weakly defined function definitions
 //==============================================================================
@@ -147,7 +130,9 @@ OT_TOOL_WEAK void app_init(void)
 
 OT_TOOL_WEAK void otSysEventSignalPending(void)
 {
-    // Intentionally empty
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_ot_sleep_update();
+#endif
 }
 
 //==============================================================================
@@ -176,8 +161,8 @@ void sl_ot_sys_init(void)
 #if USE_EFR32_LOG
     efr32LogInit();
 #endif
-    efr32RadioInit();
     efr32AlarmInit();
+    efr32RadioInit();
     efr32MiscInit();
 }
 
@@ -211,6 +196,7 @@ void otSysProcessDrivers(otInstance *aInstance)
     efr32GpProcess();
 #endif
 
+    // Serial task is not enabled, process serial events here
     efr32SerialProcess();
 
     efr32RadioProcess(aInstance);
@@ -218,9 +204,8 @@ void otSysProcessDrivers(otInstance *aInstance)
     // See alarm.c: Wrapped in a critical section
     efr32AlarmProcess(aInstance);
 
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT) && !defined(SL_CATALOG_KERNEL_PRESENT)
-    // Let the CPU go to sleep if the system allows it.
-    sl_power_manager_sleep();
+#if !defined(SL_CATALOG_KERNEL_PRESENT)
+    otSysEventSignalPending();
 #endif
 }
 

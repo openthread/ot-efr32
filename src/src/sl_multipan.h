@@ -48,9 +48,19 @@ extern "C" {
 #define RADIO_INTERFACE_COUNT (OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_NUM + 1)
 #else
 #define RADIO_INTERFACE_COUNT 1
+extern otInstance *sInstance;
 #endif
 
 #define INVALID_INTERFACE_INDEX (0xFF)
+
+typedef enum
+{
+    EFR32_IID_BCAST   = 0,
+    EFR32_IID_1       = 1,
+    EFR32_IID_2       = 2,
+    EFR32_IID_3       = 3,
+    EFR32_IID_INVALID = 0xFF
+} efr32Iid_t;
 
 /*
  * RAIL accepts 3 pan indices 0, 1 or 2. But valid IIDs are 1, 2 and 3 (0 is reserved for bcast).
@@ -70,6 +80,16 @@ exit:
 #endif
 
     return panIndex;
+}
+
+static inline otInstance *efr32GetInstanceFromIid(efr32Iid_t aIid)
+{
+#if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
+    return otPlatMultipanIidToInstance((uint8_t)aIid);
+#else
+    OT_UNUSED_VARIABLE(aIid);
+    return sInstance;
+#endif
 }
 
 static inline uint8_t efr32GetIidFromInstance(otInstance *aInstance)

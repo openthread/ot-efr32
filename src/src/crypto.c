@@ -31,22 +31,35 @@
  *   This file implements the OpenThread platform abstraction for PSA.
  *
  */
-#include "security_manager.h"
+
 #include <openthread-core-config.h>
 #include <openthread/error.h>
 #include <openthread/platform/crypto.h>
+
+#if OPENTHREAD_CONFIG_CRYPTO_LIB == OPENTHREAD_CONFIG_CRYPTO_LIB_PSA
+#include "security_manager.h"
 #include "common/debug.hpp"
 #include "utils/code_utils.h"
 
 #include "em_device.h"
-#include "em_system.h"
-#include "sl_psa_crypto.h"
 #include <mbedtls/ecdsa.h>
 #include <mbedtls/md.h>
 #include <mbedtls/pk.h>
 #include "mbedtls/psa_util.h"
+#if defined(_SILICON_LABS_32B_SERIES_2)
+#include "em_system.h"
+#else
+#include "sl_hal_system.h"
+#endif
+#include "sl_psa_crypto.h"
 
-#if OPENTHREAD_CONFIG_CRYPTO_LIB == OPENTHREAD_CONFIG_CRYPTO_LIB_PSA
+#if defined(_SILICON_LABS_32B_SERIES_2)
+#define GET_SECURITY_CAPABILITY SYSTEM_GetSecurityCapability
+#define VAULT_ENABLED securityCapabilityVault
+#else
+#define GET_SECURITY_CAPABILITY sl_hal_system_get_security_capability
+#define VAULT_ENABLED SL_SYSTEM_SECURITY_CAPABILITY_VAULT
+#endif
 
 #define PERSISTENCE_KEY_ID_USED_MAX (7)
 #define MAX_HMAC_KEY_SIZE (32)
@@ -130,6 +143,11 @@ static psa_key_usage_t getPsaKeyUsage(int aKeyUsage)
         aPsaKeyUsage |= PSA_KEY_USAGE_SIGN_HASH;
     }
 
+    if (aKeyUsage & OT_CRYPTO_KEY_USAGE_VERIFY_HASH)
+    {
+        aPsaKeyUsage |= PSA_KEY_USAGE_VERIFY_HASH;
+    }
+
     return aPsaKeyUsage;
 }
 
@@ -189,10 +207,8 @@ static void checkAndWrapKeys(void)
 
 void otPlatCryptoInit(void)
 {
-    (void)sl_sec_man_init();
-
 #if defined(SEMAILBOX_PRESENT) && !defined(SL_TRUSTZONE_NONSECURE)
-    if (SYSTEM_GetSecurityCapability() == securityCapabilityVault)
+    if (GET_SECURITY_CAPABILITY() == VAULT_ENABLED)
     {
         checkAndWrapKeys();
     }
@@ -730,4 +746,51 @@ exit:
     return error;
 }
 
-#endif // OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE
+otError otPlatCryptoEcdsaVerify(const otPlatCryptoEcdsaPublicKey *aPublicKey,
+                                const otPlatCryptoSha256Hash     *aHash,
+                                const otPlatCryptoEcdsaSignature *aSignature)
+{
+    otError        error = OT_ERROR_NONE;
+    psa_status_t   status;
+    bool           aIsHash = true;
+    uint8_t        aByteArray[OT_CRYPTO_ECDSA_PUBLIC_KEY_SIZE + 1];
+    otCryptoKeyRef aKeyId;
+
+    otEXPECT_ACTION(((aPublicKey != NULL) && (aHash != NULL) && (aSignature != NULL)), error = OT_ERROR_INVALID_ARGS);
+
+    // Public key needs a extra byt of encoding header, which has a value of 0x04, to be included for PSA to validate
+    // and process the publc key. Copy the key into a new temp array and append the encoding header to it.
+    aByteArray[0] = 0x04;
+    memcpy(&aByteArray[1], aPublicKey, OT_CRYPTO_ECDSA_PUBLIC_KEY_SIZE);
+
+    // Import the public key into a temp slot.
+    status = sl_sec_man_import_key(&aKeyId,
+                                   PSA_KEY_TYPE_ECC_PUBLIC_KEY(PSA_ECC_FAMILY_SECP_R1),
+                                   PSA_ALG_ECDSA(PSA_ALG_ANY_HASH),
+                                   PSA_KEY_USAGE_VERIFY_HASH,
+                                   PSA_KEY_PERSISTENCE_VOLATILE,
+                                   aByteArray,
+                                   OT_CRYPTO_ECDSA_PUBLIC_KEY_SIZE + 1); // To account for the padded byte.
+
+    // If key import fails, assert, as we cannot proceed
+    OT_ASSERT(status == PSA_SUCCESS);
+
+    // Verify the signature.
+    status = sl_sec_man_verify(aKeyId,
+                               PSA_ALG_ECDSA(PSA_ALG_SHA_256),
+                               aHash->m8,
+                               sizeof(aHash->m8),
+                               aSignature->m8,
+                               sizeof(aSignature->m8),
+                               aIsHash);
+
+    // Destroy the temp key.
+    sl_sec_man_destroy_key(aKeyId);
+
+    otEXPECT_ACTION((status == PSA_SUCCESS), error = OT_ERROR_FAILED);
+
+exit:
+    return error;
+}
+
+#endif // OPENTHREAD_CONFIG_CRYPTO_LIB == OPENTHREAD_CONFIG_CRYPTO_LIB_PSA

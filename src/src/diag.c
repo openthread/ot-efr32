@@ -37,6 +37,10 @@
 #include <stdio.h>
 #include <sys/time.h>
 
+#ifdef SL_COMPONENT_CATALOG_PRESENT
+#include "sl_component_catalog.h"
+#endif // SL_COMPONENT_CATALOG_PRESENT
+
 #include <openthread-core-config.h>
 #include <utils/code_utils.h>
 #include <openthread/cli.h>
@@ -48,7 +52,10 @@
 #include "common/logging.hpp"
 
 #include "diag.h"
-#include "em_gpio.h"
+
+#include "sl_gpio.h"
+#include "sl_hal_gpio.h"
+
 #include "platform-band.h"
 #include "platform-efr32.h"
 #include "rail_ieee802154.h"
@@ -81,7 +88,8 @@ struct PlatformDiagCommand
 };
 
 // Diagnostics mode variables.
-static bool                     sDiagMode            = false;
+static bool sDiagMode = false;
+
 static otPlatDiagOutputCallback sDiagOutputCallback  = NULL;
 static void                    *sDiagCallbackContext = NULL;
 
@@ -99,9 +107,6 @@ static void diagOutput(const char *aFormat, ...)
     va_end(args);
 }
 
-// *****************************************************************************
-// Helper functions
-// *****************************************************************************
 static void appendErrorResult(otError aError)
 {
     if (aError != OT_ERROR_NONE)
@@ -167,14 +172,6 @@ const struct PlatformDiagCommand sCommands[] = {
     {"auto-ack", &processAutoAck},
 };
 
-void otPlatDiagSetOutputCallback(otInstance *aInstance, otPlatDiagOutputCallback aCallback, void *aContext)
-{
-    OT_UNUSED_VARIABLE(aInstance);
-
-    sDiagOutputCallback  = aCallback;
-    sDiagCallbackContext = aContext;
-}
-
 otError otPlatDiagProcess(otInstance *aInstance, uint8_t aArgsLength, char *aArgs[])
 {
     otError error = OT_ERROR_INVALID_COMMAND;
@@ -195,6 +192,14 @@ otError otPlatDiagProcess(otInstance *aInstance, uint8_t aArgsLength, char *aArg
 // *****************************************************************************
 // Implement platform specific diagnostic's APIs.
 // *****************************************************************************
+
+void otPlatDiagSetOutputCallback(otInstance *aInstance, otPlatDiagOutputCallback aCallback, void *aContext)
+{
+    OT_UNUSED_VARIABLE(aInstance);
+
+    sDiagOutputCallback  = aCallback;
+    sDiagCallbackContext = aContext;
+}
 
 void otPlatDiagModeSet(bool aMode)
 {
@@ -239,7 +244,7 @@ static RAIL_Status_t stopTxStream(void)
     RAIL_Status_t        status;
     uint16_t             currentChannel;
     RAIL_SchedulerInfo_t rxSchedulerInfo = {
-        .priority = RADIO_SCHEDULER_BACKGROUND_RX_PRIORITY,
+        .priority = SL_802154_RADIO_PRIO_BACKGROUND_RX_VALUE,
     };
 
     SuccessOrExit(status = RAIL_StopTxStream(gRailHandle));
@@ -317,7 +322,7 @@ void otPlatDiagChannelSet(uint8_t aChannel)
     RAIL_Status_t status;
 
     RAIL_SchedulerInfo_t bgRxSchedulerInfo = {
-        .priority = RADIO_SCHEDULER_BACKGROUND_RX_PRIORITY,
+        .priority = SL_802154_RADIO_PRIO_BACKGROUND_RX_VALUE,
         // sliptime/transaction time is not used for bg rx
     };
 
@@ -354,10 +359,15 @@ void otPlatDiagAlarmCallback(otInstance *aInstance)
 static otError getGpioPortAndPin(uint32_t aGpio, uint16_t *aPort, uint16_t *aPin)
 {
     otError error = OT_ERROR_NONE;
-    *aPort        = GET_GPIO_PORT(aGpio);
-    *aPin         = GET_GPIO_PIN(aGpio);
 
+    *aPort = GET_GPIO_PORT(aGpio);
+    *aPin  = GET_GPIO_PIN(aGpio);
+
+#if defined(SL_CATALOG_GPIO_PRESENT)
+    if (*aPort > SL_HAL_GPIO_PORT_MAX || *aPin > SL_HAL_GPIO_PIN_MAX)
+#else
     if (*aPort > GPIO_PORT_MAX || *aPin > GPIO_PIN_MAX)
+#endif
     {
         ExitNow(error = OT_ERROR_INVALID_ARGS);
     }
@@ -368,19 +378,24 @@ exit:
 
 otError otPlatDiagGpioSet(uint32_t aGpio, bool aValue)
 {
-    otError  error;
+    otError  error = OT_ERROR_NONE;
     uint16_t port;
     uint16_t pin;
 
     SuccessOrExit(error = getGpioPortAndPin(aGpio, &port, &pin));
 
+    sl_gpio_t gpio;
+
+    gpio.port = (uint8_t)port;
+    gpio.pin  = (uint8_t)pin;
+
     if (aValue)
     {
-        GPIO_PinOutSet((GPIO_Port_TypeDef)port, pin);
+        VerifyOrExit(sl_gpio_set_pin(&gpio) == SL_STATUS_OK, error = OT_ERROR_INVALID_ARGS);
     }
     else
     {
-        GPIO_PinOutClear((GPIO_Port_TypeDef)port, pin);
+        VerifyOrExit(sl_gpio_clear_pin(&gpio) == SL_STATUS_OK, error = OT_ERROR_INVALID_ARGS);
     }
 
 exit:
@@ -389,13 +404,18 @@ exit:
 
 otError otPlatDiagGpioGet(uint32_t aGpio, bool *aValue)
 {
-    otError  error;
+    otError  error = OT_ERROR_NONE;
     uint16_t port;
     uint16_t pin;
 
     SuccessOrExit(error = getGpioPortAndPin(aGpio, &port, &pin));
 
-    *aValue = GPIO_PinInGet((GPIO_Port_TypeDef)port, pin);
+    sl_gpio_t gpio;
+
+    gpio.port = (uint8_t)port;
+    gpio.pin  = (uint8_t)pin;
+
+    VerifyOrExit(sl_gpio_get_pin_input(&gpio, aValue) == SL_STATUS_OK, error = OT_ERROR_INVALID_ARGS);
 
 exit:
     return error;
@@ -403,16 +423,25 @@ exit:
 
 otError otPlatDiagGpioSetMode(uint32_t aGpio, otGpioMode aMode)
 {
-    otError           error;
-    uint16_t          port;
-    uint16_t          pin;
-    GPIO_Mode_TypeDef mode;
+    otError        error = OT_ERROR_NONE;
+    uint16_t       port;
+    uint16_t       pin;
+    sl_gpio_mode_t mode;
 
     SuccessOrExit(error = getGpioPortAndPin(aGpio, &port, &pin));
 
-    mode = (aMode == OT_GPIO_MODE_INPUT) ? gpioModeInput : gpioModePushPull;
+    mode = (aMode == OT_GPIO_MODE_INPUT) ? SL_GPIO_MODE_INPUT : SL_GPIO_MODE_PUSH_PULL;
 
-    GPIO_PinModeSet((GPIO_Port_TypeDef)port, pin, mode, 0 /*out*/);
+    sl_gpio_t gpio;
+
+    gpio.port = (uint8_t)port;
+    gpio.pin  = (uint8_t)pin;
+
+    error = sl_gpio_set_pin_mode(&gpio, mode, 0 /*out*/);
+
+    // Convert to otError.
+    VerifyOrExit(error == SL_STATUS_OK,
+                 error = (error == SL_STATUS_INVALID_STATE ? OT_ERROR_INVALID_STATE : OT_ERROR_INVALID_ARGS));
 
 exit:
     return error;
@@ -420,16 +449,23 @@ exit:
 
 otError otPlatDiagGpioGetMode(uint32_t aGpio, otGpioMode *aMode)
 {
-    otError           error;
-    uint16_t          port;
-    uint16_t          pin;
-    GPIO_Mode_TypeDef mode;
+    otError        error = OT_ERROR_NONE;
+    uint16_t       port;
+    uint16_t       pin;
+    sl_gpio_mode_t mode;
 
     SuccessOrExit(error = getGpioPortAndPin(aGpio, &port, &pin));
 
-    mode = GPIO_PinModeGet((GPIO_Port_TypeDef)port, pin);
+    sl_gpio_t            gpio;
+    sl_gpio_pin_config_t pin_config;
 
-    *aMode = (mode == gpioModeInput) ? OT_GPIO_MODE_INPUT : OT_GPIO_MODE_OUTPUT;
+    gpio.port = (uint8_t)port;
+    gpio.pin  = (uint8_t)pin;
+
+    VerifyOrExit(sl_gpio_get_pin_config(&gpio, &pin_config) == SL_STATUS_OK, error = OT_ERROR_INVALID_ARGS);
+    mode = pin_config.mode;
+
+    *aMode = (mode == SL_GPIO_MODE_INPUT) ? OT_GPIO_MODE_INPUT : OT_GPIO_MODE_OUTPUT;
 
 exit:
     return error;

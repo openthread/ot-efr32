@@ -7,6 +7,7 @@ description: This component provides the OpenThread stack features configuration
 provides:
   - name: ot_stack_features_config
 config_file:
+  - path: third_party/silabs/simplicity_sdk/protocol/openthread/config/sl_openthread_radio_config.h
   - path: third_party/silabs/simplicity_sdk/protocol/openthread/config/sl_openthread_features_config.h
     file_id: openthread_features
     unless: [ot_reference_device]

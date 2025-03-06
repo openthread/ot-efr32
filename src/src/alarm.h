@@ -35,8 +35,23 @@
 #ifndef _ALARM_H
 #define _ALARM_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "openthread/instance.h"
+
+#ifdef SL_COMPONENT_CATALOG_PRESENT
+#include "sl_component_catalog.h"
+#endif // SL_COMPONENT_CATALOG_PRESENT
+
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#include "sl_power_manager.h"
+
+/**
+ * This function determines whether the device should sleep after an alarm triggers.
+ */
+bool efr32AlarmIsReady(void);
+
+#endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
 /**
  * This function initializes the alarm service used by OpenThread.
@@ -47,8 +62,10 @@ void efr32AlarmInit(void);
 /**
  * This function provides the remaining time (in milliseconds) on an alarm service.
  *
+ * @param[in]  aInstance  The OpenThread instance structure.
+ *
  */
-uint64_t efr32AlarmPendingTime(void);
+uint64_t efr32AlarmPendingTime(otInstance *aInstance);
 
 /**
  * This function checks if the alarm service is running.

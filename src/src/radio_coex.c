@@ -60,35 +60,38 @@ void sl_rail_util_coex_ot_events(sl_rail_util_coex_ot_event_t event)
     uint64_t *totalReqToGrantDuration =
         (isTxEvent) ? &sl_coex_counter.totalTxReqToGrantDuration : &sl_coex_counter.totalRxReqToGrantDuration;
 
+    /* clang-format off */
+
     // uint32_t mNumGrantGlitch;                       ///< Not available.
 
     // mNumTxRequest    = mNumTxGrantImmediate + mNumTxGrantWait
     // mNumTxGrantWait  = mNumTxGrantWaitActivated + mNumTxGrantWaitTimeout
     // Same applies for Rx counters.
-
+    
     /* Tx Events*/
-    // uint32_t mNumTxRequest;                         ///< Number of Tx Requested = mNumTxGrantImmediate +
-    // mNumTxGrantWait. uint32_t mNumTxGrantImmediate;                  ///< Not Available. uint32_t mNumTxGrantWait;
-    // ///< Number of tx requests while grant was inactive. uint32_t mNumTxGrantWaitActivated;              ///< Number
-    // of tx requests while grant was inactive that were ultimately granted. uint32_t mNumTxGrantWaitTimeout; ///<
-    // Number of tx requests while grant was inactive that timed out. uint32_t mNumTxGrantDeactivatedDuringRequest; ///<
-    // Number of tx that were in progress when grant was deactivated. uint32_t mNumTxDelayedGrant; ///< Number of tx
-    // requests that were not granted within 50us. uint32_t mAvgTxRequestToGrantTime;              ///< Average time in
-    // usec from tx request to grant.
-
+    // uint32_t mNumTxRequest;                         ///< Number of Tx Requested = mNumTxGrantImmediate + mNumTxGrantWait.
+    // uint32_t mNumTxGrantImmediate;                  ///< Not Available.
+    // uint32_t mNumTxGrantWait;                       ///< Number of tx requests while grant was inactive.
+    // uint32_t mNumTxGrantWaitActivated;              ///< Number of tx requests while grant was inactive that were ultimately granted.
+    // uint32_t mNumTxGrantWaitTimeout;                ///< Number of tx requests while grant was inactive that timed out.
+    // uint32_t mNumTxGrantDeactivatedDuringRequest;   ///< Number of tx that were in progress when grant was deactivated.
+    // uint32_t mNumTxDelayedGrant;                    ///< Number of tx requests that were not granted within 50us.
+    // uint32_t mAvgTxRequestToGrantTime;              ///< Average time in usec from tx request to grant.
+    
     /* Rx Events*/
     // uint32_t mNumRxRequest;                         ///< Number of rx requests.
     // uint32_t mNumRxGrantImmediate;                  ///< Number of rx requests while grant was active.
     // uint32_t mNumRxGrantWait;                       ///< Number of rx requests while grant was inactive.
-    // uint32_t mNumRxGrantWaitActivated;              ///< Number of rx requests while grant was inactive that were
-    // ultimately granted. uint32_t mNumRxGrantWaitTimeout;                ///< Number of rx requests while grant was
-    // inactive that timed out. uint32_t mNumRxGrantDeactivatedDuringRequest;   ///< Number of rx that were in progress
-    // when grant was deactivated. uint32_t mNumRxDelayedGrant;                    ///< Number of rx requests that were
-    // not granted within 50us. uint32_t mAvgRxRequestToGrantTime;              ///< Average time in usec from rx
-    // request to grant.
+    // uint32_t mNumRxGrantWaitActivated;              ///< Number of rx requests while grant was inactive that were ultimately granted.
+    // uint32_t mNumRxGrantWaitTimeout;                ///< Number of rx requests while grant was inactive that timed out.
+    // uint32_t mNumRxGrantDeactivatedDuringRequest;   ///< Number of rx that were in progress when grant was deactivated.
+    // uint32_t mNumRxDelayedGrant;                    ///< Number of rx requests that were not granted within 50us.
+    // uint32_t mAvgRxRequestToGrantTime;              ///< Average time in usec from rx request to grant.
+    
+    // uint32_t mNumRxGrantNone;                       ///< Number of rx requests that completed without receiving grant.
+    // bool     mStopped;
 
-    // uint32_t mNumRxGrantNone;                       ///< Number of rx requests that completed without receiving
-    // grant. bool     mStopped;
+    /* clang-format on */
 
     otEXPECT(sl_coex_counter.metrics.mStopped == false);
 

@@ -15,6 +15,8 @@ component:
     from: ot-efr32
   - id: ot_core_vendor_extension
     from: ot-efr32
+  - id: ot_serial_efr32
+    from: ot-efr32
 
   # SDK Components
   - id: ot_mbedtls
@@ -22,14 +24,12 @@ component:
   - id: rail_util_pti
 
 configuration:
-  - name: SL_BOARD_ENABLE_VCOM
-    value: 1
   - name: CIRCULAR_QUEUE_LEN_MAX
     value: 16
+  - name: SL_OPENTHREAD_STACK_TASK_MEM_SIZE
+    value: 4608
 
 define:
-  - name: OPENTHREAD_COPROCESSOR
-    value: 1
   - name: OPENTHREAD_RADIO
     value: 1
 
