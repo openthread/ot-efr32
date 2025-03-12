@@ -2,32 +2,32 @@
  * @file
  * @brief SSED application logic.
  *******************************************************************************
- *  Copyright (c) 2023, The OpenThread Authors.
- *  All rights reserved.
+ * # License
+ * <b>Copyright 2024 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
  *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. Neither the name of the copyright holder nor the
- *     names of its contributors may be used to endorse or promote products
- *     derived from this software without specific prior written permission.
+ * SPDX-License-Identifier: Zlib
  *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ *
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
+ * 2. Altered source versions must be plainly marked as such, and must not be
+ *    misrepresented as being the original software.
+ * 3. This notice may not be removed or altered from any source distribution.
+ *
  ******************************************************************************/
+
 // Define module name for Power Manager debugging feature.
 #define CURRENT_MODULE_NAME "OPENTHREAD_SAMPLE_APP"
 
@@ -49,16 +49,13 @@
 #include "sl_simple_button_instances.h"
 
 #include "sl_component_catalog.h"
-#ifdef SL_CATALOG_POWER_MANAGER_PRESENT
-#include "sl_power_manager.h"
-#endif
 
 // Constants
 #define MULTICAST_ADDR "ff03::1"
 #define MULTICAST_PORT 123
 #define RECV_PORT 234
-#define SSED_CSL_PERIOD_SYMBOLS 3125 // units of 10 symbols = 160 us.
-#define SSED_CSL_TIMEOUT_SEC 30      // seconds.
+#define SSED_CSL_PERIOD_US 500000 // 500000 us.
+#define SSED_CSL_TIMEOUT_SEC 20   // 20 seconds.
 #define FTD_MESSAGE "ftd button"
 #define SSED_MESSAGE "ssed button"
 
@@ -80,11 +77,9 @@ void sleepyInit(void)
     otCliOutputFormat("sleepy-demo-ssed starting in EM1 (idle) mode\r\n");
     otCliOutputFormat("Press Button 0 to toggle between EM2 (sleep) and EM1 (idle) modes\r\n");
 
-    otCliOutputFormat("[csl period: %d us.] [csl timeout: %d sec.]\r\n",
-                      SSED_CSL_PERIOD_SYMBOLS * 160,
-                      SSED_CSL_TIMEOUT_SEC);
+    otCliOutputFormat("[csl period: %d us.] [csl timeout: %d sec.]\r\n", SSED_CSL_PERIOD_US, SSED_CSL_TIMEOUT_SEC);
     SuccessOrExit(error = otLinkSetCslChannel(otGetInstance(), 15));
-    SuccessOrExit(error = otLinkSetCslPeriod(otGetInstance(), SSED_CSL_PERIOD_SYMBOLS));
+    SuccessOrExit(error = otLinkSetCslPeriod(otGetInstance(), SSED_CSL_PERIOD_US));
     SuccessOrExit(error = otLinkSetCslTimeout(otGetInstance(), SSED_CSL_TIMEOUT_SEC));
 
     otLinkModeConfig config;
@@ -227,17 +222,6 @@ void applicationTick(void)
         sRxOnIdleButtonPressed = false;
         sAllowSleep            = !sAllowSleep;
         sPrintState            = true;
-
-#if (defined(SL_CATALOG_KERNEL_PRESENT) && defined(SL_CATALOG_POWER_MANAGER_PRESENT))
-        if (sAllowSleep)
-        {
-            sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
-        }
-        else
-        {
-            sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
-        }
-#endif
     }
 
     // Check for BTN1 button press

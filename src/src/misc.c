@@ -42,18 +42,38 @@
 #include "btl_interface.h"
 #endif
 
+#if defined(SL_CATALOG_EMLIB_RMU_PRESENT)
 #include "em_rmu.h"
+#else
+#include "sl_hal_emu.h"
+#endif
 #include "platform-efr32.h"
+
+#if SL_OPENTHREAD_ENABLE_HOST_WAKE_GPIO
+#include "sl_gpio.h"
+#include "sl_sleeptimer.h"
+
+static sl_sleeptimer_timer_handle_t wake_timer;
+extern sl_gpio_t                    host_wakeup_gpio;
+#endif
 
 static uint32_t sResetCause;
 
 void efr32MiscInit(void)
 {
+#if defined(_SILICON_LABS_32B_SERIES_2)
     // Read the cause of last reset.
     sResetCause = RMU_ResetCauseGet();
 
     // Clear the register, as the causes cumulate over resets.
     RMU_ResetCauseClear();
+#else
+    // Read the cause of last reset.
+    sResetCause = sl_hal_emu_get_reset_cause();
+
+    // Clear the register, as the causes cumulate over resets.
+    sl_hal_emu_clear_reset_cause();
+#endif
 }
 
 void otPlatReset(otInstance *aInstance)
@@ -153,9 +173,31 @@ otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
     return reason;
 }
 
+// Timer callback function to clear the GPIO pin
+#if SL_OPENTHREAD_ENABLE_HOST_WAKE_GPIO
+static void clearWakeHostPin(sl_sleeptimer_timer_handle_t *handle, void *data)
+{
+    (void)handle;
+    (void)data;
+
+    // Clear the GPIO pin
+    sl_gpio_clear_pin(&host_wakeup_gpio);
+}
+#endif
+
+OT_TOOL_WEAK void otPlatEfrWakeHost(void)
+{
+// Set the GPIO pin to wake up the host
+#if SL_OPENTHREAD_ENABLE_HOST_WAKE_GPIO
+    sl_gpio_set_pin(&host_wakeup_gpio);
+    // Start a timer to clear the GPIO pin after the timeout
+    sl_sleeptimer_start_timer_ms(&wake_timer, SL_OPENTHREAD_HOST_CLEAR_PIN_TIMEOUT_MS, clearWakeHostPin, NULL, 0, 0);
+#endif
+}
+
 void otPlatWakeHost(void)
 {
-    // TODO: implement an operation to wake the host from sleep state.
+    otPlatEfrWakeHost();
 }
 
 OT_TOOL_WEAK void otCliOutputFormat(const char *aFmt, ...)

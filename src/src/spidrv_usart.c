@@ -40,8 +40,14 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "em_core.h"
+#include "sl_core.h"
+
+#if defined(SL_CATALOG_GPIO_PRESENT)
+#include "sl_device_gpio.h"
+#else
 #include "em_gpio.h"
+#endif
+
 #include "em_ldma.h"
 
 #include "gpiointerrupt.h"
@@ -72,8 +78,6 @@
 
 //  MEMBER VARIABLES
 static volatile bool should_process_transaction = false;
-
-static volatile bool transaction_active;
 
 // DMA
 static LDMA_TransferCfg_t rx_dma_transfer_config;
@@ -116,7 +120,6 @@ static void rcp_spidrv_spi_transaction_end_interrupt(uint8_t intNo)
 {
     if (intNo == SL_NCP_SPIDRV_USART_CS_FALLING_EDGE_INT_NO)
     {
-        transaction_active = true;
         return;
     }
     else if (intNo == SL_NCP_SPIDRV_USART_CS_RISING_EDGE_INT_NO)
@@ -124,7 +127,6 @@ static void rcp_spidrv_spi_transaction_end_interrupt(uint8_t intNo)
         // Must be done before calling the "complete_callback" since
         // this callback will use otPlatSpiSlavePrepareTransaction who
         // would not setup the buffers if a transaction is ongoing.
-        transaction_active = false;
         rcp_spidrv_deassert_host_request();
     }
 
@@ -227,9 +229,6 @@ otError otPlatSpiSlaveEnable(otPlatSpiSlaveTransactionCompleteCallback aComplete
 
     // Client complete callback request foreground processing.
     should_process_transaction = false;
-
-    // SPI transaction status.
-    transaction_active = false;
 
     // TX default value.
     default_tx_value = 0xFFU;
@@ -348,7 +347,6 @@ void otPlatSpiSlaveDisable(void)
 #endif
 
     should_process_transaction = false;
-    transaction_active         = false;
 
     complete_callback = NULL;
     process_callback  = NULL;
@@ -366,20 +364,29 @@ otError otPlatSpiSlavePrepareTransaction(uint8_t *aOutputBuf,
 
     otError error = OT_ERROR_NONE;
 
-    otEXPECT_ACTION(!transaction_active, error = OT_ERROR_BUSY);
     otEXPECT_ACTION(aOutputBufLen <= MAX_DMA_DESCRIPTOR_TRANSFER_COUNT, error = OT_ERROR_FAILED);
     otEXPECT_ACTION(aInputBufLen <= MAX_DMA_DESCRIPTOR_TRANSFER_COUNT, error = OT_ERROR_FAILED);
 
     uint32_t tx_dma_channel_number = sl_spidrv_handle_data.txDMACh;
     uint32_t rx_dma_channel_number = sl_spidrv_handle_data.rxDMACh;
 
+    // Check the CS pin if SPI transactions are in progress.
+    otEXPECT_ACTION(GPIO_PinInGet(SL_NCP_SPIDRV_USART_CS_PORT, SL_NCP_SPIDRV_USART_CS_PIN), error = OT_ERROR_BUSY);
+
     if (aInputBuf != NULL)
     {
-        LDMA_StopTransfer(rx_dma_channel_number);
         sl_spidrv_handle_data.peripheral.usartPort->CMD = USART_CMD_CLEARRX;
+        // Wait until the Rx fifo clears up.
+        while (sl_spidrv_handle_data.peripheral.usartPort->STATUS & _USART_STATUS_RXDATAV_MASK)
+            ;
 
         rx_descriptor.xfer.xferCnt = aInputBufLen - 1U;
         rx_descriptor.xfer.dstAddr = (uint32_t)aInputBuf;
+
+        LDMA_StopTransfer(rx_dma_channel_number);
+        // Wait if Rx LDMA channel is busy.
+        while (LDMA->CHBUSY & (1 << rx_dma_channel_number))
+            ;
 
         LDMA_StartTransfer(rx_dma_channel_number,
                            (LDMA_TransferCfg_t *)&rx_dma_transfer_config,
@@ -389,10 +396,18 @@ otError otPlatSpiSlavePrepareTransaction(uint8_t *aOutputBuf,
     if (aOutputBuf != NULL)
     {
         LDMA_StopTransfer(tx_dma_channel_number);
+        // Wait if Tx LDMA channel is busy.
+        while (LDMA->CHBUSY & (1 << tx_dma_channel_number))
+            ;
+
         sl_spidrv_handle_data.peripheral.usartPort->CMD = USART_CMD_CLEARTX;
 
         tx_descriptor[0].xfer.xferCnt = aOutputBufLen - 1U;
         tx_descriptor[0].xfer.srcAddr = (uint32_t)aOutputBuf;
+
+        // Wait until Tx fifo clears up.
+        while (sl_spidrv_handle_data.peripheral.usartPort->STATUS & _USART_STATUS_TXBUFCNT_MASK)
+            ;
 
         LDMA_StartTransfer(tx_dma_channel_number,
                            (LDMA_TransferCfg_t *)&tx_dma_transfer_config,

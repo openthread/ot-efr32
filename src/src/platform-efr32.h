@@ -42,9 +42,16 @@ extern "C" {
 #include <openthread/instance.h>
 
 #include "em_device.h"
+#if defined(_SILICON_LABS_32B_SERIES_2)
 #include "em_system.h"
+#else
+#include "sl_hal_system.h"
+#endif
 
 #include "rail.h"
+
+#include "alarm.h"
+#include "uart.h"
 
 // Global OpenThread instance structure
 extern otInstance *sInstance;
@@ -54,9 +61,6 @@ extern otInstance *sInstance;
 #endif // SL_COMPONENT_CATALOG_PRESENT
 
 #ifndef SL_CATALOG_KERNEL_PRESENT
-#define sl_ot_rtos_task_can_access_pal() (true)
-#elif defined(MATTER_INTEGRATION) && MATTER_INTEGRATION
-// TODO: Temporary for matter integration. This will be fixed later.
 #define sl_ot_rtos_task_can_access_pal() (true)
 #else
 #include "sl_ot_rtos_adaptation.h"
@@ -95,12 +99,6 @@ void efr32RadioDeinit(void);
  *
  */
 void efr32RadioProcess(otInstance *aInstance);
-
-/**
- * This function performs UART driver processing.
- *
- */
-void efr32UartProcess(void);
 
 /**
  * This function performs CPC driver processing.
@@ -182,6 +180,12 @@ bool efr32AllowSleepCallback(void);
 otError efr32RadioLoadChannelConfig(uint8_t aChannel, int8_t aTxPower);
 
 otError railStatusToOtError(RAIL_Status_t status);
+
+/**
+ * This function performs Serial processing.
+ *
+ */
+void efr32SerialProcess(void);
 
 #ifdef __cplusplus
 }
