@@ -193,16 +193,6 @@
 #endif
 
 /**
- * @def OPENTHREAD_CONFIG_UPTIME_ENABLE
- *
- * (For FTDs only) Define to 1 to enable tracking the uptime of OpenThread instance.
- *
- */
-#ifndef OPENTHREAD_CONFIG_UPTIME_ENABLE
-#define OPENTHREAD_CONFIG_UPTIME_ENABLE OPENTHREAD_FTD
-#endif
-
-/**
  * @def OPENTHREAD_CONFIG_CHILD_SUPERVISION_CHECK_TIMEOUT
  *
  * The default supervision check timeout interval (in seconds) used by a device in child state. Set to zero to disable
