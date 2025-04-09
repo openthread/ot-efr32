@@ -4,6 +4,6 @@ description: "ot-efr32 extension for Simplicity SDK Suite"
 label: "Silicon Labs OpenThread"
 sdk:
   id: simplicity_sdk
-  version: 2024.12.1
+  version: 2024.12.2
 component_path:
   - path: third_party/silabs/slc/component
