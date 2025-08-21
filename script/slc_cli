@@ -49,8 +49,21 @@ use_slc_from_path=1
 # Wrapper function to execute an slc command
 run_slc()
 {
-    IFS=" " read -r -a slc_args <<<"${@}"
-    eval "${slc_cmd}" "${slc_args[*]}"
+    (
+        export HOME="${repo_dir}"
+        export USERPROFILE="${repo_dir}"
+        export _JAVA_OPTIONS="-Duser.home=${repo_dir}"
+
+        set +x
+        echo "slc environment variables set:"
+        echo "  HOME=${HOME}"
+        echo "  USERPROFILE=${USERPROFILE}"
+        echo "  _JAVA_OPTIONS=${_JAVA_OPTIONS}"
+        set -x
+
+        IFS=" " read -r -a slc_args <<<"${@}"
+        eval "${slc_cmd}" "${slc_args[*]}"
+    )
 }
 
 # Find the command to use for slc
