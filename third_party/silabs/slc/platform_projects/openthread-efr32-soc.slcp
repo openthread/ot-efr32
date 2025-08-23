@@ -1,14 +1,12 @@
 project_name: openthread-efr32-soc
 label: ot-efr32
-package: OpenThread
+package: openthread
 description: This platform project is used to generate a CMake library for EFR32 SoCs
 category: OpenThread Examples
 quality: production
 
 component:
   # ot-efr32 components
-  - id: ot_crash_handler
-  - id: ot_platform_abstraction_core
   - id: ot_headers
     from: ot-efr32
   - id: ot_stack_features_config
@@ -19,10 +17,16 @@ component:
     from: ot-efr32
 
   # SDK components
+  - id: sl_main
+  - id: sl_main_custom_main
+  - id: ot_crash_handler
+  - id: ot_platform_abstraction_core
   - id: ot_psa_crypto
   - id: ot_mbedtls
   - id: iostream_recommended_console
   - id: rail_util_pti
+  - id: clock_manager
+  - id: ot_reset_utils
 
 configuration:
   - name: SL_BOARD_ENABLE_VCOM
@@ -40,12 +44,40 @@ configuration:
   - name: SL_HEAP_SIZE
     value: 16384
     condition: [freertos]
+  # This stack size is dependent on LTO optimization. In the cases, where LTO merges more than 1 functions in a single one
+  # (includes inlining) causing the stack to increase. This project wide configuration, it is recommended to ensure this
+  # configuration is updated with appropriate values based on the additional components installed and application code added.
   - name: SL_STACK_SIZE
-    value: 5120
+    value: 6144
+    condition: [toolchain_lto]
     unless: [freertos]
   - name: SL_STACK_SIZE
     value: 4608
     condition: [freertos]
+    unless: [toolchain_lto]
+  - name: SL_STACK_SIZE
+    value: 5120
+    condition: [toolchain_lto, freertos]
+  - name: SL_STACK_SIZE
+    value: 5120
+    unless: [toolchain_lto, freertos]
+  # Stack size config end
+  - name: SL_MAIN_START_TASK_STACK_SIZE_BYTES
+    value: 4608
+    condition: [sl_main,freertos]
+  - name: SL_MAIN_START_TASK_STACK_SIZE_BYTES
+    value: 5120
+    condition: [sl_main]
+    unless: [freertos]
+  - name: SL_OPENTHREAD_SERIAL_TASK_MEM_SIZE
+    value: 5120
+    condition: [toolchain_lto, freertos]
+  - name: SL_OPENTHREAD_STACK_TASK_MEM_SIZE
+    value: 7168
+    condition: [toolchain_lto]
+  - name: configTOTAL_HEAP_SIZE
+    value: 16384
+    condition: [toolchain_lto, freertos]
   - name: CIRCULAR_QUEUE_LEN_MAX
     value: 16
   - name: SL_IOSTREAM_USART_VCOM_FLOW_CONTROL_TYPE
