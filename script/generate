@@ -250,12 +250,16 @@ generate()
         "${generation_dir}"
 }
 
+# shellcheck disable=SC2031
 cleanup()
 {
-    # print out slc error logs if any
-    if [ $? -ne 0 ]; then
-        echo "Checking slc logs..."
-        find "${SLC_INSTALL_DIR}"/slc_cli/bin/slc-cli/configuration/ -type f -name "*.log" -exec cat {} +
+    # print out slc error logs if any on ci environment
+    local ret_status=$?
+    if [ "$HOME" = "/" ]; then
+        if [ $ret_status -ne 0 ]; then
+            echo "Checking slc logs..."
+            find "${SLC_INSTALL_DIR}"/slc_cli/bin/slc-cli/configuration/ -type f -name "*.log" -exec cat {} +
+        fi
     fi
 
     # Placeholder for any other cleanup tasks

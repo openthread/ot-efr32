@@ -50,16 +50,18 @@ use_slc_from_path=1
 run_slc()
 {
     (
-        export HOME="${repo_dir}"
-        export USERPROFILE="${repo_dir}"
-        export _JAVA_OPTIONS="-Duser.home=${repo_dir}"
+        if [ "$HOME" = "/" ]; then
+            export HOME="${repo_dir}"
+            export USERPROFILE="${repo_dir}"
+            export _JAVA_OPTIONS="-Duser.home=${repo_dir}"
 
-        set +x
-        echo "slc environment variables set:"
-        echo "  HOME=${HOME}"
-        echo "  USERPROFILE=${USERPROFILE}"
-        echo "  _JAVA_OPTIONS=${_JAVA_OPTIONS}"
-        set -x
+            set +x
+            echo "slc environment variables set:"
+            echo "  HOME=${HOME}"
+            echo "  USERPROFILE=${USERPROFILE}"
+            echo "  _JAVA_OPTIONS=${_JAVA_OPTIONS}"
+            set -x
+        fi
 
         IFS=" " read -r -a slc_args <<<"${@}"
         eval "${slc_cmd}" "${slc_args[*]}"
