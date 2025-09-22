@@ -31,8 +31,12 @@
  *   This file implements the OpenThread platform abstraction for miscellaneous behaviors.
  */
 
+#include <stdarg.h>
+
 #include <openthread-core-config.h>
+#include <openthread/platform/logging.h>
 #include <openthread/platform/misc.h>
+#include <openthread/platform/toolchain.h>
 
 #if defined(SL_COMPONENT_CATALOG_PRESENT)
 #include "sl_component_catalog.h"

@@ -125,8 +125,7 @@ static void clearEusartFifos(EUSART_TypeDef *eusart)
     sl_hal_eusart_disable_rx(eusart);
     sl_hal_eusart_disable_tx(eusart);
     sl_hal_eusart_disable(eusart);
-    while (eusart->EN & _EUSART_EN_DISABLING_MASK)
-        ;
+    while (eusart->EN & _EUSART_EN_DISABLING_MASK);
 
     sl_hal_eusart_enable(eusart);
     sl_hal_eusart_enable_rx(eusart);

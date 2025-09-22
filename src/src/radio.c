@@ -38,7 +38,6 @@
 #include <openthread/link.h>
 #include <openthread/platform/alarm-micro.h>
 #include <openthread/platform/alarm-milli.h>
-#include <openthread/platform/diag.h>
 #include <openthread/platform/radio.h>
 #include <openthread/platform/time.h>
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
@@ -113,7 +112,7 @@
 // Enums, macros and static variables
 
 #ifndef LOW_BYTE
-#define LOW_BYTE(n) ((uint8_t)((n)&0xFF))
+#define LOW_BYTE(n) ((uint8_t)((n) & 0xFF))
 #endif // LOW_BTE
 
 #ifndef HIGH_BYTE
@@ -856,7 +855,7 @@ static void efr32CoexInit(void);
 static void tryTxCurrentPacket(void);
 #else
 // Transmit the current outgoing frame.
-void        txCurrentPacket(void);
+void txCurrentPacket(void);
 #define tryTxCurrentPacket txCurrentPacket
 #endif // SL_CATALOG_RAIL_UTIL_COEX_PRESENT
 
@@ -1926,11 +1925,11 @@ void txCurrentPacket(void)
     // non-CSMA transmit) giving the Coex master a little more time to grant or deny.
     if (getInternalFlag(FLAG_CURRENT_TX_USE_CSMA))
     {
-        (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_TX_PENDED_PHY, (uint32_t) true);
+        (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_TX_PENDED_PHY, (uint32_t)true);
     }
     else
     {
-        (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_TX_PENDED_PHY, (uint32_t) false);
+        (void)handlePhyStackEvent(SL_RAIL_UTIL_IEEE802154_STACK_EVENT_TX_PENDED_PHY, (uint32_t)false);
     }
 
     frameLength = (uint8_t)sCurrentTxPacket->frame.mLength;
@@ -2151,8 +2150,7 @@ int8_t otPlatRadioGetRssi(otInstance *aInstance)
 
     // waiting for the event SL_RAIL_EVENT_RSSI_AVERAGE_DONE
     while (sEnergyScanStatus == ENERGY_SCAN_STATUS_IN_PROGRESS
-           && ((sl_rail_get_time(SL_RAIL_EFR32_HANDLE) - start) < SL_OPENTHREAD_RSSI_AVERAGING_TIMEOUT))
-        ;
+           && ((sl_rail_get_time(SL_RAIL_EFR32_HANDLE) - start) < SL_OPENTHREAD_RSSI_AVERAGING_TIMEOUT));
 
     if (sEnergyScanStatus == ENERGY_SCAN_STATUS_COMPLETED)
     {
@@ -3445,13 +3443,7 @@ static void processNextRxPacket(otInstance *aInstance)
         {
             continue;
         }
-#if OPENTHREAD_CONFIG_DIAG_ENABLE
-        if (otPlatDiagModeGet())
-        {
-            otPlatDiagRadioReceiveDone(instance, &sReceive.frame, sReceiveError);
-        }
-        else
-#endif // OPENTHREAD_CONFIG_DIAG_ENABLE
+        otPlatRadioReceiveDone(instance, &sReceive.frame, sReceiveError);
         {
             bool isGpPacket = sl_gp_intf_is_gp_pkt(&sReceive.frame);
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
@@ -3528,32 +3520,17 @@ static void processTxComplete(otInstance *aInstance)
             otLogDebgPlat("Transmit failed ErrorCode=%d", txStatus);
         }
 
-#if OPENTHREAD_CONFIG_DIAG_ENABLE
-        if (otPlatDiagModeGet())
-        {
+        // Clear any internally-set txDelays so future transmits are not affected.
+        sCurrentTxPacket->frame.mInfo.mTxInfo.mTxDelayBaseTime = 0;
+        sCurrentTxPacket->frame.mInfo.mTxInfo.mTxDelay         = 0;
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
-            otPlatDiagRadioTransmitDone(otPlatMultipanIidToInstance(sCurrentTxPacket->iid),
-                                        &sCurrentTxPacket->frame,
-                                        txStatus);
+        otPlatRadioTxDone(otPlatMultipanIidToInstance(sCurrentTxPacket->iid),
+                          &sCurrentTxPacket->frame,
+                          ackFrame,
+                          txStatus);
 #else
-            otPlatDiagRadioTransmitDone(aInstance, &sCurrentTxPacket->frame, txStatus);
+        otPlatRadioTxDone(aInstance, &sCurrentTxPacket->frame, ackFrame, txStatus);
 #endif
-        }
-        else
-#endif
-        {
-            // Clear any internally-set txDelays so future transmits are not affected.
-            sCurrentTxPacket->frame.mInfo.mTxInfo.mTxDelayBaseTime = 0;
-            sCurrentTxPacket->frame.mInfo.mTxInfo.mTxDelay         = 0;
-#if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
-            otPlatRadioTxDone(otPlatMultipanIidToInstance(sCurrentTxPacket->iid),
-                              &sCurrentTxPacket->frame,
-                              ackFrame,
-                              txStatus);
-#else
-            otPlatRadioTxDone(aInstance, &sCurrentTxPacket->frame, ackFrame, txStatus);
-#endif
-        }
 
 #if RADIO_CONFIG_DEBUG_COUNTERS_SUPPORT
         railDebugCounters.mRailPlatRadioTxDoneCbCount++;
