@@ -51,7 +51,10 @@ jobs:
     - name: Bootstrap
       run: |
         sudo rm /etc/apt/sources.list.d/* && sudo apt-get update
-        sudo apt-get --no-install-recommends install -y clang-format-14 shellcheck
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 19 all # 19.1.7 required for openthread
+        sudo apt-get --no-install-recommends install -y shellcheck
         python3 -m pip install yapf==0.29.0
         sudo snap install shfmt
     - name: Check

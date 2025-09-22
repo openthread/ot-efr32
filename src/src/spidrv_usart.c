@@ -190,32 +190,31 @@ otError otPlatSpiSlaveEnable(otPlatSpiSlaveTransactionCompleteCallback aComplete
 
     sl_clock_manager_enable_bus_clock(SL_BUS_CLOCK_GPIO);
 
-    SPIDRV_Init_t init_data = (SPIDRV_Init_t)
-    {
+    SPIDRV_Init_t init_data = (SPIDRV_Init_t){
         SL_NCP_SPIDRV_USART_PERIPHERAL, ///< The USART used for SPI.
 #if defined(_USART_ROUTELOC0_MASK)
-            SL_NCP_SPIDRV_USART_TX_LOC,  ///< A location number for the SPI Tx pin.
-            SL_NCP_SPIDRV_USART_RX_LOC,  ///< A location number for the SPI Rx pin.
-            SL_NCP_SPIDRV_USART_CLK_LOC, ///< A location number for the SPI Clk pin.
-            SL_NCP_SPIDRV_USART_CS_LOC,  ///< A location number for the SPI Cs pin.
+        SL_NCP_SPIDRV_USART_TX_LOC,  ///< A location number for the SPI Tx pin.
+        SL_NCP_SPIDRV_USART_RX_LOC,  ///< A location number for the SPI Rx pin.
+        SL_NCP_SPIDRV_USART_CLK_LOC, ///< A location number for the SPI Clk pin.
+        SL_NCP_SPIDRV_USART_CS_LOC,  ///< A location number for the SPI Cs pin.
 #elif defined(_GPIO_USART_ROUTEEN_MASK)
-            SL_NCP_SPIDRV_USART_TX_PORT,  ///< Tx port.
-            SL_NCP_SPIDRV_USART_RX_PORT,  ///< Rx port.
-            SL_NCP_SPIDRV_USART_CLK_PORT, ///< Clock port.
-            SL_NCP_SPIDRV_USART_CS_PORT,  ///< Chip select port.
-            SL_NCP_SPIDRV_USART_TX_PIN,   ///< Tx pin.
-            SL_NCP_SPIDRV_USART_RX_PIN,   ///< Rx pin.
-            SL_NCP_SPIDRV_USART_CLK_PIN,  ///< Clock pin.
-            SL_NCP_SPIDRV_USART_CS_PIN,   ///< Chip select pin.
+        SL_NCP_SPIDRV_USART_TX_PORT,  ///< Tx port.
+        SL_NCP_SPIDRV_USART_RX_PORT,  ///< Rx port.
+        SL_NCP_SPIDRV_USART_CLK_PORT, ///< Clock port.
+        SL_NCP_SPIDRV_USART_CS_PORT,  ///< Chip select port.
+        SL_NCP_SPIDRV_USART_TX_PIN,   ///< Tx pin.
+        SL_NCP_SPIDRV_USART_RX_PIN,   ///< Rx pin.
+        SL_NCP_SPIDRV_USART_CLK_PIN,  ///< Clock pin.
+        SL_NCP_SPIDRV_USART_CS_PIN,   ///< Chip select pin.
 #endif
-            0U,                             ///< An SPI bitrate.
-            8,                              ///< An SPI framelength, valid numbers are 4..16
-            0,                              ///< The value to transmit when using SPI receive API functions.
-            spidrvSlave,                    ///< An SPI type, slave.
-            SL_NCP_SPIDRV_USART_BIT_ORDER,  ///< A bit order on the SPI bus, MSB or LSB first.
-            SL_NCP_SPIDRV_USART_CLOCK_MODE, ///< SPI mode, CLKPOL/CLKPHASE setting.
-            spidrvCsControlAuto,            ///< A select master mode chip select (CS) control scheme.
-            spidrvSlaveStartImmediate,      ///< A slave mode transfer start scheme.
+        0U,                             ///< An SPI bitrate.
+        8,                              ///< An SPI framelength, valid numbers are 4..16
+        0,                              ///< The value to transmit when using SPI receive API functions.
+        spidrvSlave,                    ///< An SPI type, slave.
+        SL_NCP_SPIDRV_USART_BIT_ORDER,  ///< A bit order on the SPI bus, MSB or LSB first.
+        SL_NCP_SPIDRV_USART_CLOCK_MODE, ///< SPI mode, CLKPOL/CLKPHASE setting.
+        spidrvCsControlAuto,            ///< A select master mode chip select (CS) control scheme.
+        spidrvSlaveStartImmediate,      ///< A slave mode transfer start scheme.
     };
 
     VerifyOrExit(SPIDRV_Init((SPIDRV_HandleData_t *)&sl_spidrv_handle_data, &init_data) == ECODE_EMDRV_SPIDRV_OK,
@@ -381,8 +380,7 @@ otError otPlatSpiSlavePrepareTransaction(uint8_t *aOutputBuf,
         {
             sl_spidrv_handle_data.peripheral.usartPort->CMD = USART_CMD_CLEARRX;
             // Wait until the Rx fifo clears up.
-            while (sl_spidrv_handle_data.peripheral.usartPort->STATUS & _USART_STATUS_RXDATAV_MASK)
-                ;
+            while (sl_spidrv_handle_data.peripheral.usartPort->STATUS & _USART_STATUS_RXDATAV_MASK);
         }
 
         LDMA_StopTransfer(rx_dma_channel_number);
@@ -402,8 +400,7 @@ otError otPlatSpiSlavePrepareTransaction(uint8_t *aOutputBuf,
         tx_descriptor[0].xfer.srcAddr = (uint32_t)aOutputBuf;
 
         // Wait until Tx fifo clears up.
-        while (sl_spidrv_handle_data.peripheral.usartPort->STATUS & _USART_STATUS_TXBUFCNT_MASK)
-            ;
+        while (sl_spidrv_handle_data.peripheral.usartPort->STATUS & _USART_STATUS_TXBUFCNT_MASK);
     }
 
     if (aInputBuf != NULL)

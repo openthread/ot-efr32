@@ -421,7 +421,7 @@ otError otPlatCryptoHmacSha256Start(otCryptoContext *aContext, const otCryptoKey
 #if defined(SEMAILBOX_PRESENT)
     sl_sec_man_destroy_key(hmacKeyRef);
 #else
-    hmacKeyRef   = 0;
+    hmacKeyRef = 0;
 #endif
 
 exit:
