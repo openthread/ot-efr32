@@ -1,6 +1,6 @@
 id: ot_serial_efr32
 label: OpenThread serial component for ot-efr32
-package: OpenThread
+package: openthread
 category: OpenThread
 quality: production
 description: This component provides a serial implementation for v2024.12.* SDK without ot-platform-abstraction requirement
@@ -8,7 +8,7 @@ ui_hints:
   visibility: never
 provides:
   - name: ot_serial_efr32
-  - name: ot_uart_implemention
+  - name: ot_uart_implementation
 requires:
   - name: gpio
     condition: [uartdrv_instance]

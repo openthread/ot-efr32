@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2023, The OpenThread Authors.
+ *  Copyright (c) 2025, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -27,13 +27,19 @@
  */
 
 /**
- * @file logging_rtt.c
- *  This file implements the OpenThread platform abstraction for logging using RTT interface.
+ * @file logging_backchannel.c
+ *  This file implements the OpenThread platform abstraction for logging using the backchannel interface.
  *
  */
 
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
+
 #include <openthread-core-config.h>
 #include <openthread/config.h>
+
+#include <utils/code_utils.h>
 #include <openthread/platform/alarm-milli.h>
 #include <openthread/platform/logging.h>
 
@@ -41,19 +47,65 @@
 #include "sl_component_catalog.h"
 #endif // SL_COMPONENT_CATALOG_PRESENT
 
-#ifdef SL_CATALOG_OT_RTT_LOG_PRESENT
+#ifdef SL_CATALOG_OT_BACKCHANNEL_LOG_PRESENT
 
-#include <utils/logging_rtt.h>
+#include "debug_channel.h"
 
 #if (OPENTHREAD_CONFIG_LOG_OUTPUT == OPENTHREAD_CONFIG_LOG_OUTPUT_PLATFORM_DEFINED)
+static bool sLogInitialized = false;
+
+#ifndef LOG_PARSE_BUFFER_SIZE
+#define LOG_PARSE_BUFFER_SIZE (19 /* Timestamp */ + OPENTHREAD_CONFIG_LOG_MAX_SIZE + 1 /* \n */)
+#endif
+
+#if (LOG_TIMESTAMP_ENABLE == 1)
+static inline int logTimestamp(char *aLogString, uint16_t aMaxSize)
+{
+    long unsigned int now = otPlatAlarmMilliGetNow();
+    return snprintf(aLogString, (size_t)aMaxSize, "[%010lu]", now);
+}
+#endif
+
+static void utilsLogBackchannelOutput(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, va_list ap)
+{
+    OT_UNUSED_VARIABLE(aLogLevel);
+    OT_UNUSED_VARIABLE(aLogRegion);
+
+    size_t length = 0;
+    int    charsWritten;
+    char   logString[LOG_PARSE_BUFFER_SIZE + 1];
+
+    otEXPECT(sLogInitialized == true);
+
+#if (LOG_TIMESTAMP_ENABLE == 1)
+    length += logTimestamp(logString, LOG_PARSE_BUFFER_SIZE);
+#endif
+
+    charsWritten = vsnprintf(&logString[length], (size_t)(LOG_PARSE_BUFFER_SIZE - length), aFormat, ap);
+    otEXPECT(charsWritten >= 0);
+    length += charsWritten;
+
+    if (length > LOG_PARSE_BUFFER_SIZE)
+    {
+        length = LOG_PARSE_BUFFER_SIZE;
+    }
+
+    logString[length++] = '\n';
+
+    sl_debug_binary_write(EM_DEBUG_PRINTF, logString, length);
+
+exit:
+    return;
+}
+
 void efr32LogInit(void)
 {
-    utilsLogRttInit();
+    sLogInitialized = true;
 }
 
 void efr32LogDeinit(void)
 {
-    utilsLogRttDeinit();
+    sLogInitialized = false;
 }
 
 void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
@@ -62,10 +114,10 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
 
     va_start(ap, aFormat);
 
-    utilsLogRttOutput(aLogLevel, aLogRegion, aFormat, ap);
+    utilsLogBackchannelOutput(aLogLevel, aLogRegion, aFormat, ap);
 
     va_end(ap);
 }
 #endif
 
-#endif // SL_CATALOG_OT_RTT_LOG_PRESENT
+#endif // SL_CATALOG_OT_BACKCHANNEL_LOG_PRESENT

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2024, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,13 +31,13 @@
 
 #include "board_config.h"
 #ifndef RADIO_CONFIG_915MHZ_OQPSK_SUPPORT
-#if OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT
+#if defined(OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT) && OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT
 #error "Platform not configured to support configuration option: OPENTHREAD_CONFIG_RADIO_915MHZ_OQPSK_SUPPORT"
 #endif
 #endif
 
 #ifndef RADIO_CONFIG_915MHZ_2GFSK_SUPPORT
-#if OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT
+#if defined(OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT) && OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT
 #error "Platform not configured to support configuration option: OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT"
 #endif
 #endif

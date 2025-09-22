@@ -41,6 +41,6 @@ description: "example_vendor extension for Simplicity SDK Suite"
 label: "Example Vendor extension"
 sdk:
   id: simplicity_sdk
-  version: 2024.12.2
+  version: 2025.6.1
 component_path:
   - path: component

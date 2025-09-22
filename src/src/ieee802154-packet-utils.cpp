@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2024, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -261,6 +261,7 @@ static inline void efr32CreateKeyDesc(const otMacKeyMaterial *key, sli_crypto_de
     key_desc->key.plaintext_key.buffer.pointer = (uint8_t *)key->mKeyMaterial.mKey.m8;
     key_desc->key.plaintext_key.buffer.size    = OT_MAC_KEY_SIZE;
     key_desc->key.plaintext_key.key_size       = OT_MAC_KEY_SIZE;
+    key_desc->yield                            = false;
 }
 #endif
 

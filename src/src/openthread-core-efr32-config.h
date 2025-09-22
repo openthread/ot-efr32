@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2024, The OpenThread Authors.
+ *  Copyright (c) 2023, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -60,14 +60,6 @@
 // with Simplicity Studio
 #ifdef SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE
 #include SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE
-#endif
-
-#ifndef RADIO_CONFIG_SUBGHZ_SUPPORT
-#define RADIO_CONFIG_SUBGHZ_SUPPORT 0
-#endif
-
-#ifndef OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT
-#define OPENTHREAD_CONFIG_RADIO_915MHZ_2GFSK_SUPPORT 0
 #endif
 
 #include "board_config.h"
@@ -132,13 +124,13 @@
  * This configuration option is used by the Sub-GHz feature to specify proprietary radio parameters,
  * currently not defined by the Thread spec.
  */
-#if RADIO_CONFIG_SUBGHZ_SUPPORT
+#if defined(RADIO_CONFIG_SUBGHZ_SUPPORT) && RADIO_CONFIG_SUBGHZ_SUPPORT
 #define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_SUPPORT 1
 #else
 #define OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_SUPPORT 0
 #endif
 
-#if RADIO_CONFIG_SUBGHZ_SUPPORT
+#if defined(RADIO_CONFIG_SUBGHZ_SUPPORT) && RADIO_CONFIG_SUBGHZ_SUPPORT
 /**
  * @def OPENTHREAD_CONFIG_PLATFORM_RADIO_PROPRIETARY_CHANNEL_PAGE
  *
@@ -198,6 +190,16 @@
  */
 #ifndef OPENTHREAD_CONFIG_PLATFORM_INFO
 #define OPENTHREAD_CONFIG_PLATFORM_INFO "EFR32"
+#endif
+
+/**
+ * @def OPENTHREAD_CONFIG_UPTIME_ENABLE
+ *
+ * (For FTDs/MTDs only) Define to 1 to enable tracking the uptime of OpenThread instance.
+ *
+ */
+#ifndef OPENTHREAD_CONFIG_UPTIME_ENABLE
+#define OPENTHREAD_CONFIG_UPTIME_ENABLE (OPENTHREAD_FTD || OPENTHREAD_MTD)
 #endif
 
 /**
@@ -264,7 +266,7 @@
  *
  */
 #ifndef OPENTHREAD_CONFIG_MIN_RECEIVE_ON_AHEAD
-#if RADIO_CONFIG_SUBGHZ_SUPPORT
+#if defined(RADIO_CONFIG_SUBGHZ_SUPPORT) && RADIO_CONFIG_SUBGHZ_SUPPORT
 #define OPENTHREAD_CONFIG_MIN_RECEIVE_ON_AHEAD 256
 #else
 #define OPENTHREAD_CONFIG_MIN_RECEIVE_ON_AHEAD 192
@@ -557,7 +559,7 @@
  *
  */
 #ifndef SL_OPENTHREAD_RADIO_CCA_MODE
-#define SL_OPENTHREAD_RADIO_CCA_MODE RAIL_IEEE802154_CCA_MODE_RSSI
+#define SL_OPENTHREAD_RADIO_CCA_MODE SL_RAIL_IEEE802154_CCA_MODE_RSSI
 #endif
 
 /**
@@ -623,5 +625,19 @@
  *
  */
 #define OPENTHREAD_CONFIG_PLATFORM_POWER_CALIBRATION_ENABLE OPENTHREAD_CONFIG_POWER_CALIBRATION_ENABLE
+
+/**
+ * @def OPENTHREAD_CONFIG_RADIO_LINK_TREL_ENABLE
+ *
+ * Set to 1 to enable support for Thread Radio Encapsulation Link (TREL).
+ *
+ * @note Only valid for NCP devices
+ */
+#if !defined(SL_CATALOG_OPENTHREAD_NCP_PRESENT) || defined(SL_CATALOG_OPENTHREAD_STACK_RCP_PRESENT)
+#ifdef OPENTHREAD_CONFIG_RADIO_LINK_TREL_ENABLE
+#undef OPENTHREAD_CONFIG_RADIO_LINK_TREL_ENABLE
+#endif
+#define OPENTHREAD_CONFIG_RADIO_LINK_TREL_ENABLE 0
+#endif
 
 #endif // OPENTHREAD_CORE_EFR32_CONFIG_H_

@@ -39,7 +39,7 @@
 
 #include "common/logging.hpp"
 
-#include "sl_system_init.h"
+#include "sl_main_init.h"
 
 //==============================================================================
 // Component Catalog includes
@@ -49,9 +49,9 @@
 #endif
 
 #if defined(SL_CATALOG_KERNEL_PRESENT)
-#include "sl_system_kernel.h"
+#include "sl_main_kernel.h"
 #else
-#include "sl_system_process_action.h"
+#include "sl_main_process_action.h"
 #endif
 
 #if defined(SL_CATALOG_MEMORY_MANAGER_PRESENT)
@@ -86,7 +86,7 @@ otInstance *sInstance;
 //==============================================================================
 // Serial process helper functions
 //==============================================================================
-#if (OPENTHREAD_RADIO)
+#if (SL_CATALOG_OPENTHREAD_NCP_PRESENT)
 static void efr32NcpProcess(void)
 {
 #if OPENTHREAD_CONFIG_NCP_HDLC_ENABLE
@@ -106,7 +106,7 @@ static void efr32CliProcess(void)
 
 void efr32SerialProcess(void)
 {
-#if (OPENTHREAD_RADIO)
+#if (SL_CATALOG_OPENTHREAD_NCP_PRESENT)
     efr32NcpProcess();
 #else
     efr32CliProcess();
@@ -145,7 +145,7 @@ void otSysInit(int argc, char *argv[])
     // Initialize Silicon Labs device, system, service(s) and protocol stack(s).
     // Note that if the kernel is present, processing task(s) will be created by
     // this call.
-    sl_system_init();
+    sl_main_init();
 
     // Initialize the application. For example, create periodic timer(s) or
     // task(s) if the kernel is present.
@@ -189,7 +189,7 @@ void otSysProcessDrivers(otInstance *aInstance)
 #if !defined(SL_CATALOG_KERNEL_PRESENT)
     // Do not remove this call: Silicon Labs components process action routine
     // must be called from the super loop.
-    sl_system_process_action();
+    sl_main_process_action();
 #endif
 
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
