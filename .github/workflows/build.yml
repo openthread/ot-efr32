@@ -138,7 +138,7 @@ jobs:
               mv "build/${board}/slc" "artifact/${board}"
           done
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: build-${{ matrix.gcc_ver }}
