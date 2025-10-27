@@ -100,7 +100,7 @@ jobs:
 
     - name: Upload Docker image
       id: upload-artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.artifact_name }}
         path: ${{ env.image_name }}.tar
