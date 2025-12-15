@@ -78,7 +78,7 @@ jobs:
           verbose: 2
 
       - name: Restore ARM Toolchain
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-arm-toolchain
         with:
             path: ${{ env.TOOLCHAIN_DIR }}/${{ matrix.gcc_extract_dir }}
@@ -114,7 +114,7 @@ jobs:
         run: git -C third_party/silabs/simplicity_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
 
       - name: Restore simplicity_sdk LFS cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: lfs-cache-simplicity_sdk
         with:
             path: .git/modules/third_party/silabs/simplicity_sdk/lfs
