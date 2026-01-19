@@ -61,7 +61,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PERSONAL_ACCESS_TOKEN }}
 
       - name: 'Download artifact'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ${{ inputs.artifact_name }}
 
