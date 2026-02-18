@@ -93,7 +93,9 @@ jobs:
           name: ${{ needs.docker.outputs.artifact_name }}
 
       - name: Load docker image
-        run: docker load -i ${{ needs.docker.outputs.image_name }}.tar
+        run: docker load -i ${NEEDS_DOCKER_OUTPUTS_IMAGE_NAME}.tar
+        env:
+          NEEDS_DOCKER_OUTPUTS_IMAGE_NAME: ${{ needs.docker.outputs.image_name }}
 
       - name: Start ot-efr32-dev container
         run: |
@@ -103,7 +105,9 @@ jobs:
             --name ${{ env.container_name }} \
             --env CCACHE_DIR=/ot-efr32/.ccache \
             -v $PWD:/ot-efr32 -w /ot-efr32\
-            ${{ needs.docker.outputs.image_name }}
+            ${NEEDS_DOCKER_OUTPUTS_IMAGE_NAME}
+        env:
+          NEEDS_DOCKER_OUTPUTS_IMAGE_NAME: ${{ needs.docker.outputs.image_name }}
 
       - name: Append LFS include config to simplicity_sdk .lfsconfig
         run: |
