@@ -84,7 +84,7 @@ jobs:
         cache-to: type=gha,mode=max
 
     - name: Inspect Docker image
-      run: docker inspect ${{ env.image_name }}
+      run: docker inspect ${IMAGE_NAME}
 
     - name: Container image sanity checks
       run: |
@@ -93,10 +93,10 @@ jobs:
           && chmod +x container-structure-test-linux-amd64
 
         # Run tests
-        ./container-structure-test-linux-amd64 test --config docker/test-ot-efr32-dev.yml --image ${{ env.image_name }}
+        ./container-structure-test-linux-amd64 test --config docker/test-ot-efr32-dev.yml --image ${IMAGE_NAME}
 
     - name: Export Docker image
-      run: docker save -o ${{ env.image_name }}.tar ${{ env.image_name }}
+      run: docker save -o ${IMAGE_NAME}.tar ${IMAGE_NAME}
 
     - name: Upload Docker image
       id: upload-artifact

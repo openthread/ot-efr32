@@ -66,11 +66,16 @@ jobs:
           name: ${{ inputs.artifact_name }}
 
       - name: Load Docker image
-        run: docker load -i ${{ inputs.image_name }}.tar
+        run: docker load -i ${INPUTS_IMAGE_NAME}.tar
+        env:
+          INPUTS_IMAGE_NAME: ${{ inputs.image_name }}
 
       - name: Tag Docker image
         if: inputs.new_image_name
-        run: docker tag ${{ inputs.image_name }} ${{ inputs.new_image_name }}
+        run: docker tag ${INPUTS_IMAGE_NAME} ${INPUTS_NEW_IMAGE_NAME}
+        env:
+          INPUTS_IMAGE_NAME: ${{ inputs.image_name }}
+          INPUTS_NEW_IMAGE_NAME: ${{ inputs.new_image_name }}
 
       - name: Push Docker image
         run: docker push ${{ inputs.new_image_name || inputs.image_name }}
