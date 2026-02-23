@@ -85,8 +85,12 @@ jobs:
 
     - name: Inspect Docker image
       run: docker inspect ${IMAGE_NAME}
+      env:
+        IMAGE_NAME: ${{ env.image_name }}
 
     - name: Container image sanity checks
+      env:
+        IMAGE_NAME: ${{ env.image_name }}
       run: |
         # Download container-structure-test
         curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 \
@@ -97,6 +101,8 @@ jobs:
 
     - name: Export Docker image
       run: docker save -o ${IMAGE_NAME}.tar ${IMAGE_NAME}
+      env:
+        IMAGE_NAME: ${{ env.image_name }}
 
     - name: Upload Docker image
       id: upload-artifact
