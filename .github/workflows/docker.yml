@@ -71,7 +71,7 @@ jobs:
         platforms: linux/amd64
 
     - name: Build and export to Docker context
-      uses: docker/build-push-action@v6
+      uses: docker/build-push-action@v7
       with:
         build-args: |
           BUILD_DATE=${{ needs.metadata.outputs.date }}
