@@ -7,7 +7,7 @@
 
 # OpenThread on EFR32 Examples
 
-This repo contains example platform drivers for the [Silicon Labs EFR32 Mighty Gecko][efr32mg].
+This repo contains example platform drivers for the [Silicon Labs EFR32 Mighty Gecko][efr32mg] family.
 
 [efr32mg]: https://www.silabs.com/support/getting-started/mesh-networking/thread/mighty-gecko
 
