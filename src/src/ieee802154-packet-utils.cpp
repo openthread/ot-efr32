@@ -272,21 +272,18 @@ void efr32PlatProcessTransmitAesCcm(otRadioFrame *aFrame, const otExtAddress *aE
     OT_UNUSED_VARIABLE(aExtAddress);
 #else
 
-    uint32_t      frameCounter = 0;
-    uint8_t       tagLength;
-    uint8_t       securityLevel;
-    uint8_t       nonce[Crypto::AesCcm::kNonceSize];
-    Mac::TxFrame *aTxFrame = static_cast<Mac::TxFrame *>(aFrame);
+    uint32_t                  frameCounter = 0;
+    uint8_t                   tagLength;
+    Mac::Frame::SecurityLevel securityLevel;
+    Crypto::AesCcm::Nonce     nonce;
+    Mac::TxFrame             *aTxFrame = static_cast<Mac::TxFrame *>(aFrame);
 
     VerifyOrExit(aTxFrame->GetSecurityEnabled());
 
     SuccessOrExit(aTxFrame->GetSecurityLevel(securityLevel));
     SuccessOrExit(aTxFrame->GetFrameCounter(frameCounter));
 
-    Crypto::AesCcm::GenerateNonce(*static_cast<const Mac::ExtAddress *>(aExtAddress),
-                                  frameCounter,
-                                  securityLevel,
-                                  nonce);
+    nonce.InitFrom(*static_cast<const Mac::ExtAddress *>(aExtAddress), frameCounter, securityLevel);
 
     tagLength = aTxFrame->GetFooterLength() - aTxFrame->GetFcsSize();
 
@@ -297,7 +294,7 @@ void efr32PlatProcessTransmitAesCcm(otRadioFrame *aFrame, const otExtAddress *aE
     packetSecurityHandler.Init(aTxFrame->GetHeaderLength(),
                                aTxFrame->GetPayloadLength(),
                                tagLength,
-                               nonce,
+                               &nonce,
                                sizeof(nonce));
     packetSecurityHandler.Header(aTxFrame->GetHeader(), aTxFrame->GetHeaderLength());
     packetSecurityHandler.Payload(aTxFrame->GetPayload(), aTxFrame->GetPayload(), aTxFrame->GetPayloadLength());
@@ -315,7 +312,7 @@ void efr32PlatProcessTransmitAesCcm(otRadioFrame *aFrame, const otExtAddress *aE
                        ((securityLevel >= Mac::Frame::SecurityLevel::kSecurityEnc) ? aTxFrame->GetPayload() : NULL),
                        ((securityLevel >= Mac::Frame::SecurityLevel::kSecurityEnc) ? aTxFrame->GetPayloadLength() : 0),
                        aTxFrame->GetPayload(),
-                       nonce,
+                       &nonce,
                        sizeof(nonce),
                        aTxFrame->GetHeader(),
                        aTxFrame->GetHeaderLength(),
