@@ -38,6 +38,9 @@ on:
         description: 'The current date'
         value: ${{ jobs.metadata.outputs.date }}
 
+permissions:
+  contents: read
+
 jobs:
   metadata:
     name: Generate required metadata

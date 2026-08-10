@@ -49,6 +49,9 @@ on:
       DOCKERHUB_PERSONAL_ACCESS_TOKEN:
         description: 'DockerHub personal access token'
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     name: Tag `latest` and publish to DockerHub
