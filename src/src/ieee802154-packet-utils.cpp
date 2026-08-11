@@ -277,28 +277,28 @@ void efr32PlatProcessTransmitAesCcm(otRadioFrame *aFrame, const otExtAddress *aE
     Mac::Frame::SecurityLevel securityLevel;
     Crypto::AesCcm::Nonce     nonce;
     Mac::TxFrame             *aTxFrame = static_cast<Mac::TxFrame *>(aFrame);
+    Mac::Frame::Lengths       lengths;
 
     VerifyOrExit(aTxFrame->GetSecurityEnabled());
 
+    SuccessOrExit(aTxFrame->DetermineLengths(lengths));
     SuccessOrExit(aTxFrame->GetSecurityLevel(securityLevel));
     SuccessOrExit(aTxFrame->GetFrameCounter(frameCounter));
 
     nonce.InitFrom(*static_cast<const Mac::ExtAddress *>(aExtAddress), frameCounter, securityLevel);
 
-    tagLength = aTxFrame->GetFooterLength() - aTxFrame->GetFcsSize();
+    tagLength = lengths.mFooter - aTxFrame->GetFcsSize();
 
 #if defined(RADIOAES_PRESENT)
     TxSecurityProcessing packetSecurityHandler;
 
     packetSecurityHandler.SetKey(aFrame->mInfo.mTxInfo.mAesKey->mKeyMaterial.mKey.m8);
-    packetSecurityHandler.Init(aTxFrame->GetHeaderLength(),
-                               aTxFrame->GetPayloadLength(),
-                               tagLength,
-                               &nonce,
-                               sizeof(nonce));
-    packetSecurityHandler.Header(aTxFrame->GetHeader(), aTxFrame->GetHeaderLength());
-    packetSecurityHandler.Payload(aTxFrame->GetPayload(), aTxFrame->GetPayload(), aTxFrame->GetPayloadLength());
-    packetSecurityHandler.Finalize(aTxFrame->GetFooter());
+    packetSecurityHandler.Init(lengths.mHeader, lengths.mPayload, tagLength, &nonce, sizeof(nonce));
+    packetSecurityHandler.Header(aTxFrame->GetPsdu(), lengths.mHeader);
+    packetSecurityHandler.Payload(aTxFrame->GetPsdu() + lengths.mHeader,
+                                  aTxFrame->GetPsdu() + lengths.mHeader,
+                                  lengths.mPayload);
+    packetSecurityHandler.Finalize(aTxFrame->GetPsdu() + lengths.mHeader + lengths.mPayload);
 
 #elif defined(LPWAES_PRESENT)
     sli_crypto_descriptor_t key_desc;
@@ -306,18 +306,18 @@ void efr32PlatProcessTransmitAesCcm(otRadioFrame *aFrame, const otExtAddress *aE
 
     efr32CreateKeyDesc(aFrame->mInfo.mTxInfo.mAesKey, &key_desc);
 
-    ret =
-        sli_crypto_ccm(&key_desc,
-                       true,
-                       ((securityLevel >= Mac::Frame::SecurityLevel::kSecurityEnc) ? aTxFrame->GetPayload() : NULL),
-                       ((securityLevel >= Mac::Frame::SecurityLevel::kSecurityEnc) ? aTxFrame->GetPayloadLength() : 0),
-                       aTxFrame->GetPayload(),
-                       &nonce,
-                       sizeof(nonce),
-                       aTxFrame->GetHeader(),
-                       aTxFrame->GetHeaderLength(),
-                       aTxFrame->GetPayload() + aTxFrame->GetPayloadLength(),
-                       tagLength);
+    ret = sli_crypto_ccm(
+        &key_desc,
+        true,
+        ((securityLevel >= Mac::Frame::SecurityLevel::kSecurityEnc) ? (aTxFrame->GetPsdu() + lengths.mHeader) : NULL),
+        ((securityLevel >= Mac::Frame::SecurityLevel::kSecurityEnc) ? lengths.mPayload : 0),
+        aTxFrame->GetPsdu() + lengths.mHeader,
+        &nonce,
+        sizeof(nonce),
+        aTxFrame->GetPsdu(),
+        lengths.mHeader,
+        aTxFrame->GetPsdu() + lengths.mHeader + lengths.mPayload,
+        tagLength);
 
     OT_ASSERT(ret == SL_STATUS_OK);
 #endif
@@ -348,8 +348,16 @@ otPanId efr32GetDstPanId(otRadioFrame *aFrame)
 
 uint8_t *efr32GetPayload(otRadioFrame *aFrame)
 {
-    uint8_t *payload = static_cast<Mac::RxFrame *>(aFrame)->GetPayload();
-    return payload;
+    Mac::RxFrame *rxFrame = static_cast<Mac::RxFrame *>(aFrame);
+    FrameData     payload;
+    uint8_t      *result = nullptr;
+
+    if (rxFrame->GetPayload(payload) == OT_ERROR_NONE)
+    {
+        result = const_cast<uint8_t *>(payload.GetBytes());
+    }
+
+    return result;
 }
 
 bool efr32FrameIsPanIdCompressed(otRadioFrame *aFrame)
