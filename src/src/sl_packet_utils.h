@@ -81,15 +81,6 @@ otPanId efr32GetDstPanId(otRadioFrame *aFrame);
 uint8_t *efr32GetPayload(otRadioFrame *aFrame);
 
 /**
- * This function checks if the PAN ID Compression bit is set in the given MAC frame.
- *
- * @param[in]  aFrame       A pointer to the MAC frame buffer.
- *
- * @return true if the PAN ID Compression bit is set, false otherwise.
- */
-bool efr32FrameIsPanIdCompressed(otRadioFrame *aFrame);
-
-/**
  * This function returns the frame version.
  *
  * @param[in]  aFrame       A pointer to the MAC frame buffer.

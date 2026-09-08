@@ -338,10 +338,7 @@ otPanId efr32GetDstPanId(otRadioFrame *aFrame)
 {
     otPanId aPanId = 0xFFFF;
 
-    if (static_cast<Mac::RxFrame *>(aFrame)->IsDstPanIdPresent())
-    {
-        static_cast<Mac::RxFrame *>(aFrame)->GetDstPanId(aPanId);
-    }
+    IgnoreError(static_cast<Mac::RxFrame *>(aFrame)->GetDstPanId(aPanId));
 
     return aPanId;
 }
@@ -360,12 +357,7 @@ uint8_t *efr32GetPayload(otRadioFrame *aFrame)
     return result;
 }
 
-bool efr32FrameIsPanIdCompressed(otRadioFrame *aFrame)
-{
-    return static_cast<Mac::RxFrame *>(aFrame)->IsPanIdCompressed();
-}
-
 uint16_t efr32GetFrameVersion(otRadioFrame *aFrame)
 {
-    return static_cast<Mac::RxFrame *>(aFrame)->GetVersion();
+    return static_cast<uint16_t>(static_cast<Mac::RxFrame *>(aFrame)->GetVersion()) << 12;
 }
