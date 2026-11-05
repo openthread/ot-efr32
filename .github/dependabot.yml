@@ -32,8 +32,14 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    cooldown: # zizmor: ignore[dependabot-cooldown]
+      exclude:
+        - "openthread"
     allow:
       - dependency-name: "openthread"
+    ignore:
+      - dependency-name: "openthread"
+        versions: ["> 0.0.0"]
     commit-message:
       prefix: "submodule"
     rebase-strategy: "disabled"
@@ -42,6 +48,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "github-actions"
     rebase-strategy: "disabled"
