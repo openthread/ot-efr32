@@ -1,5 +1,4 @@
-cmake~=3.26.3
-Jinja2~=3.1.2
-GitPython~=3.1.31
-PyYAML~=6.0
-yapf~=0.40.2
+cmake==3.31.10
+Jinja2==3.1.6
+PyYAML==6.0.3
+yapf==0.43.0
