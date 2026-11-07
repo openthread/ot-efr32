@@ -63,16 +63,35 @@ run_slc()
             set -x
         fi
 
-        IFS=" " read -r -a slc_args <<<"${@}"
-        eval "${slc_cmd}" "${slc_args[*]}"
+        # Prevent host Python virtualenvs or PYTHONPATH from shadowing SLC's
+        # bundled Jep/Jinja2 runtime.
+        if [ -n "${VIRTUAL_ENV-}" ]; then
+            PATH=":${PATH}:"
+            PATH="${PATH//:${VIRTUAL_ENV}\/bin:/:}"
+            PATH="${PATH#:}"
+            PATH="${PATH%:}"
+            export PATH
+        fi
+        unset PYTHONHOME PYTHONPATH VIRTUAL_ENV
+
+        "${slc_cmd}" "$@"
     )
+}
+
+find_slc_executable()
+{
+    if [ -x "${SLC_INSTALL_DIR}/slc_cli/slc" ]; then
+        echo "${SLC_INSTALL_DIR}/slc_cli/slc"
+    elif [ -d "${SLC_INSTALL_DIR}" ]; then
+        find "${SLC_INSTALL_DIR}" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc' -type f | head -n 1
+    fi
 }
 
 # Find the command to use for slc
 slc_init()
 {
     # use_slc_from_path:
-    # 0 - Use slc-cli from ${repo_dir}/third_party/silabs/slc
+    # 0 - Use slc-cli from ${SLC_INSTALL_DIR}
     # 1 - Use slc-cli or slc from PATH
     set -x
 
@@ -81,18 +100,18 @@ slc_init()
     elif [ "$use_slc_from_path" -eq "1" ] && command -v slc-cli; then
         slc_cmd="slc-cli"
     else
-        echo "Searching for 'slc*' executable in '${SLC_INSTALL_DIR}'"
+        echo "Searching for 'slc' executable in '${SLC_INSTALL_DIR}'"
 
         # Find the slc executable
-        slc_cmd=$(find "${SLC_INSTALL_DIR}" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f | head -n 1)
+        slc_cmd="$(find_slc_executable)"
 
         # Automatically download slc if not found
         if [ -z "${slc_cmd}" ]; then
-            echo "-- No 'slc*' executable found. Downloading"
+            echo "-- No 'slc' executable found. Downloading"
             "${repo_dir}"/script/bootstrap_silabs
 
             # Find the slc executable
-            slc_cmd=$(find "${SLC_INSTALL_DIR}" -perm "$([[ $OSTYPE == darwin* ]] && echo '+' || echo '/')"111 -name 'slc*' -type f | head -n 1)
+            slc_cmd="$(find_slc_executable)"
         fi
 
     fi
@@ -102,7 +121,7 @@ slc_init()
 cleanup()
 {
     if [ "$?" -eq "14" ]; then
-        echo "Please make sure Java 11 installed and the JAVA_11_HOME environment variable is set."
+        echo "Please make sure Java 21 is installed and on PATH."
     fi
 }
 

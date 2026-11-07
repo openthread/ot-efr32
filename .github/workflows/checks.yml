@@ -46,20 +46,22 @@ permissions:
 jobs:
 
   pretty:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         submodules: true
+        persist-credentials: false
     - name: Bootstrap
       run: |
-        sudo rm /etc/apt/sources.list.d/* && sudo apt-get update
-        wget https://apt.llvm.org/llvm.sh
+        sudo apt-get update
+        wget --timeout=30 --tries=4 https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
         sudo ./llvm.sh 19 all # 19.1.7 required for openthread
         sudo apt-get --no-install-recommends install -y shellcheck
-        python3 -m pip install yapf==0.29.0
+        python3 -m pip install --break-system-packages yapf==0.43.0
         sudo snap install shfmt
+        npm install prettier@2.0.4
     - name: Check
       run: |
         script/make-pretty check
@@ -68,6 +70,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
     - uses: umbrelladocs/action-linkspector@568ec8d29fa92b31fd9ea5381e155c51e922af83 # v1.5.5
       env:
         PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome

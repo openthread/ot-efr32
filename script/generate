@@ -48,12 +48,10 @@ source "${repo_dir}/script/slc_cli"
 source "${repo_dir}/script/util"
 
 # ==============================================================================
-trust_sdk_and_extensions()
+collect_extension_dirs()
 {
-    # TODO: Figure out a way to skip the trust command if the SDK or extensions are already trusted
-
-    # List of dirs containing SDK extensions to trust
-    # NOTE: this list must only contain absolute paths since it will be used to generate symlinks
+    # List of dirs containing SDK extensions
+    # NOTE: this list must only contain absolute paths
     extension_dirs=(
         # ot-efr32 extension
         "${repo_dir}"
@@ -70,19 +68,26 @@ trust_sdk_and_extensions()
             *)
                 # relative path
                 vendor_extension_abs_path=$(realpath "$(pwd)/${VENDOR_EXTENSION}")
-                if [ ! -d "${vendor_extension_abs_path}" ]; then
-                    set +x
-                    echo "VENDOR_EXTENSION=${VENDOR_EXTENSION}"
-                    echo "script_dir=${script_dir}"
-                    echo "vendor_extension_abs_path=${vendor_extension_abs_path}"
-                    echo "ERROR: '${vendor_extension_abs_path}' does not exist"
-                    exit 5
-                fi
                 ;;
         esac
 
+        if [ ! -d "${vendor_extension_abs_path}" ]; then
+            set +x
+            echo "VENDOR_EXTENSION=${VENDOR_EXTENSION}"
+            echo "script_dir=${script_dir}"
+            echo "vendor_extension_abs_path=${vendor_extension_abs_path}"
+            echo "ERROR: '${vendor_extension_abs_path}' does not exist"
+            exit 5
+        fi
+
         extension_dirs+=("${vendor_extension_abs_path}")
     fi
+}
+
+trust_sdk_and_extensions()
+{
+    # TODO: Figure out a way to skip the trust command if the SDK or extensions are already trusted
+    collect_extension_dirs
 
     set +x
     echo "======================================================================"
@@ -200,7 +205,22 @@ generate()
         exit
     fi
 
-    trust_sdk_and_extensions
+    local sdk_flag=""
+    local slc_verbosity="1"
+    if run_slc generate --help 2>&1 | grep -q -- '--sdk-package-path'; then
+        collect_extension_dirs
+        local package_dirs=("${sdk_dir}" "${extension_dirs[@]}")
+        local sdk_package_path
+        sdk_package_path="$(
+            IFS=","
+            echo "${package_dirs[*]}"
+        )"
+        sdk_flag="--sdk-package-path=${sdk_package_path}"
+        slc_verbosity="INFO"
+    else
+        trust_sdk_and_extensions
+        sdk_flag="--sdk=${sdk_dir?}"
+    fi
 
     local yaml_export_templates="${repo_dir}/third_party/silabs/slc/exporter_templates/yaml"
     set +x
@@ -215,10 +235,10 @@ generate()
     echo "======================================================================"
     set -x
 
-    run_slc -v 1 generate \
+    run_slc -v "${slc_verbosity}" generate \
         -data "${openthread_slc_data?}" \
         --cache-home "${build_dir}/slc/slcc_components.cache" \
-        --sdk="${sdk_dir?}" \
+        "${sdk_flag}" \
         --clear-cache \
         --project-file="${slcp}" \
         --project-name="${project_name}" \
@@ -258,7 +278,10 @@ cleanup()
     if [ "$HOME" = "/" ]; then
         if [ $ret_status -ne 0 ]; then
             echo "Checking slc logs..."
-            find "${SLC_INSTALL_DIR}"/slc_cli/bin/slc-cli/configuration/ -type f -name "*.log" -exec cat {} +
+            local slc_log_dir="${SLC_INSTALL_DIR}/slc_cli/bin/slc-cli/configuration"
+            if [ -d "${slc_log_dir}" ]; then
+                find "${slc_log_dir}" -type f -name "*.log" -exec cat {} +
+            fi
         fi
     fi
 

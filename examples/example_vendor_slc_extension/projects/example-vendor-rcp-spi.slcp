@@ -34,14 +34,19 @@ category: OpenThread Examples
 quality: production
 
 component:
+  - id: ot_headers
+    from: ot-efr32
+  - id: ot_stack_features_config
+    from: ot-efr32
+  - id: ot_serial_efr32
+    from: ot-efr32
   - id: sl_main
   - id: sl_main_custom_main
   - id: ot_platform_abstraction_core
   - id: ot_mbedtls
-  - id: ot_stack_features_config
-    from: ot-efr32
   - id: ot_ncp_spidrv
   - id: rail_util_pti
+  - id: clock_manager
   - id: ot_reset_utils
 
 configuration:
@@ -59,3 +64,7 @@ configuration:
 define:
   - name: OPENTHREAD_RADIO
     value: 1
+
+sdk_extension:
+  - id: ot-efr32
+    version: 0.0.1

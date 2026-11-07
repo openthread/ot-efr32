@@ -46,20 +46,75 @@ install_slc_cli()
 {
     [ -n "${SLC_INSTALL_DIR-}" ] || SLC_INSTALL_DIR="${repo_dir}/slc"
 
-    # Install slc-cli
-    local os_type
+    local slc_version="${SLC_CLI_VERSION:-6.0.25}"
+    local slc_python_version="${SLC_PYTHON_VERSION:-3.10.4}"
+    local base_url="https://updates.silabs.com/studio/v6/updates/update_site/archives"
+    local arch
+    arch="$(uname -m)"
+
+    local slc_archive=""
+    local python_archive=""
     if [[ $OSTYPE == "linux"* ]]; then
-        os_type="linux"
+        case "${arch}" in
+            x86_64 | amd64)
+                slc_archive="slc-cli.linux.gtk.x86_64.zip"
+                python_archive="python.${slc_python_version}.gtk.linux.x86_64.zip"
+                ;;
+            aarch64 | arm64)
+                slc_archive="slc-cli.linux.gtk.aarch64.zip"
+                python_archive="python.${slc_python_version%.*}.gtk.linux.aarch64.zip"
+                ;;
+            *)
+                echo >&2 "Unsupported Linux architecture: ${arch}"
+                exit 1
+                ;;
+        esac
     elif [[ $OSTYPE == "darwin"* ]]; then
-        os_type="mac"
+        case "${arch}" in
+            x86_64)
+                slc_archive="slc-cli.macosx.cocoa.x86_64.zip"
+                python_archive="python.${slc_python_version}.cocoa.macosx.x86_64.zip"
+                ;;
+            arm64 | aarch64)
+                slc_archive="slc-cli.macosx.cocoa.aarch64.zip"
+                python_archive="python.${slc_python_version}.cocoa.macosx.aarch64.zip"
+                ;;
+            *)
+                echo >&2 "Unsupported macOS architecture: ${arch}"
+                exit 1
+                ;;
+        esac
+    else
+        echo >&2 "Unsupported OS type: ${OSTYPE}"
+        exit 1
     fi
 
-    local zip_url="https://www.silabs.com/documents/public/software/slc_cli_${os_type}.zip"
+    local slc_url="${base_url}/slc-cli/${slc_version}/${slc_archive}"
+    local python_url="${base_url}/python/${slc_python_version}/${python_archive}"
+
     mkdir -p "${SLC_INSTALL_DIR}"
     pushd "${SLC_INSTALL_DIR}"
+
     local zip_path="./slc_cli.zip"
-    wget "${zip_url}" -O "${zip_path}"
-    unzip -q -o "${zip_path}" -d "$(dirname ${zip_path})" && rm "${zip_path}"
+    wget --tries 4 --timeout 30 "${slc_url}" -O "${zip_path}"
+    unzip -q -o "${zip_path}" -d "$(dirname "${zip_path}")" && rm "${zip_path}"
+
+    # SLC 6.x splits its Jep/Jinja2 Python runtime into a separate adapter pack.
+    local slc_ini=""
+    slc_ini="$(find "${SLC_INSTALL_DIR}/slc_cli" -name 'slc-cli.ini' -type f | head -n 1)"
+    if [ -z "${slc_ini}" ]; then
+        echo >&2 "Failed to locate slc-cli.ini under ${SLC_INSTALL_DIR}/slc_cli"
+        exit 1
+    fi
+
+    local adapter_packs_dir
+    adapter_packs_dir="$(dirname "${slc_ini}")/developer/adapter_packs"
+    mkdir -p "${adapter_packs_dir}"
+
+    local python_zip_path="./slc_python.zip"
+    wget --tries 4 --timeout 30 "${python_url}" -O "${python_zip_path}"
+    unzip -q -o "${python_zip_path}" -d "${adapter_packs_dir}" && rm "${python_zip_path}"
+
     popd
 
     # Link if root

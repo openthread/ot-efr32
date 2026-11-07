@@ -84,7 +84,7 @@ install_packages_brew()
         git-lfs
         grep
         ninja
-        openjdk@17
+        openjdk@21
         unzip
         wget
     )
@@ -98,7 +98,13 @@ install_packages_source()
 
 install_packages_pip3()
 {
-    pip3 install --no-cache-dir --upgrade -r "${repo_dir}/requirements.txt"
+    local pip_args=(--no-cache-dir --upgrade)
+
+    if [ -z "${VIRTUAL_ENV-}" ] && pip3 install --help | grep -q -- '--break-system-packages'; then
+        pip_args+=(--break-system-packages)
+    fi
+
+    pip3 install "${pip_args[@]}" -r "${repo_dir}/requirements.txt"
 }
 
 install_packages()
