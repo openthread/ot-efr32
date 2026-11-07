@@ -33,11 +33,10 @@ from pathlib import Path
 import copy
 import yaml
 import argparse
-import os
 
 
-def prepare_path(path: str) -> str:
-    if type(path) is not str:
+def prepare_path(path: str, base_dir: Path, repo_root_dir: Path) -> str:
+    if not isinstance(path, str):
         return path
 
     # Remove any leading '-I' flag
@@ -46,15 +45,28 @@ def prepare_path(path: str) -> str:
     # Replace back-slashes with forward-slashes
     path = path.replace('\\', '/')
 
-    # Escape spaces
-    path = path.replace(' ', '\\ ')
-
-    # Strip outer quotes
+    # Strip outer quotes before resolving relative paths
     if path.startswith('"') and path.endswith('"'):
         path = path.strip('"')
 
+    # Convert relative extension paths emitted with --sdk-package-path
+    if path == ".." or path.startswith("../"):
+        resolved_path = (base_dir / path).resolve()
+        if resolved_path.is_relative_to(repo_root_dir):
+            rel_path = resolved_path.relative_to(repo_root_dir).as_posix()
+            path = "${PROJECT_SOURCE_DIR}" if rel_path == "." else f"${{PROJECT_SOURCE_DIR}}/{rel_path}"
+        else:
+            path = resolved_path.as_posix()
+
+    # Escape spaces
+    path = path.replace(' ', '\\ ')
+
     # Replace SDK_PATH with SILABS_SDK_DIR
     path = path.replace('(SDK_PATH)', '{SILABS_SDK_DIR}')
+
+    # Normalize SDK-relative and legacy symlink extension paths to repo root
+    path = path.replace('${SILABS_SDK_DIR}/../../..', '${PROJECT_SOURCE_DIR}')
+    path = path.replace('${SILABS_SDK_DIR}/extension/ot-efr32', '${PROJECT_SOURCE_DIR}')
 
     # Redirect OpenThread stack sources to the ot-efr32 openthread submodule #}
     path = path.replace('${SILABS_SDK_DIR}/util/third_party/openthread', '${PROJECT_SOURCE_DIR}/openthread')
@@ -159,6 +171,10 @@ for key in ["EXT_LD_FLAGS", "EXT_DEBUG_LD_FLAGS"]:
     flags = slc_vars[key]
     slc_vars[key] = list(filter(f, flags))
 
+script_dir: Path = Path(__file__).resolve().parent
+repo_root: Path = script_dir.parent
+slc_vars_yaml_dir: Path = Path(args.slc_vars_yaml).resolve().parent
+
 # Do some general cleaning up of paths
 keys_to_prepare = [
     "C_CXX_INCLUDES",
@@ -168,17 +184,16 @@ keys_to_prepare = [
 ]
 for key in keys_to_prepare:
     value = slc_vars[key]
-    if type(value) is list:
-        for i in range(len(slc_vars[key])):
-            path = value[i]
-            value[i] = prepare_path(path)
-    elif type(value) is dict:
+    if isinstance(value, list):
+        for i, path in enumerate(value):
+            value[i] = prepare_path(path, slc_vars_yaml_dir, repo_root)
+    elif isinstance(value, dict):
         for k, v in value.items():
-            value[k] = prepare_path(v)
+            value[k] = prepare_path(v, slc_vars_yaml_dir, repo_root)
 
 # Remove None values
 for key in slc_vars:
-    if type(slc_vars[key]) is list:
+    if isinstance(slc_vars[key], list):
         slc_vars[key] = list(filter(lambda item: item, slc_vars[key]))
 
 # Separate mbedtls sources
@@ -210,8 +225,6 @@ platform_lib_vars = filter_platform_lib_vars(slc_vars)
 mbedtls_lib_vars = filter_mbedtls_lib_vars(slc_vars)
 
 # Define CMakeLists.txt template location
-script_dir: Path = Path(os.path.dirname(os.path.abspath(__file__)))
-repo_root: Path = script_dir.parent
 environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(f"{repo_root}/third_party/silabs/slc/exporter_templates/platform_library"))
 platform_lib_template: jinja2.Template = environment.get_template("CMakeLists.txt.jinja")
@@ -222,7 +235,6 @@ platform_lib_content = platform_lib_template.render(platform_lib_vars)
 mbedtls_lib_content = mbedtls_lib_template.render(mbedtls_lib_vars)
 
 # Output rendered files
-slc_vars_yaml_dir: Path = Path(args.slc_vars_yaml).parent
 platform_lib_output_file: Path = slc_vars_yaml_dir / "CMakeLists.txt"
 with open(platform_lib_output_file, mode="w", encoding="utf-8") as message:
     message.write(platform_lib_content)
