@@ -325,7 +325,7 @@ static inline uint64_t GetPendingTime(otInstance *aInstance)
 {
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
     efr32Iid_t currentIid = (efr32Iid_t)efr32GetIidFromInstance(aInstance);
-    OT_ASSERT(currentIid <= OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_NUM);
+    OT_ASSERT(currentIid != EFR32_IID_BCAST && currentIid <= OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_NUM);
     return sPendingTimeMs[currentIid - 1];
 #else
     OT_UNUSED_VARIABLE(aInstance);
@@ -337,7 +337,7 @@ static inline void SetPendingTime(otInstance *aInstance, uint64_t aPendingTime)
 {
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
     efr32Iid_t currentIid = (efr32Iid_t)efr32GetIidFromInstance(aInstance);
-    OT_ASSERT(currentIid <= OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_NUM);
+    OT_ASSERT(currentIid != EFR32_IID_BCAST && currentIid <= OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_NUM);
     sPendingTimeMs[currentIid - 1] = aPendingTime;
 #else
     OT_UNUSED_VARIABLE(aInstance);
@@ -347,14 +347,22 @@ static inline void SetPendingTime(otInstance *aInstance, uint64_t aPendingTime)
 
 static inline AlarmHandle *GetAlarmHandle(AlarmHandle *aHandleList, otInstance *aInstance)
 {
-    AlarmHandle *alarmHandle = aHandleList;
+    AlarmHandle *alarmHandle = NULL;
 #if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
-    efr32Iid_t currentIid = (efr32Iid_t)efr32GetIidFromInstance(aInstance);
-    OT_ASSERT(currentIid <= OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_NUM);
+    efr32Iid_t currentIid;
+#endif
+
+    otEXPECT(aInstance != NULL);
+
+#if OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE
+    currentIid = (efr32Iid_t)efr32GetIidFromInstance(aInstance);
+    otEXPECT(currentIid != EFR32_IID_BCAST && currentIid <= OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_NUM);
     alarmHandle = aHandleList + ((uint8_t)(currentIid - 1));
 #else
-    OT_UNUSED_VARIABLE(aInstance);
+    alarmHandle = aHandleList;
 #endif
+
+exit:
     return alarmHandle;
 }
 
@@ -367,12 +375,12 @@ static AlarmHandle *GetNextFiredAlarm(AlarmHandle *aAlarm, const AlarmHandle *aA
 {
     AlarmHandle *nextAlarm = aAlarm;
 
-    while (nextAlarm && nextAlarm->mFiredCount == 0 && nextAlarm < aAlarmEnd)
+    while (nextAlarm != NULL && nextAlarm < aAlarmEnd && nextAlarm->mFiredCount == 0)
     {
         nextAlarm++;
     }
 
-    if (nextAlarm >= aAlarmEnd)
+    if (nextAlarm != NULL && nextAlarm >= aAlarmEnd)
     {
         nextAlarm = NULL;
     }
@@ -478,10 +486,14 @@ exit:
 
 uint64_t efr32AlarmPendingTime(otInstance *aInstance)
 {
-    uint64_t remaining = GetPendingTime(aInstance);
-    uint32_t now       = otPlatAlarmMilliGetNow();
+    uint64_t     remaining = 0;
+    uint32_t     now;
+    AlarmHandle *alarm = GetAlarmHandle(sMsAlarmHandles, aInstance);
 
-    otEXPECT_ACTION(GetAlarmHandle(sMsAlarmHandles, aInstance)->mIsRunning, remaining = 0);
+    otEXPECT(alarm != NULL && alarm->mIsRunning);
+
+    remaining = GetPendingTime(aInstance);
+    now       = otPlatAlarmMilliGetNow();
 
     if (remaining > now)
     {
@@ -494,7 +506,9 @@ exit:
 
 bool efr32AlarmIsRunning(otInstance *aInstance)
 {
-    return (otInstanceIsInitialized(aInstance) ? GetAlarmHandle(sMsAlarmHandles, aInstance)->mIsRunning : false);
+    AlarmHandle *alarm = GetAlarmHandle(sMsAlarmHandles, aInstance);
+
+    return (alarm != NULL) ? alarm->mIsRunning : false;
 }
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
@@ -527,18 +541,30 @@ uint16_t otPlatTimeGetXtalAccuracy(void)
 void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 {
     AlarmHandle *alarm = GetAlarmHandle(sMsAlarmHandles, aInstance);
-    if (alarm->mThreadInstance == NULL)
-    {
-        alarm->mThreadInstance = aInstance;
-    }
+
+    OT_ASSERT(alarm != NULL);
+    otEXPECT(alarm != NULL);
+
+    alarm->mThreadInstance = aInstance;
 
     SetPendingTime(aInstance, (uint64_t)aT0 + (uint64_t)aDt);
     CORE_ATOMIC_SECTION(StartAlarmAt(alarm, aT0, aDt);)
+
+exit:
+    return;
 }
 
 void otPlatAlarmMilliStop(otInstance *aInstance)
 {
-    CORE_ATOMIC_SECTION(StopActiveAlarm(GetAlarmHandle(sMsAlarmHandles, aInstance));)
+    AlarmHandle *alarm = GetAlarmHandle(sMsAlarmHandles, aInstance);
+
+    OT_ASSERT(alarm != NULL);
+    otEXPECT(alarm != NULL);
+
+    CORE_ATOMIC_SECTION(StopActiveAlarm(alarm);)
+
+exit:
+    return;
 }
 
 uint32_t otPlatAlarmMicroGetNow(void)
@@ -570,15 +596,27 @@ uint64_t otPlatTimeGet(void)
 void otPlatAlarmMicroStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 {
     AlarmHandle *alarm = GetAlarmHandle(sUsAlarmHandles, aInstance);
-    if (alarm->mThreadInstance == NULL)
-    {
-        alarm->mThreadInstance = aInstance;
-    }
+
+    OT_ASSERT(alarm != NULL);
+    otEXPECT(alarm != NULL);
+
+    alarm->mThreadInstance = aInstance;
 
     CORE_ATOMIC_SECTION(StartAlarmAt(alarm, aT0, aDt);)
+
+exit:
+    return;
 }
 
 void otPlatAlarmMicroStop(otInstance *aInstance)
 {
-    CORE_ATOMIC_SECTION(StopActiveAlarm(GetAlarmHandle(sUsAlarmHandles, aInstance));)
+    AlarmHandle *alarm = GetAlarmHandle(sUsAlarmHandles, aInstance);
+
+    OT_ASSERT(alarm != NULL);
+    otEXPECT(alarm != NULL);
+
+    CORE_ATOMIC_SECTION(StopActiveAlarm(alarm);)
+
+exit:
+    return;
 }
