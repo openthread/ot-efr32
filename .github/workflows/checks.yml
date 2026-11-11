@@ -58,9 +58,8 @@ jobs:
         wget --timeout=30 --tries=4 https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
         sudo ./llvm.sh 19 all # 19.1.7 required for openthread
-        sudo apt-get --no-install-recommends install -y shellcheck
+        sudo apt-get --no-install-recommends install -y shellcheck shfmt
         python3 -m pip install --break-system-packages yapf==0.43.0
-        sudo snap install shfmt
         npm install prettier@2.0.4
     - name: Check
       run: |
