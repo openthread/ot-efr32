@@ -48,8 +48,10 @@ install_packages_apt()
     # Install dependencies
     sudo apt-get update
     apt_packages=(
+        ca-certificates
         ccache
         coreutils
+        curl
         git
         git-lfs
         openjdk-21-jre-headless
@@ -133,6 +135,11 @@ install_arm_toolchain()
     local url=${1-"https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi.tar.xz"}
     local extract_dir=${2-"arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi"}
     local toolchain_dir=${3-""}
+    local mirror_url=${4-""}
+
+    if [ -z "${mirror_url}" ] && [[ ${url} == https://developer.arm.com/-/media/Files/* ]]; then
+        mirror_url="https://armkeil.blob.core.windows.net/developer/Files/${url#https://developer.arm.com/-/media/Files/}"
+    fi
 
     # If toolchain_dir is not provided, use /opt if root, else use ~/.local
     if [ -z "${toolchain_dir}" ]; then
@@ -152,13 +159,36 @@ install_arm_toolchain()
 
     echo 'Installing GNU ARM Embedded Toolchain...'
 
-    # Download
+    # Download and extract with mirror fallback
     local tarball=gcc-arm.tar.xz
-    mkdir -p "${toolchain_dir}/${extract_dir}"
-    wget --tries 4 --no-check-certificate --quiet "${url}" -O "${toolchain_dir}/${tarball}"
+    local urls=("${url}")
+    local success=false
+    local download_url
 
-    # Extract
-    tar xf "${toolchain_dir}/${tarball}" --directory "${toolchain_dir}/${extract_dir}" --strip-components=1
+    if [ -n "${mirror_url}" ]; then
+        urls+=("${mirror_url}")
+    fi
+
+    for download_url in "${urls[@]}"; do
+        rm -rf "${toolchain_dir:?}/${tarball:?}" "${toolchain_dir:?}/${extract_dir:?}"
+        mkdir -p "${toolchain_dir}/${extract_dir}"
+
+        if curl --proto '=https' --tlsv1.2 -fsSL --retry 2 --retry-delay 2 --retry-max-time 80 \
+            --connect-timeout 15 --max-time 75 --speed-limit 1048576 --speed-time 15 \
+            -o "${toolchain_dir}/${tarball}" "${download_url}" \
+            && tar xf "${toolchain_dir}/${tarball}" --directory "${toolchain_dir}/${extract_dir}" --strip-components=1; then
+            success=true
+            break
+        fi
+
+        echo "WARNING: failed to download or extract from ${download_url}" >&2
+    done
+
+    if [ "${success}" = false ]; then
+        echo "ERROR: failed to download or extract GNU ARM Embedded Toolchain" >&2
+        rm -rf "${toolchain_dir:?}/${tarball:?}" "${toolchain_dir:?}/${extract_dir:?}"
+        exit 1
+    fi
 
     # Link if root
     if [ "$EUID" -eq 0 ]; then
