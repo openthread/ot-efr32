@@ -66,14 +66,55 @@ jobs:
         script/make-pretty check
 
   markdown-link-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
-    - uses: umbrelladocs/action-linkspector@568ec8d29fa92b31fd9ea5381e155c51e922af83 # v1.5.5
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version: 24
+        package-manager-cache: false
+    - name: Bootstrap
       env:
         PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
-      with:
-        github_token: ${{ secrets.github_token }}
-        fail_level: error
+        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
+      run: |
+        sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+        for attempt in 1 2 3; do
+          if npm install -g @umbrelladocs/linkspector@0.5.6; then
+            break
+          fi
+          if [ "$attempt" -eq 3 ]; then
+            exit 1
+          fi
+          sleep 10
+        done
+        wget --timeout=30 --tries=4 -O /tmp/reviewdog.tar.gz https://github.com/reviewdog/reviewdog/releases/download/v0.21.0/reviewdog_0.21.0_Linux_x86_64.tar.gz
+        sudo tar -xzf /tmp/reviewdog.tar.gz -C /usr/local/bin reviewdog
+        rm -f /tmp/reviewdog.tar.gz
+    - name: Run linkspector
+      env:
+        PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        for attempt in 1 2 3; do
+          linkspector_exit=0
+          linkspector check -c .linkspector.yml -j > /tmp/linkspector.rdjson || linkspector_exit=$?
+          if [ "$linkspector_exit" -eq 0 ]; then
+            break
+          fi
+          if [ "$attempt" -lt 3 ]; then
+            echo "Linkspector check failed (attempt ${attempt}/3); retrying in 10s..." >&2
+            sleep 10
+          fi
+        done
+        if [ ! -s /tmp/linkspector.rdjson ]; then
+          exit "${linkspector_exit:-1}"
+        fi
+        reviewdog -f=rdjson \
+          -name=Linkspector \
+          -reporter=github-check \
+          -filter-mode=added \
+          -fail-level=error \
+          -level=error < /tmp/linkspector.rdjson
