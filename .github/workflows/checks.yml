@@ -53,13 +53,13 @@ jobs:
         submodules: true
         persist-credentials: false
     - name: Bootstrap
+      timeout-minutes: 10
+      shell: bash ./openthread/script/retry {0}
       run: |
         sudo apt-get update
-        wget --timeout=30 --tries=4 https://apt.llvm.org/llvm.sh
-        chmod +x llvm.sh
-        sudo ./llvm.sh 19 all # 19.1.7 required for openthread
         sudo apt-get --no-install-recommends install -y shellcheck shfmt
-        python3 -m pip install --break-system-packages yapf==0.43.0
+        sudo bash openthread/script/install-llvm.sh
+        python3 -m pip install --break-system-packages --retries 5 --timeout 30 yapf==0.43.0
         npm install prettier@2.0.4
     - name: Check
       run: |
