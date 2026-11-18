@@ -48,6 +48,7 @@ install_packages_apt()
     # Install dependencies
     sudo apt-get update
     apt_packages=(
+        bzip2
         ca-certificates
         ccache
         coreutils
@@ -132,80 +133,190 @@ do_bootstrap_silabs()
 
 install_arm_toolchain()
 {
-    local url=${1-"https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi.tar.xz"}
-    local extract_dir=${2-"arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi"}
-    local toolchain_dir=${3-""}
-    local mirror_url=${4-""}
+    local installer="${repo_dir}/openthread/script/install-arm-toolchain.sh"
+    local dest_dir=""
+    local host_os
 
-    if [ -z "${mirror_url}" ] && [[ ${url} == https://developer.arm.com/-/media/Files/* ]]; then
-        mirror_url="https://armkeil.blob.core.windows.net/developer/Files/${url#https://developer.arm.com/-/media/Files/}"
+    if [[ ${1-} == "-h" || ${1-} == "--help" ]]; then
+        cat <<'EOF'
+Usage:
+  script/bootstrap arm_toolchain [<version> [<dest_dir>]]
+  script/bootstrap arm_toolchain <url> [<extract_dir> [<toolchain_dir> [<mirror_url>]]]
+EOF
+        exit 0
     fi
 
-    # If toolchain_dir is not provided, use /opt if root, else use ~/.local
-    if [ -z "${toolchain_dir}" ]; then
-        if [ "$EUID" -eq 0 ]; then
-            toolchain_dir=/opt
-        else
-            toolchain_dir="${HOME}/.local"
-        fi
-    fi
-
-    # Check if the toolchain is already present at the desired location
-    if command -v "${toolchain_dir}/${extract_dir}/bin/arm-none-eabi-gcc"; then
-        echo "'arm-none-eabi-gcc' found. Skipping GNU ARM Embedded toolchain install"
-        "${toolchain_dir}"/"${extract_dir}"/bin/arm-none-eabi-gcc --version
-        return
-    fi
-
-    echo 'Installing GNU ARM Embedded Toolchain...'
-
-    # Download and extract with mirror fallback
-    local tarball=gcc-arm.tar.xz
-    local urls=("${url}")
-    local success=false
-    local download_url
-
-    if [ -n "${mirror_url}" ]; then
-        urls+=("${mirror_url}")
-    fi
-
-    for download_url in "${urls[@]}"; do
-        rm -rf "${toolchain_dir:?}/${tarball:?}" "${toolchain_dir:?}/${extract_dir:?}"
-        mkdir -p "${toolchain_dir}/${extract_dir}"
-
-        if curl --proto '=https' --tlsv1.2 -fsSL --retry 2 --retry-delay 2 --retry-max-time 80 \
-            --connect-timeout 15 --max-time 75 --speed-limit 1048576 --speed-time 15 \
-            -o "${toolchain_dir}/${tarball}" "${download_url}" \
-            && tar xf "${toolchain_dir}/${tarball}" --directory "${toolchain_dir}/${extract_dir}" --strip-components=1; then
-            success=true
-            break
-        fi
-
-        echo "WARNING: failed to download or extract from ${download_url}" >&2
-    done
-
-    if [ "${success}" = false ]; then
-        echo "ERROR: failed to download or extract GNU ARM Embedded Toolchain" >&2
-        rm -rf "${toolchain_dir:?}/${tarball:?}" "${toolchain_dir:?}/${extract_dir:?}"
+    if [[ ! -f ${installer} ]]; then
+        echo >&2 "ERROR: missing toolchain installer '${installer}'. Ensure the openthread submodule is initialized."
         exit 1
     fi
 
+    if [[ ${1-} == https://* || ${1-} == http://* ]]; then
+        if [[ $# -gt 4 ]]; then
+            echo >&2 "Usage: $0 arm_toolchain <url> [<extract_dir> [<toolchain_dir> [<mirror_url>]]]"
+            exit 128
+        fi
+
+        local url="$1"
+        local extract_dir="arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi"
+        local toolchain_dir="${3-}"
+        local mirror_url="${4-}"
+
+        if [[ $# -ge 2 ]]; then
+            extract_dir="$2"
+        fi
+
+        case "${extract_dir}" in
+            "" | "." | ".." | /* | */. | */.. | */../* | ../*)
+                echo >&2 "ERROR: invalid extract_dir '${extract_dir}'"
+                exit 128
+                ;;
+        esac
+
+        if [[ -z ${toolchain_dir} ]]; then
+            if [[ ${EUID} -eq 0 ]]; then
+                toolchain_dir="/opt"
+            else
+                toolchain_dir="${HOME}/.local"
+            fi
+        elif [[ ${toolchain_dir} == -* ]]; then
+            echo >&2 "ERROR: invalid toolchain_dir '${toolchain_dir}'"
+            exit 128
+        fi
+
+        while [[ ${toolchain_dir} == */ && ${toolchain_dir} != "/" ]]; do
+            toolchain_dir="${toolchain_dir%/}"
+        done
+        if [[ ${toolchain_dir} == "/" ]]; then
+            dest_dir="/${extract_dir}"
+        else
+            dest_dir="${toolchain_dir}/${extract_dir}"
+        fi
+
+        local args=(--url "${url}")
+        if [[ -n ${mirror_url} ]]; then
+            args+=(--mirror-url "${mirror_url}")
+        fi
+        args+=("${dest_dir}")
+
+        bash "${installer}" "${args[@]}"
+    else
+        if [[ $# -gt 2 ]]; then
+            echo >&2 "Usage: $0 arm_toolchain [<version> [<dest_dir>]]"
+            exit 128
+        fi
+
+        local version="12.2.Rel1"
+        if [[ $# -ge 1 ]]; then
+            if [[ -z $1 ]]; then
+                echo >&2 "ERROR: toolchain version must not be empty"
+                exit 128
+            fi
+            version="$1"
+        fi
+
+        case "${version}" in
+            -* | */* | "." | "..")
+                echo >&2 "ERROR: invalid toolchain version '${version}'"
+                exit 128
+                ;;
+        esac
+
+        if [[ $# -eq 2 ]]; then
+            if [[ -z $2 || $2 == -* ]]; then
+                echo >&2 "ERROR: invalid destination directory '$2'"
+                exit 128
+            fi
+            dest_dir="$2"
+        elif [[ ${EUID} -eq 0 ]]; then
+            dest_dir="/opt/arm-gnu-toolchain-${version}"
+        else
+            dest_dir="${HOME}/.local/arm-gnu-toolchain-${version}"
+        fi
+
+        host_os="$(uname -s)"
+        case "${host_os}" in
+            Linux)
+                bash "${installer}" "${version/.Rel/.rel}" "${dest_dir}"
+                ;;
+            Darwin)
+                local darwin_arch
+                local darwin_ver=""
+                local darwin_url
+
+                darwin_arch="$(uname -m)"
+                case "${darwin_arch}" in
+                    x86_64)
+                        darwin_arch="x86_64"
+                        ;;
+                    arm64 | aarch64)
+                        darwin_arch="arm64"
+                        ;;
+                    *)
+                        echo >&2 "ERROR: unsupported macOS architecture '${darwin_arch}'"
+                        exit 1
+                        ;;
+                esac
+
+                case "${version}" in
+                    11 | 11.3 | 11.3.rel1 | 11.3.Rel1)
+                        [[ ${darwin_arch} == "x86_64" ]] || {
+                            echo >&2 "ERROR: Arm toolchain '${version}' on macOS is only available for x86_64"
+                            exit 1
+                        }
+                        darwin_ver="11.3.rel1"
+                        ;;
+                    12 | 12.2 | 12.2.rel1 | 12.2.Rel1)
+                        darwin_ver="12.2.rel1"
+                        ;;
+                    12.3 | 12.3.rel1 | 12.3.Rel1)
+                        darwin_ver="12.3.rel1"
+                        ;;
+                    13 | 13.3 | 13.3.rel1 | 13.3.Rel1)
+                        darwin_ver="13.3.rel1"
+                        ;;
+                    14 | 14.2 | 14.2.rel1 | 14.2.Rel1)
+                        darwin_ver="14.2.rel1"
+                        ;;
+                    15 | 15.2 | 15.2.rel1 | 15.2.Rel1)
+                        [[ ${darwin_arch} == "arm64" ]] || {
+                            echo >&2 "ERROR: Arm toolchain '${version}' on macOS is only available for arm64"
+                            exit 1
+                        }
+                        darwin_ver="15.2.rel1"
+                        ;;
+                    *)
+                        echo >&2 "ERROR: unsupported Arm toolchain version '${version}' on macOS; pass an archive URL instead"
+                        exit 1
+                        ;;
+                esac
+
+                darwin_url="https://developer.arm.com/-/media/Files/downloads/gnu/${darwin_ver}/binrel/arm-gnu-toolchain-${darwin_ver}-darwin-${darwin_arch}-arm-none-eabi.tar.xz"
+                bash "${installer}" --url "${darwin_url}" "${dest_dir}"
+                ;;
+            *)
+                echo >&2 "ERROR: unsupported host OS '${host_os}'; pass an archive URL instead"
+                exit 1
+                ;;
+        esac
+    fi
+
+    dest_dir="$(realpath "${dest_dir}")"
+
     # Link if root
-    if [ "$EUID" -eq 0 ]; then
-        ln -s -f "${toolchain_dir}"/"${extract_dir}"/bin/* /usr/local/bin/
+    if [[ ${EUID} -eq 0 ]]; then
+        mkdir -p /usr/local/bin
+        ln -s -f "${dest_dir}"/bin/* /usr/local/bin/
         ls -alh /usr/local/bin/arm*
     else
         set +x
         echo ""
         echo "The bootstrap script was run without sudo"
         echo ""
-        echo "Make sure to add '${toolchain_dir}/${extract_dir}/bin/' to PATH"
+        echo "Make sure to add '${dest_dir}/bin/' to PATH"
         echo ""
         set -x
     fi
-
-    # Cleanup
-    rm -rf "${toolchain_dir:?}/${tarball:?}"
 }
 
 main()

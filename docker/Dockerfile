@@ -16,6 +16,8 @@ RUN apt-get update && \
 # Copy scripts
 COPY  ./script/bootstrap \
       ./script/
+COPY  ./openthread/script/install-arm-toolchain.sh \
+      ./openthread/script/
 
 # Install system packages and ARM toolchain
 RUN ./script/bootstrap packages && rm -rf /var/lib/apt/lists/*
